@@ -1,0 +1,13 @@
+Django==4.0.4
+environs==9.5.0
+psycopg2-binary==2.9.3
+requests==2.27.1
+djangorestframework==3.13.1
+beautifulsoup4==4.11.1
+stix2-elevator==4.1.7
+stix2==3.0.1
+django-filter==22.1
+drf-yasg==1.21.4
+flatdict==4.0.1
+django-debug-toolbar==3.7.0
+django-rest-swagger==2.2.0

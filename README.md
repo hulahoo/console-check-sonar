@@ -17,17 +17,17 @@ API для Консоли Управления, куда ходит Веб-ин�
 
 ## Информаци о ENV-параметрах
 Имеющиеся env-параметры в проекте:
-    ```
-    DEBUG=
+```
+DEBUG=
 
-    POSTGRES_SERVER=
-    POSTGRES_PASSWORD=
-    POSTGRES_USER=
-    POSTGRES_DB=
-    POSTGRES_PORT=
-    
-    SWAGGER=(bool)
-    ```
+POSTGRES_SERVER=
+POSTGRES_PASSWORD=
+POSTGRES_USER=
+POSTGRES_DB=
+POSTGRES_PORT=
+
+SWAGGER=(bool)
+```
 
 ## Информация о файлах конфигурации
 ```text

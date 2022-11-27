@@ -39,7 +39,7 @@ psvc:
   publishAPI: true
 
 vaultSecretKeys:
-  - g
+  - POSTGRES_PASSWORD
   - POSTGRES_USER
 
 strategyType: Recreate

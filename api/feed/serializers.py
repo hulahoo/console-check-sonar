@@ -7,3 +7,10 @@ class FeedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed
         exclude = []
+
+
+class DashboardFeedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feed
+        fields = ['name', 'ts']
+        exclude = []

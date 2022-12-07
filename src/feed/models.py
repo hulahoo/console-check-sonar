@@ -24,19 +24,19 @@ class Feed(BaseModel):
     """
 
     type_of_feed = models.CharField(
-        "Тип фида", max_length=13, choices=TypesEnum.choices(), default=TypesEnum.IP
+        "Тип фида", max_length=13, default=TypesEnum.IP.value
     )
     format_of_feed = models.CharField(
-        "Формат фида", max_length=15, choices=FeedFormatEnum.choices(), default=FeedFormatEnum.TXT_FILE
+        "Формат фида", max_length=15, default=FeedFormatEnum.TXT_FILE.value
     )
     auth_type = models.CharField(
-        "Тип авторизации", max_length=7, choices=AuthEnum.choices(), default=AuthEnum.NO_AUTH
+        "Тип авторизации", max_length=7, default=AuthEnum.NO_AUTH.value
     )
     polling_frequency = models.CharField(
         "Частота обновления фида",
         max_length=17,
         choices=PollingFrequencyEnum.choices(),
-        default=PollingFrequencyEnum.NEVER,
+        default=PollingFrequencyEnum.NEVER.value,
     )
 
     auth_login = models.CharField(
@@ -45,7 +45,7 @@ class Feed(BaseModel):
     auth_password = models.CharField(
         "Пароль для авторизации", max_length=64, blank=True, null=True
     )
-    ayth_querystring = models.CharField(
+    auth_querystring = models.CharField(
         "Строка для авторизации", max_length=128, blank=True, null=True
     )
     separator = models.CharField(
@@ -73,7 +73,7 @@ class Feed(BaseModel):
     )
 
     update_status = models.CharField(
-        max_length=15, choices=StatusUpdateEnum.choices(), default=StatusUpdateEnum.ENABLED
+        max_length=15, choices=StatusUpdateEnum.choices(), default=StatusUpdateEnum.ENABLED.value
     )
 
     ts = models.DateTimeField(auto_now_add=True)

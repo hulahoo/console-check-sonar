@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 from rest_framework.pagination import PageNumberPagination
 
 from src.indicator.models import Indicator
-from api.indicator.filters import IndicatorFilter
+from api.indicator.filters import IndicatorFilter, DashboardFilter
 from api.indicator.serializers import IndicatorSerializer, IndicatorWithFeedsSerializer
 
 
@@ -19,4 +19,4 @@ class Dashboard(viewsets.ModelViewSet):
     serializer_class = IndicatorWithFeedsSerializer
     queryset = Indicator.objects.all().prefetch_related('feeds')
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = IndicatorFilter
+    filterset_class = DashboardFilter

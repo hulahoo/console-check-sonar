@@ -157,10 +157,11 @@ class Indicator(BaseModel):
     def __str__(self):
         return f"{self.value}"
 
-    @classmethod
-    def get_model_fields(cls):
-        return {i.attname: list(i.class_lookups.keys()) for i in cls._meta.fields}
+    # @classmethod
+    # def get_model_fields(cls):
+    #     return {i.attname: list(i.class_lookups.keys()) for i in cls._meta.fields}
 
     class Meta:
         verbose_name = "Индикатор"
         verbose_name_plural = "Индикаторы"
+    

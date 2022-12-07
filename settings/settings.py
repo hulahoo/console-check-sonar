@@ -26,8 +26,9 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'drf_yasg',
+    "django_filters",
     "rest_framework",
-    "rest_framework_swagger"
 ]
 
 LOCAL_APPS = [

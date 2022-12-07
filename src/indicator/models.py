@@ -12,7 +12,7 @@ class Indicator(BaseModel):
     """
 
     type = models.CharField(
-        "Тип индикатора", max_length=13, choices=TypesEnum.choices(), default=TypesEnum.IP
+        "Тип индикатора", max_length=13, default=TypesEnum.IP.value
     )
     uuid = models.CharField(
         "Уникальный идентификатор индикатора", unique=True, max_length=255
@@ -164,4 +164,3 @@ class Indicator(BaseModel):
     class Meta:
         verbose_name = "Индикатор"
         verbose_name_plural = "Индикаторы"
-    

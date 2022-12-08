@@ -4,6 +4,7 @@ from setuptools import setup
 install_requires = [
     ('Django', '4.0.4'),
     ('django-filter', '22.1'),
+    ('django-cors-headers', '3.13.0')
     ('drf-yasg', '1.21.4'),
     ('django-rest-swagger', '2.2.0')
     ('pydantic', '1.10.2'),

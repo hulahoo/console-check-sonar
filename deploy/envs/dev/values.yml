@@ -38,6 +38,33 @@ psvc:
       zones: external
   publishAPI: true
 
+spec:
+  ports:
+    - name: api
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+
+  livenessProbe:
+      failureThreshold: 5
+      httpGet:
+        path: 0.0.0.0:8080/api/health/liveness
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+
+  readinessProbe:
+    failureThreshold: 3
+    httpGet:
+      path: 0.0.0.0:8080/api/health/readiness
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 1
+
 vaultSecretKeys:
   - POSTGRES_PASSWORD
   - POSTGRES_USER

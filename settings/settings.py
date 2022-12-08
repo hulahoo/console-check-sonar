@@ -29,6 +29,7 @@ THIRD_PARTY_APPS = [
     'drf_yasg',
     "django_filters",
     "rest_framework",
+    'corsheaders',
 ]
 
 LOCAL_APPS = [
@@ -134,3 +135,10 @@ AUTH_USER_MODEL = "users.User"
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost",
+    "http://localhost:8080",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1",
+]

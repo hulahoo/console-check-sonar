@@ -10,14 +10,13 @@ resources:
 
 env:
   # app
-  DEBUG="True"
-  SWAGGER="True"
+  DEBUG: True
+  SWAGGER: True
 
   # db
-  POSTGRES_SERVER="10.7.77.7"
-  POSTGRES_DB="mydb"
-  POSTGRES_PORT="5432"
-
+  POSTGRES_SERVER: 10.7.77.7
+  POSTGRES_DB: mydb
+  POSTGRES_PORT: 5432
 
 psvc:
   name: Сервис представления событийнных данных
@@ -29,39 +28,6 @@ psvc:
     requests:
       memory: 50Mi
       cpu: 10m
-  roleMapping:
-    - endpoint: /api/v1/todo-lists
-      roles: admin
-      methods: GET,POST
-      zones: external
-  publishAPI: true
-
-spec:
-  ports:
-    - name: api
-      port: 8080
-      protocol: TCP
-      targetPort: 8080
-
-  livenessProbe:
-      failureThreshold: 5
-      httpGet:
-        path: 0.0.0.0:8080/api/health/liveness
-        port: 8080
-      initialDelaySeconds: 10
-      periodSeconds: 5
-      successThreshold: 1
-      timeoutSeconds: 1
-
-  readinessProbe:
-    failureThreshold: 3
-    httpGet:
-      path: 0.0.0.0:8080/api/health/readiness
-      port: 8080
-    initialDelaySeconds: 10
-    periodSeconds: 5
-    successThreshold: 1
-    timeoutSeconds: 1
 
 vaultSecretKeys:
   - POSTGRES_PASSWORD
@@ -74,8 +40,3 @@ databases:
     host: 10.7.77.7
     port: 5432
     name: mydb
-
-kafkaClusters:
-  cluster-1:
-    topics:
-      syslog:

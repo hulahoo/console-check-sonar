@@ -14,6 +14,15 @@ class IndicatorSerializer(serializers.ModelSerializer):
         exclude = []
 
 
+class CustomSerializer(serializers.ModelSerializer):
+    data = IndicatorSerializer()
+
+    class Meta:
+        model = Indicator
+        fields = ['data']
+        exclude = []
+
+
 class MatchedIndicatorSerializer(serializers.ModelSerializer):
     detected_count = serializers.IntegerField()
 
@@ -25,11 +34,12 @@ class MatchedIndicatorSerializer(serializers.ModelSerializer):
 
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
     feeds = DashboardFeedSerializer(many=True, read_only=True)
-    # name = django_filters.CharFilter(field_name='feeds__name', lookup_expr='iexact')
+
+    # name = serializers.CharField(feeds.name)
     # ts = django_filters.DateTimeFilter(field_name='feeds__ts', lookup_expr='iexact')
     class Meta:
         model = Indicator
-        fields = ['feeds', 'id', 'false_detected', 'positive_detected']
+        fields = ['false_detected', 'positive_detected', 'feeds']
         exclude = []
 
     @staticmethod

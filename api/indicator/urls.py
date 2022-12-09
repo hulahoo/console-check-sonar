@@ -10,5 +10,5 @@ urlpatterns = [
     path(r'statistics/matched-indicators', views.MatchedIndicatorStatiscList.as_view(), name='indicator_matched'),
     path(r'statistics/matched-objects', views.MatchedObjectsStatiscList.as_view(), name='objects_matched'),
     path(r'statistics/checked-objects', views.CheckedObjectsStatiscList.as_view(), name='objects_checked'),
-    path(r'statistics/feeds-intersections', views.FeedStatiscList.as_view(), name="feeds_intersections"),
+    path(r'statistics/feeds-intersections', views.FeedsIntersectionList.as_view(), name="feeds_intersections"),
 ]

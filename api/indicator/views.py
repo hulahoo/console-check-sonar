@@ -2,38 +2,47 @@ import collections
 
 from django.db import connection
 from django.db.models import Count, Sum
+from django.http import JsonResponse
 from django_filters import rest_framework as filters
 from rest_framework import generics, viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from api.indicator.filters import DashboardFilter, IndicatorFilter
-from api.indicator.serializers import (IndicatorSerializer,
+from api.indicator.serializers import (DataIndicatorSerializer,
                                        IndicatorWithFeedsSerializer,
-                                       MatchedIndicatorSerializer)
+                                       MatchedIndicatorSerializer, IndicatorSerializer)
+from src.feed.models import Feed
 from src.indicator.models import Indicator
 from src.source.models import Source
-from src.feed.models import Feed
 
 
 class IndicatorStatiscList(generics.ListAPIView):
     queryset = Indicator.objects.all()
     serializer_class = IndicatorSerializer
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return JsonResponse({"data": serializer.data})
+
     def get_queryset(self):
         return (Indicator.objects
                 .values('type', 'detected')
                 .annotate(checked_count=Count('type'), detected_count=Sum('detected'))
                 .order_by('type'))
-    # filter_backends = (filters.DjangoFilterBackend,)
-    # filterset_class = IndicatorFilter
 
 
 class FeedStatiscList(generics.ListAPIView):
     pagination_class = PageNumberPagination
     serializer_class = IndicatorWithFeedsSerializer
     queryset = Indicator.objects.all().prefetch_related('feeds')
-    # filter_backends = (filters.DjangoFilterBackend,)import collections
-    # filterset_class = DashboardFilter
 
 
 class MatchedIndicatorStatiscList(generics.ListAPIView):
@@ -97,8 +106,11 @@ class CheckedObjectsStatiscList(generics.ListAPIView):
 
 
 class FeedsIntersectionList(generics.ListAPIView):
-    # queryset = Source.objects.prefetch_related('feeds')
-    # serializer_class = MatchedIndicatorSerializer
+    serializer_class = MatchedIndicatorSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return JsonResponse({"data": queryset})
 
     def get_queryset(self):
         with connection.cursor() as cursor:
@@ -115,23 +127,19 @@ class FeedsIntersectionList(generics.ListAPIView):
                 dict(zip(columns, row))
                 for row in cursor.fetchall()
             ]
+            sources_ind: dict = collections.defaultdict(list)
+            intersect_weight: dict = collections.defaultdict(dict)
             for item in data:
                 indicators = [i for i in data if i['source_id'] == item['source_id']]
                 sum_ind = collections.Counter(item["indicator_id"] for item in indicators)
+                sources_ind[item.get('source_name')] = dict(sum_ind)
 
-        return 
-
-    def get(self, request, * args, **kwargs):
-        sources = self.get_queryset()
-        res: dict = collections.defaultdict(list)
-        for source in sources:
-            new_sources = sources.copy()
-            new_sources.pop(source)
-            for new_source in new_sources:
-                list1 = set(source.feeds)
-                list2 = set(new_source.feeds)
-                inter = list1 & list2 
-                data = len(inter) / len(source) * 100
-                res[source.name] = data
-
-        return 
+        for source, _ in sorted(sources_ind.items()):
+            new_sources_ind = list(sources_ind.keys())
+            new_sources_ind.remove(source)
+            a = set(sources_ind.get(source).keys())
+            for src in new_sources_ind:
+                b = set(sources_ind.get(src).keys())
+                c = a.intersection(b)
+                intersect_weight[source].update({src: len(c) / len(a) * 100})
+        return intersect_weight

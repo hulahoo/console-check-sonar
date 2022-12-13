@@ -1,0 +1,16 @@
+[
+    {
+        "model": "users.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$320000$DtqxZXn8wxKnh2nUa5PWVA$AOLq8aPiEEYkqjnL5V9FihmTX6Vi6IDsEiY3O2qfjWY=",
+            "last_login": null,
+            "is_superuser": false,
+            "created": "2022-12-13T12:29:09.922Z",
+            "modified": "2022-12-13T12:29:10.132Z",
+            "username": "test",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]

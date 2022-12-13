@@ -37,7 +37,7 @@ class MatchedIndicatorSerializer(serializers.ModelSerializer):
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
     feeds = DashboardFeedSerializer(many=True, read_only=True)
 
-    #name = serializers.CharField(source='feeds.name')
+    # name = serializers.CharField(feeds.name)
     # ts = django_filters.DateTimeFilter(field_name='feeds__ts', lookup_expr='iexact')
     class Meta:
         model = Indicator

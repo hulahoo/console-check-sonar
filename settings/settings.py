@@ -27,8 +27,9 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'drf_yasg',
-    "django_filters",
-    "rest_framework",
+    'django_filters',
+    'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
 
@@ -37,7 +38,8 @@ LOCAL_APPS = [
     "src.indicator.apps.IndicatorConfig",
     "src.source.apps.SourceConfig",
     "src.tag.apps.TagConfig",
-    "src.users.apps.UsersConfig"
+    "src.users.apps.UsersConfig",
+    "src.statistics.apps.StatisticsConfig"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -57,6 +59,14 @@ if DEBUG:
     THIRD_PARTY_MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 MIDDLEWARE = THIRD_PARTY_MIDDLEWARE + DJANGO_MIDDLEWARE
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
 
 SWAGGER = env("SWAGGER")
 if SWAGGER:

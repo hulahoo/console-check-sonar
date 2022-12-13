@@ -110,3 +110,6 @@ venv.bak/
 .vscode
 *poetry.lock*
 */static*/
+migrations/
+static/
+.idea/

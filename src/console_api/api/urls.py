@@ -6,6 +6,6 @@ urlpatterns = [
     path("statistics/", include("api.statistics.urls")),
     path("source/", include("api.source.urls")),
     path("tag/", include("api.tag.urls")),
-    path("users/", include("api.users.urls")),
+    path("", include("api.users.urls")),
     path("api/", include("api.system.urls"))
 ]

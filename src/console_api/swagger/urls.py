@@ -34,7 +34,7 @@ schema_view = get_schema_view(
     ),
     patterns=[
         path("api/statistics/", include("api.statistics.urls")),
-        path("api/users/", include("api.users.urls")),
+        path("api/", include("api.users.urls")),
     ],
 )
 
@@ -105,7 +105,7 @@ urlpatterns = [
     #     name="schema-api-ui",
     # ),
     path(
-        "docs/",
+        "api/doc/",
         schema_view.with_ui("swagger", cache_timeout=0),  # noqa
         name="schema-api-ui",
     )

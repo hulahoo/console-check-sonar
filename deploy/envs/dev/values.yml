@@ -47,4 +47,3 @@ links:
     targetServiceId: console-api
     endpointMapping:
   - endpointAlias: /api
-  - endpointAlias: /docs

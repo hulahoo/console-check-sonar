@@ -8,7 +8,16 @@ API для Консоли Управления, куда ходит Веб-ин�
 
 - Запустить создание статических файлов
     ```
-    python3 mamage.py collectstatic
+    python3 src/manage.py collectstatic
+    python3 src/manage.py makemigrations
+    python3 src/manage.py makemigrations feed
+    python3 src/manage.py makemigrations indicator
+    python3 src/manage.py makemigrations source
+    python3 src/manage.py makemigrations tag
+    python3 src/manage.py makemigrations users
+    python3 src/manage.py migrate
+    python3 src/manage.py loaddata fixt_user.json
+    python3 mamage.py runserver
     ```
 - Запуск приложения
     ```

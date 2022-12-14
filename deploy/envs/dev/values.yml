@@ -40,3 +40,11 @@ databases:
     host: 10.7.77.7
     port: 5432
     name: mydb
+
+links:
+  - targetProtocol: HTTP
+    targetInformationSystemId: threat-intelligence
+    targetServiceId: console-api
+    endpointMapping:
+  - endpointAlias: /api
+  - endpointAlias: /docs

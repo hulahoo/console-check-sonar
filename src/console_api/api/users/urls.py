@@ -10,7 +10,7 @@ from api.users import views
 # urlpatterns = router.urls
 
 urlpatterns = [
-    path('register/', views.RegisterUserAPIView.as_view()),
+    # path('register/', views.RegisterUserAPIView.as_view()),
     path('sessions/', views_auth.obtain_auth_token),
     path('logout/', views.Logout.as_view()),
 ]

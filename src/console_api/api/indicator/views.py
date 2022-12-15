@@ -1,6 +1,6 @@
 from django.db.models import Count, Sum
 from django.http import JsonResponse
-from rest_framework import generics
+from rest_framework import generics, viewsets
 
 from api.indicator.serializers import IndicatorSerializer
 
@@ -27,3 +27,16 @@ class IndicatorStatiscList(generics.ListAPIView):
                 .values('type', 'detected')
                 .annotate(checked_count=Count('type'), detected_count=Sum('detected'))
                 .order_by('type'))
+
+
+class IndicatorCreateView(viewsets.ModelViewSet):
+    authentication_classes = ()
+    permission_classes = []
+    serializer_class = IndicatorSerializer
+    queryset = Indicator.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        super(IndicatorCreateView, self).create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        super(IndicatorCreateView, self).update(request, *args, **kwargs)

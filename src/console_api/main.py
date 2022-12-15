@@ -1,8 +1,15 @@
 import os
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.settings")
+
+import django
+django.setup()
+
+from django.core.management import call_command
+
 
 def execute():
     """
-    Function run entrypoint file:
+    Function apply migrations:
     """
-    os.popen('sh ./entrypoint.sh')
+    call_command('migrate')

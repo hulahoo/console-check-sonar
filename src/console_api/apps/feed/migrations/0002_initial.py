@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL("CREATE TABLE IF NOT EXISTS 'indicator_feed_relationships' ('id' SERIAL NOT NULL PRIMARY KEY, 'created_at' TIMESTAMP NOT NULL, 'deleted_at' TIMESTAMP NOT NULL, 'feed_id' INTEGER REFERENCES feed(id), 'indicator_id' INTEGER REFERENCES indicators(id)"),
+        migrations.RunSQL('CREATE TABLE IF NOT EXISTS indicator_feed_relationships (id SERIAL NOT NULL PRIMARY KEY, created_at TIMESTAMP NOT NULL, deleted_at TIMESTAMP NOT NULL, indicator_id INTEGER REFERENCES indicators(id), feed_id INTEGER REFERENCES feeds(id));'),
         migrations.AddField(
             model_name='feed',
             name='parsing_rules',

@@ -1,6 +1,7 @@
 import requests
 
-from apps.feed.models import Feed
+from console_api.config.log_conf import logger
+from console_api.apps.feed.models import Feed
 
 
 def get_url(url) -> str:
@@ -10,7 +11,7 @@ def get_url(url) -> str:
     try:
         received_data = requests.get(url).text
     except Exception as e:
-        raise Exception(f"Возникла ошибка при получении данных: {e}")
+        logger.error(f"Error is: {e}")
     return received_data
 
 

@@ -1,9 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from apps.tag.models import Tag
-from apps.common.enums import TypesEnum
-from apps.models.abstract import BaseModel
+from console_api.apps.tag.models import Tag
+from console_api.apps.common.enums import TypesEnum
+from console_api.apps.models.abstract import BaseModel
 
 
 class Indicator(BaseModel):
@@ -156,10 +156,6 @@ class Indicator(BaseModel):
 
     def __str__(self):
         return f"{self.value}"
-
-    # @classmethod
-    # def get_model_fields(cls):
-    #     return {i.attname: list(i.class_lookups.keys()) for i in cls._meta.fields}
 
     class Meta:
         verbose_name = "Индикатор"

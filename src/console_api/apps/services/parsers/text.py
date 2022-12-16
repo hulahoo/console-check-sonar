@@ -1,6 +1,7 @@
 from uuid import uuid4
 
-from apps.indicator.models import Indicator
+from console_api.config.log_conf import logger
+from console_api.apps.indicator.models import Indicator
 
 
 def convert_txt_to_indicator(feed, raw_indicators=None):
@@ -31,7 +32,7 @@ def parse_free_text(feed, raw_indicators=None, config: dict = {}):
     try:
         raw_indicators.remove("")
     except Exception as e:
-        raise Exception(f"Error is: {e}")
+        logger.info(f"Error is: {e}")
     raw_indicators = [
         ioc.replace("\r", "") for ioc in raw_indicators if not ioc.startswith("#")
     ]

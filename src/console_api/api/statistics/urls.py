@@ -1,6 +1,6 @@
 from django.urls import path
 
-from api.statistics import views
+from console_api.api.statistics import views
 
 urlpatterns = [
     path(r'feeds', views.FeedStatiscList.as_view(), name='feed_stat'),

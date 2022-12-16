@@ -3,8 +3,9 @@ from uuid import uuid4
 
 from stix2elevator import elevate
 
-from apps.indicator.models import Indicator
-from apps.services.ext import get_url, feed_control
+from console_api.config.log_conf import logger
+from console_api.apps.indicator.models import Indicator
+from console_api.apps.services.ext import get_url, feed_control
 
 
 def get_or_elevate(feed) -> dict:
@@ -15,10 +16,14 @@ def get_or_elevate(feed) -> dict:
     try:
         return json.loads(text)
     except Exception as e:
-        return elevate(text, f"Error is: {e}")
+        logger.info(f"Error is: {e}")
+        return elevate(text)
 
 
-def parse_stix(feed, raw_indicators=None, config: dict = {}):
+def parse_stix(
+    feed,
+    raw_indicators=None, config: dict = {}
+):
     """
     Парсит переданный json в формате STIX и отдает список индикаторов.
     """

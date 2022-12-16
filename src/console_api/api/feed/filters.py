@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from apps.feed.models import Feed
+from console_api.apps.feed.models import Feed
 
 
 class FeedFilter(filters.FilterSet):

@@ -6,11 +6,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django_filters import rest_framework as filters
 
-from apps.feed.models import Feed
-from api.feed.forms import FeedForm
-from api.feed.filters import FeedFilter
-from api.feed.serializers import FeedSerializer
-from apps.services.format_selector import choose_type
+from console_api.apps.feed.models import Feed
+from console_api.api.feed.forms import FeedForm
+from console_api.api.feed.filters import FeedFilter
+from console_api.api.feed.serializers import FeedSerializer
+from console_api.apps.services.format_selector import choose_type
 
 
 def feed_add(request):

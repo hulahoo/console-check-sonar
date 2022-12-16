@@ -1,7 +1,7 @@
 import sys
 import logging
 
-logger = logging.getLogger('gateway')
+logger = logging.getLogger('console_api')
 logger.setLevel(logging.DEBUG)
 
 console = logging.StreamHandler(sys.stdout)

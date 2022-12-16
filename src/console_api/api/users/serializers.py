@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from apps.users.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
+from console_api.apps.users.models import User
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,9 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from apps.models.abstract import BaseModel
-from apps.indicator.models import Indicator
-from apps.common.enums import (
+from console_api.apps.models.abstract import BaseModel
+from console_api.apps.indicator.models import Indicator
+from console_api.apps.common.enums import (
     TypesEnum, FeedFormatEnum, AuthEnum, PollingFrequencyEnum, StatusUpdateEnum
 )
 

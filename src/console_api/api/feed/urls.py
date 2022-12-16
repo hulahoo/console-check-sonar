@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework import routers
 
-from api.feed import views
+from console_api.api.feed import views
 
 router = routers.SimpleRouter()
 router.register(r'feeds', views.FeedListView)

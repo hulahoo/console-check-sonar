@@ -1,7 +1,8 @@
 import os
-from django.core.management import call_command
-import django
 import subprocess
+
+import django
+from django.core.management import call_command
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.settings")
 

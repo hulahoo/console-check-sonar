@@ -4,7 +4,8 @@ import subprocess
 import django
 from django.core.management import call_command
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.settings")
+# CHECK THIS
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "console_api.settings.settings")
 
 django.setup()
 

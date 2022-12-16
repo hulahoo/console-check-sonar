@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from config.log_conf import logger
+
+from console_api.config.log_conf import logger
+# from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 
 @api_view(["GET"])
@@ -19,6 +21,20 @@ def liveness():
     """
     logger.info("Liveness checking started")
     return Response({"status": "UP"})
+
+# TODO
+# @app.route('/metrics', methods=["GET"])
+# def metrics():
+#     """
+#     Возвращает метрики сервиса
+#     """
+#     return app.response_class(
+#         response=generate_latest(),
+#         status=200,
+#         mimetype='text/plain',
+#         content_type=CONTENT_TYPE_LATEST
+#     )
+
 
 
 @api_view(["GET"])
@@ -122,3 +138,4 @@ def api_routes():
             },
         }
     })
+

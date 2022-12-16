@@ -7,5 +7,5 @@ urlpatterns = [
     path("source/", include("api.source.urls")),
     path("tag/", include("api.tag.urls")),
     path("", include("api.users.urls")),
-    path("api/", include("api.system.urls"))
+    path("", include("api.system.urls"))
 ]

@@ -10,6 +10,7 @@ install_requires = [
     ('beautifulsoup4', '4.11.1'),
     ('stix2-elevator', '4.1.7'),
     ('stix2', '3.0.1'),
+    ('prometheus-client', '0.15.0'),
     ('django-filter', '22.1'),
     ('drf-yasg', '1.21.4'),
     ('flatdict', '4.0.1'),

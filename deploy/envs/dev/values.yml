@@ -26,4 +26,4 @@ links:
     targetInformationSystemId: threat-intelligence
     targetServiceId: console-api
     endpointMapping:
-  - endpointAlias: /api
+    - endpointAlias: /api

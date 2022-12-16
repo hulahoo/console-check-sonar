@@ -34,12 +34,12 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "apps.feed.apps.FeedConfig",
-    "apps.indicator.apps.IndicatorConfig",
-    "apps.source.apps.SourceConfig",
-    "apps.tag.apps.TagConfig",
-    "apps.users.apps.UsersConfig",
-    "apps.statistics.apps.StatisticsConfig"
+    "console_api.apps.feed.apps.FeedConfig",
+    "console_api.apps.indicator.apps.IndicatorConfig",
+    "console_api.apps.source.apps.SourceConfig",
+    "console_api.apps.tag.apps.TagConfig",
+    "console_api.apps.users.apps.UsersConfig",
+    "console_api.apps.statistics.apps.StatisticsConfig"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

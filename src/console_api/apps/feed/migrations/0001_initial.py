@@ -3,7 +3,7 @@
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
-import apps.models.abstract
+import console_api.apps.models.abstract
 
 
 class Migration(migrations.Migration):
@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('indicator', '__first__'),
         ('source', '__first__'),
     ]
 
@@ -20,8 +19,8 @@ class Migration(migrations.Migration):
             name='ParsingRule',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', apps.models.abstract.CreationDateTimeField(auto_now_add=True, verbose_name='создано')),
-                ('modified', apps.models.abstract.ModificationDateTimeField(auto_now=True, verbose_name='изменено')),
+                ('created', console_api.apps.models.abstract.CreationDateTimeField(auto_now_add=True, verbose_name='создано')),
+                ('modified', console_api.apps.models.abstract.ModificationDateTimeField(auto_now=True, verbose_name='изменено')),
             ],
             options={
                 'verbose_name': 'Правило парсинга',
@@ -32,8 +31,8 @@ class Migration(migrations.Migration):
             name='Feed',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', apps.models.abstract.CreationDateTimeField(auto_now_add=True, verbose_name='создано')),
-                ('modified', apps.models.abstract.ModificationDateTimeField(auto_now=True, verbose_name='изменено')),
+                ('created', console_api.apps.models.abstract.CreationDateTimeField(auto_now_add=True, verbose_name='создано')),
+                ('modified', console_api.apps.models.abstract.ModificationDateTimeField(auto_now=True, verbose_name='изменено')),
                 ('type_of_feed', models.CharField(choices=[('EMAIL_FROM', 'FEMA'), ('EMAIL_SUBJECT', 'SEMA'), ('MD5_HASH', 'MD5H'), ('SHA1_HASH', 'SHA1'), ('SHA256_HASH', 'SHA2'), ('IP', 'IPAD'), ('URL', 'URLS'), ('DOMAIN', 'DOMN'), ('FILENAME', 'FILE'), ('REGISTRY', 'REGS')], default='IPAD', max_length=13, verbose_name='Тип фида')),
                 ('format_of_feed', models.CharField(choices=[('CSV_FILE', 'CSV'), ('JSON_FILE', 'JSON'), ('XML_FILE', 'XML'), ('TXT_FILE', 'TXT')], default='TXT', max_length=15, verbose_name='Формат фида')),
                 ('auth_type', models.CharField(choices=[('NO_AUTH', 'NAU'), ('API', 'API'), ('BASIC', 'BSC')], default='NAU', max_length=7, verbose_name='Тип авторизации')),

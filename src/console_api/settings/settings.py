@@ -97,9 +97,9 @@ WSGI_APPLICATION = 'console_api.settings.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        "NAME": env("POSTGRES_DB"),
-        "USER": env("POSTGRES_USER"),
-        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "NAME": env("APP_POSTGRESQL_NAME"),
+        "USER": env("APP_POSTGRESQL_USER"),
+        "PASSWORD": env("APP_POSTGRESQL_PASSWORD"),
         "HOST": env("APP_POSTGRESQL_HOST"),
         "PORT": env("APP_POSTGRESQL_PORT")
 

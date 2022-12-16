@@ -73,7 +73,7 @@ if SWAGGER:
     THIRD_PARTY_APPS.append('drf_yasg')
 
 
-ROOT_URLCONF = 'settings.urls'
+ROOT_URLCONF = 'console_api.settings.urls'
 
 TEMPLATES = [
     {
@@ -91,7 +91,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'settings.wsgi.application'
+WSGI_APPLICATION = 'console_api.settings.wsgi.application'
 
 
 DATABASES = {

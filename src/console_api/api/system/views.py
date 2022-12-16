@@ -6,7 +6,7 @@ from console_api.config.log_conf import logger
 
 
 @api_view(["GET"])
-def readiness():
+def readiness(request):
     """
     Текущее состояние готовности сервиса
     """
@@ -15,7 +15,7 @@ def readiness():
 
 
 @api_view(["GET"])
-def liveness():
+def liveness(request):
     """
     Возвращает информацию о работоспособности сервиса
     """
@@ -23,7 +23,7 @@ def liveness():
     return Response({"status": "UP"})
 
 @api_view(["GET"])
-def metrics():
+def metrics(request):
     """
     Возвращает метрики сервиса
     """
@@ -31,7 +31,7 @@ def metrics():
 
 
 @api_view(["GET"])
-def api_routes():
+def api_routes(request):
     return Response({
         "openapi:": "3.0.0",
         "info": {
@@ -49,7 +49,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/sessions/": {
+            "/console/sessions/": {
                 "post": {
                     "description": "Создать Новую Сессию для Пользователя",
                     "responses": {
@@ -59,7 +59,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/logout/": {
+            "/console/logout/": {
                 "get": {
                     "description": "Логаут(Удалить Сессию Пользователя)",
                     "responses": {
@@ -69,7 +69,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/statistics/feeds/": {
+            "/console/statistics/feeds/": {
                 "get": {
                     "description": "Получить Статистику По Фидам",
                     "responses": {
@@ -79,7 +79,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/statistics/indicators/": {
+            "/console/statistics/indicators/": {
                 "get": {
                     "description": "Получить Статистику По Индикаторам",
                     "responses": {
@@ -89,7 +89,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/statistics/matched-indicators/": {
+            "/console/statistics/matched-indicators/": {
                 "get": {
                     "description": "Получить Статистику По Обнаруженным Индикаторам",
                     "responses": {
@@ -99,7 +99,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/statistics/matched-objects/": {
+            "/console/statistics/matched-objects/": {
                 "get": {
                     "description": "Получить Статистику По Обнаруженным Объектам",
                     "responses": {
@@ -109,7 +109,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/statistics/checked-objects/": {
+            "/console/statistics/checked-objects/": {
                 "get": {
                     "description": "ОК",
                     "responses": {
@@ -119,7 +119,7 @@ def api_routes():
                     }
                 }
             },
-            "/api/statistics/feeds-intersections/": {
+            "/console/statistics/feeds-intersections/": {
                 "get": {
                     "description": "Получить Статистику По Пересечениям",
                     "responses": {

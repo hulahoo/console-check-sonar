@@ -13,5 +13,5 @@ def execute():
     """
     Function apply migrations:
     """
-    call_command('migrate')
-    call_command(subprocess.call(['gunicorn', 'console_api.settings.wsgi:application', '--bind 0.0.0.0:8080', '--workers=4']))
+    # call_command('migrate')
+    call_command(subprocess.call(['gunicorn', '-b 0.0.0.0:8080', 'console_api.settings.wsgi:application', '--workers=4']))

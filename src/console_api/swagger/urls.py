@@ -34,7 +34,7 @@ schema_view = get_schema_view(
     ),
     patterns=[
         path("api/statistics/", include("api.statistics.urls")),
-        path("api/users/", include("api.users.urls")),
+        path("api/users/", include("apps.users.urls")),
     ],
 )
 
@@ -56,7 +56,7 @@ user_api_schema_view = get_schema_view(
         description="User API"
     ),
     patterns=[
-        path("api/users/", include("api.users.urls")),
+        path("api/users/", include("apps.users.urls")),
     ],
 )
 

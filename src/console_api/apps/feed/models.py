@@ -8,6 +8,13 @@ from apps.common.enums import (
 )
 
 
+FEED_STATUSES = (
+    ("failed_to_update", "failed-to-update"),
+    ("is_loading", "is-loading"),
+    ("normal", "normal"),
+)
+
+
 class ParsingRule(BaseModel):
     """
     Модель правила для парсинга (CSV)
@@ -19,75 +26,118 @@ class ParsingRule(BaseModel):
 
 
 class Feed(BaseModel):
-    """
-    Модель фида - источника данных.
-    """
+    """Фид - источник данных"""
 
-    type_of_feed = models.CharField(
-        "Тип фида", max_length=13, default=TypesEnum.IP.value
-    )
-    format_of_feed = models.CharField(
-        "Формат фида", max_length=15, default=FeedFormatEnum.TXT_FILE.value
-    )
-    auth_type = models.CharField(
-        "Тип авторизации", max_length=7, default=AuthEnum.NO_AUTH.value
-    )
-    polling_frequency = models.CharField(
-        "Частота обновления фида",
-        max_length=17,
-        choices=PollingFrequencyEnum.choices(),
-        default=PollingFrequencyEnum.NEVER.value,
+    title = models.TextField(
+        "Название Фида",
+        unique=True,
     )
 
-    auth_login = models.CharField(
-        "Логин для авторизации", max_length=32, blank=True, null=True
+    provider = models.TextField(
+        "Название поставщика Фида",
     )
-    auth_password = models.CharField(
-        "Пароль для авторизации", max_length=64, blank=True, null=True
-    )
-    auth_querystring = models.CharField(
-        "Строка для авторизации", max_length=128, blank=True, null=True
-    )
-    separator = models.CharField(
-        "Разделитель для CSV формата", max_length=8, blank=True, null=True
-    )
-    parsing_rules = models.ManyToManyField(
-        ParsingRule,
-        verbose_name="Правила для парсинга",
-        related_name="feed_parsing_rules",
+
+    description = models.TextField(
+        "Описание Фида",
+        null=True,
         blank=True,
     )
-    custom_field = models.CharField(
-        "Кастомное поле", max_length=128, blank=True, null=True
-    )
-    sertificate = models.FileField("Файл сертификат", blank=True, null=True)
-    vendor = models.CharField("Вендор", max_length=32)
-    name = models.CharField("Название фида", max_length=32, unique=True)
-    link = models.CharField("Ссылка на фид", max_length=255)
-    confidence = models.IntegerField(
-        "Достоверность", validators=[MaxValueValidator(100), MinValueValidator(0)]
-    )
-    records_quantity = models.IntegerField("Количество записей", blank=True, null=True)
-    indicators = models.ManyToManyField(
-        Indicator, related_name="feeds", verbose_name="Индикатор", blank=True
+
+    format = models.TextField(
+        "Формат фида",
+        default=FeedFormatEnum.TXT_FILE.value,
     )
 
-    update_status = models.CharField(
-        max_length=15, choices=StatusUpdateEnum.choices(), default=StatusUpdateEnum.ENABLED.value
+    certificate = models.TextField(
+        "Файл сертификат",
+        blank=True,
+        null=True,
     )
 
-    ts = models.DateTimeField(auto_now_add=True)
+    url = models.CharField(
+        "Ссылка на файл Фида",
+        max_length=255,
+    )
 
-    source = models.ForeignKey("source.Source", on_delete=models.SET_NULL, null=True, default=None)
+    auth_type = models.TextField(
+        "Формат фида",
+        help_text="Например: http-basic, api-token",
+        null=True,
+        blank=True,
+    )
 
-    def __str__(self):
-        return f"{self.name}"
+    auth_api_token = models.TextField(
+        "API токен",
+    )
+
+    auth_login = models.TextField(
+        "Логин HTTP Basic Auth",
+    )
+
+    auth_pass = models.TextField(
+        "Пароль HTTP Basic Auth",
+    )
+
+    certificate = models.BinaryField(
+        "Сертификат",
+    )
+
+    use_taxii = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+    )
+
+    polling_frequency = models.TextField(
+        "Частота обновления",
+        help_text="Формат CronTab",
+        # TODO: Добавить Regex
+    )
+
+    weight = models.DecimalField(
+        "Вес фида",
+    )
+
+    available_fields = models.JSONField(
+        "Список доступных полей в индикаторах фида",
+    )
+
+    parsing_rules = models.JSONField(
+        "Настройки парсинга",
+        null=True,
+        blank=True,
+    )
+
+    status = models.TextField(
+        "Статус фида",
+        choices=FEED_STATUSES,
+    )
+
+    is_active = models.BooleanField(
+        "Включен ли фид?",
+        # TODO: уточнить default значение
+        default=False,
+    )
+
+    is_truncating = models.BooleanField(
+        "Включено ли обрезание фида?",
+        # TODO: уточнить default значение
+        default=False,
+    )
+
+    max_records_count = models.DecimalField()
+
+    def __str__(self) -> str:
+        return str(self.title)
 
     @classmethod
     def get_model_fields(cls):
         return [i.attname for i in cls._meta.fields]
 
     class Meta:
+        """Metainformation about the model"""
+
         verbose_name = "Фид"
         verbose_name_plural = "Фиды"
+
         db_table = "feeds"

@@ -61,8 +61,8 @@ class BaseModel(models.Model):
     "created" field and "modified" field.
     """
 
-    created = CreationDateTimeField("создано")
-    modified = ModificationDateTimeField("изменено")
+    created_at = CreationDateTimeField("создано")
+    updated_at = ModificationDateTimeField("изменено")
 
     class Meta:
         get_latest_by = "modified"

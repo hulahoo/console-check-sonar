@@ -4,7 +4,7 @@ from rest_framework.authtoken import views as views_auth
 
 
 urlpatterns = [
-    path("feed/", include("api.feed.urls")),
+    path("feeds", include("api.feed.urls")),
     # path("", include("api.indicator.urls")),
     path("statistics/", include("api.statistics.urls")),
     path("source/", include("api.source.urls")),

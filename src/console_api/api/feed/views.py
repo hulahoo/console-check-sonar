@@ -5,26 +5,31 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django_filters import rest_framework as filters
+from django.views.decorators.csrf import csrf_exempt
 
 from apps.feed.models import Feed
-from api.feed.forms import FeedForm
 from api.feed.filters import FeedFilter
 from api.feed.serializers import FeedSerializer
 from apps.services.format_selector import choose_type
 
-
-def feed_add(request):
-    if request.method == "POST":
-        form = FeedForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponse("Succesfully added!")
-    else:
-        form = FeedForm()
-    return render(request, "form_add.html", {"form": form})
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 
 @api_view(["POST"])
+@csrf_exempt
+def feed_add(request):
+    if request.method == "POST":
+        serializer = FeedSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+
 def feed_create(request):
     data = request.data
     feed = Feed(**data["feed"])

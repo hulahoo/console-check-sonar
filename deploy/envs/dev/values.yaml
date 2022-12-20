@@ -1,6 +1,7 @@
 psvc:
   name: Консоль мониторинга и управления фидов
   description: Консоль мониторинга и управления
+  publishapi: true
 
 replicaCount: 1
 

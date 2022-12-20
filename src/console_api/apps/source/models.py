@@ -1,8 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from apps.models.abstract import BaseModel
-from apps.common.enums import FormatTypeEnum, AuthEnum
+from console_api.apps.models.abstract import BaseModel
+from console_api.apps.common.enums import FormatTypeEnum, AuthEnum
 
 
 class Source(BaseModel):
@@ -38,14 +38,3 @@ class Source(BaseModel):
         verbose_name = 'Источник'
         verbose_name_plural = 'Источники'
         db_table = "sources"
-
-
-# class ActivityType(BaseModel):
-#     name = models.CharField(max_length=255)
-
-
-# class Activity(BaseModel):
-#     indicator = models.ForeignKey('indicator.Indicator', on_delete=models.CASCADE)
-#     activity_type = models.ForeignKey('ActivityType', on_delete=models.DO_NOTHING)
-#     comment = models.TextField()
-#     user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, default=None)

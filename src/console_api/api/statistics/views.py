@@ -6,12 +6,13 @@ from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 
-from api.indicator.serializers import (IndicatorSerializer,
-                                       IndicatorWithFeedsSerializer,
-                                       MatchedIndicatorSerializer)
-from apps.feed.models import Feed
-from apps.indicator.models import Indicator
-from apps.source.models import Source
+from console_api.apps.feed.models import Feed
+from console_api.apps.indicator.models import Indicator
+from console_api.apps.source.models import Source
+from console_api.api.statistics.serializers import (IndicatorSerializer,
+                                        IndicatorWithFeedsSerializer,
+                                        MatchedIndicatorSerializer)
+
 
 
 class IndicatorStatiscList(generics.ListAPIView):

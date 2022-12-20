@@ -1,7 +1,6 @@
 from django.urls import path
-from rest_framework import routers
 
-from api.indicator import views
+from console_api.api.indicator import views
 
 
 urlpatterns = [

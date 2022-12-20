@@ -2,8 +2,9 @@ import json
 
 from bs4 import BeautifulSoup
 
-from apps.services.ext import get_url
-from apps.indicator.models import Indicator
+from console_api.apps.services.ext import get_url
+from console_api.config.log_conf import logger
+from console_api.apps.indicator.models import Indicator
 
 
 def parse_misp_event(urls_for_parsing, feed):
@@ -43,13 +44,13 @@ def convert_misp_to_indicator(feed, raw_indicators=None):
                 indicator.feeds.add(feed)
                 indicators.append(indicator)
             except Exception as e:
-                raise Exception(f"Error is: {e}")
+                raise logger.info(f"Error is: {e}")
     except TypeError:
-        pass
+    
         return indicators
 
 
-def parse_misp(feed, raw_indicators=None, config: dict = {}) -> list:
+def parse_misp(feed, config: dict = {}) -> list:
     """
     Парсит переданный текст со списком url'ок и отдает список индикаторов.
     Применяется когда по ссылке находится список json файлов.

@@ -3,11 +3,11 @@ from uuid import uuid4
 
 from flatdict import FlatterDict
 
-from apps.services.ext import feed_control, get_url
-from apps.indicator.models import Indicator
+from console_api.apps.services.ext import feed_control, get_url
+from console_api.apps.indicator.models import Indicator
 
 
-def parse_custom_json(feed, raw_indicators=None, config: dict = {}):
+def parse_custom_json(feed, config: dict = {}):
     """
     Парсит переданный кастомный json с выбранными из фида полями и отдает список индикаторов.
     """

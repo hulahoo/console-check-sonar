@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from apps.tag.models import Tag
-from api.tag.serializers import TagSerializer
+from console_api.apps.tag.models import Tag
+from console_api.api.tag.serializers import TagSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):

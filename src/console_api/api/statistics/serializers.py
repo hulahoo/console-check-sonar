@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from apps.indicator.models import Indicator
-from api.feed.serializers import DashboardFeedSerializer
+from console_api.apps.indicator.models import Indicator
+from console_api.api.feed.serializers import DashboardFeedSerializer
 
 
 class IndicatorSerializer(serializers.ModelSerializer):
@@ -37,8 +37,6 @@ class MatchedIndicatorSerializer(serializers.ModelSerializer):
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
     feeds = DashboardFeedSerializer(many=True, read_only=True)
 
-    # name = serializers.CharField(feeds.name)
-    # ts = django_filters.DateTimeFilter(field_name='feeds__ts', lookup_expr='iexact')
     class Meta:
         model = Indicator
         fields = ['false_detected', 'positive_detected', 'feeds']

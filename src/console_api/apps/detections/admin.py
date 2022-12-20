@@ -1,3 +1,8 @@
+"""Admin interface for detections app"""
+
 from django.contrib import admin
 
-# Register your models here.
+from apps.detections.models import Detection
+
+
+admin.site.register(Detection)

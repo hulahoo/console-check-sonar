@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from console_api.apps.feed.models import Feed
+from apps.feed.models import Feed
 
 
 class FeedSerializer(serializers.ModelSerializer):

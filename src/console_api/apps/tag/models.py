@@ -1,6 +1,6 @@
 from django.db import models
 
-from console_api.apps.models.abstract import BaseModel
+from apps.models.abstract import BaseModel
 
 
 class Tag(BaseModel):

@@ -24,7 +24,7 @@ statistics_api_schema_view = get_schema_view(
         description="Statistics API"
     ),
     patterns=[
-        path("api/statistics/", include("console_api.api.statistics.urls")),
+        path("api/statistics/", include("api.statistics.urls")),
     ],
 )
 

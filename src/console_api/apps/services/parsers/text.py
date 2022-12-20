@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from console_api.config.log_conf import logger
-from console_api.apps.indicator.models import Indicator
+from config.log_conf import logger
+from apps.indicator.models import Indicator
 
 
 def convert_txt_to_indicator(feed, raw_indicators=None):

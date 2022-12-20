@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from console_api.apps.indicator.models import Indicator
-from console_api.apps.tag.models import Tag
-from console_api.apps.feed.models import Feed
+from apps.indicator.models import Indicator
+from apps.tag.models import Tag
+from apps.feed.models import Feed
 
 
 class TagSerializer(serializers.ModelSerializer):

@@ -2,9 +2,9 @@ import json
 
 from bs4 import BeautifulSoup
 
-from console_api.apps.services.ext import get_url
-from console_api.config.log_conf import logger
-from console_api.apps.indicator.models import Indicator
+from apps.services.ext import get_url
+from config.log_conf import logger
+from apps.indicator.models import Indicator
 
 
 def parse_misp_event(urls_for_parsing, feed):
@@ -46,7 +46,7 @@ def convert_misp_to_indicator(feed, raw_indicators=None):
             except Exception as e:
                 raise logger.info(f"Error is: {e}")
     except TypeError:
-    
+
         return indicators
 
 

@@ -2,8 +2,8 @@ from django.db.models import Count, Sum
 from django.http import JsonResponse
 from rest_framework import generics, viewsets
 
-from console_api.apps.indicator.models import Indicator
-from console_api.api.indicator.serializers import IndicatorSerializer
+from apps.indicator.models import Indicator
+from api.indicator.serializers import IndicatorSerializer
 
 
 class IndicatorStatiscList(generics.ListAPIView):

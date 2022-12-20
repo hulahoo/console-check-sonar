@@ -1,12 +1,15 @@
 from django.urls import path
 
-from console_api.api.statistics import views
+from api.statistics.views import (
+    FeedStatiscList, IndicatorStatiscList, MatchedIndicatorStatiscList,
+    MatchedObjectsStatiscList, CheckedObjectsStatiscList, FeedsIntersectionList
+)
 
 urlpatterns = [
-    path(r'feeds', views.FeedStatiscList.as_view(), name='feed_stat'),
-    path(r'indicators', views.IndicatorStatiscList.as_view(), name='indicator_stat'),
-    path(r'matched-indicators', views.MatchedIndicatorStatiscList.as_view(), name='indicator_matched'),
-    path(r'matched-objects', views.MatchedObjectsStatiscList.as_view(), name='objects_matched'),
-    path(r'checked-objects', views.CheckedObjectsStatiscList.as_view(), name='objects_checked'),
-    path(r'feeds-intersections', views.FeedsIntersectionList.as_view(), name="feeds_intersections"),
+    path('feeds', FeedStatiscList.as_view(), name='feed_stat'),
+    path('indicators', IndicatorStatiscList.as_view(), name='indicator_stat'),
+    path('matched-indicators', MatchedIndicatorStatiscList.as_view(), name='indicator_matched'),
+    path('matched-objects', MatchedObjectsStatiscList.as_view(), name='objects_matched'),
+    path('checked-objects', CheckedObjectsStatiscList.as_view(), name='objects_checked'),
+    path('feeds-intersections', FeedsIntersectionList.as_view(), name="feeds_intersections"),
 ]

@@ -17,6 +17,7 @@ def get_response_with_pagination(
     paginator = PageNumberPagination()
 
     paginator.page_size = _get_page_size(request)
+    paginator.page_query_param = "page-number"
 
     result_page = paginator.paginate_queryset(objects, request)
 

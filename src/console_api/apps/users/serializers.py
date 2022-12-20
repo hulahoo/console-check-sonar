@@ -1,8 +1,9 @@
+from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.password_validation import validate_password
 
-from console_api.apps.users.models import User
+from apps.users.models import User
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,3 +32,32 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    login = serializers.CharField()
+    password = serializers.CharField(source="pass")
+
+    def validate(self, attrs):
+        login = attrs.get('login')
+        password = attrs.get('pass')
+
+        if login and password:
+            user = authenticate(username=login, password=password)
+
+            if user:
+                if not user.is_active:
+                    msg = 'User account is disabled.'
+                    raise serializers.ValidationError(
+                        msg, code='authorization',
+                    )
+            else:
+                msg = 'Unable to log in with provided credentials.'
+                raise serializers.ValidationError(msg, code='authorization')
+        else:
+            msg = 'Must include "username" and "password".'
+            raise serializers.ValidationError(msg, code='authorization')
+
+        attrs['user'] = user
+
+        return attrs

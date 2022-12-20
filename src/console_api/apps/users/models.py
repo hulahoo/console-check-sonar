@@ -2,14 +2,6 @@
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-<<<<<<< HEAD
-=======
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
-
-from console_api.apps.models.abstract import BaseModel
->>>>>>> main
 
 
 class UserManager(BaseUserManager):
@@ -104,15 +96,7 @@ class User(AbstractBaseUser):
         "Is the user a member of staff?"
         return self.staff
 
-<<<<<<< HEAD
     @property
     def is_admin(self):
         "Is the user a admin member?"
         return self.admin
-=======
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = []
-
-    class Meta:
-        db_table = "users"
->>>>>>> main

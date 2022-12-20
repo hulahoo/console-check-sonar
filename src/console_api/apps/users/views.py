@@ -6,7 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import (
+    RegisterSerializer, UserSerializer, AuthTokenSerializer,
+)
 from .models import User
 
 
@@ -33,7 +35,7 @@ class CustomAuthTokenView(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
         try:
-            serializer = self.serializer_class(
+            serializer = AuthTokenSerializer(
                 data=request.data,
                 context={'request': request},
             )
@@ -43,10 +45,8 @@ class CustomAuthTokenView(ObtainAuthToken):
             user = serializer.validated_data['user']
             token, _ = Token.objects.get_or_create(user=user)
         except Exception as e:
-            error_message = list(e.args[0].values())[0][0]
-
             return Response({
-                'errors': [{"detail": error_message}]
+                'errors': [{"detail": str(e)}]
             })
 
         return Response({

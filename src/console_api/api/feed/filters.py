@@ -8,4 +8,4 @@ class FeedFilter(filters.FilterSet):
     # class Meta:
     #     model = Feed
     #     fields = Feed.get_model_fields()
-        # exclude = ['certificate']
+    #     exclude = ['certificate']

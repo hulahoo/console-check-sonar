@@ -96,9 +96,9 @@ class Feed(BaseModel):
         max_digits=12,
     )
 
-    available_fields = models.JSONField(
-        "Список доступных полей в индикаторах фида",
-    )
+    # available_fields = models.JSONField(
+    #     "Список доступных полей в индикаторах фида",
+    # )
 
     parsing_rules = models.JSONField(
         "Настройки парсинга",

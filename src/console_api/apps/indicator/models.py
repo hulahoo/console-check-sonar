@@ -1,9 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from console_api.apps.tag.models import Tag
-from console_api.apps.common.enums import TypesEnum
-from console_api.apps.models.abstract import BaseModel
+from apps.tag.models import Tag
+from apps.common.enums import TypesEnum
+from apps.models.abstract import BaseModel
 
 
 class Indicator(BaseModel):
@@ -50,106 +50,10 @@ class Indicator(BaseModel):
     supplier_created_date = models.DateTimeField(
         "Дата последнего обновления", blank=True, null=True
     )
-    # Контекст
-    ioc_context_exploits_md5 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_exploits_sha1 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_exploits_sha256 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_exploits_threat = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_av_verdict = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_ip = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_md5 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_sha1 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_sha256 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_affected_products_product = models.CharField(
-        max_length=64, blank=True, null=True
+
+    context = models.JSONField(
+        "Данные контекста из Фидов и из Сервисов Обогащения Информацией",
     )
-    joc_context_domains = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_file_names = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_file_size = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_file_type = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_files_behaviour = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_files_md5 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_files_sha1 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_files_sha256 = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_files_threat = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_malware = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_mask = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_popularity = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_port = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_protocol = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_publication_name = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_severity = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_type = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_url = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_urls_url = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_vendors_vendor = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_geo = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_id = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_industry = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_ip = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_ip_geo = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_ip_whois_asn = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_ip_whois_contact_abuse_country = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_contact_abuse_email = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_contact_abuse_name = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_contact_owner_city = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_contact_owner_code = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_contact_owner_country = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_contact_owner_email = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_contact_owner_name = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_country = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_created = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_desrc = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_ip_whois_net_name = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_net_range = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_ip_whois_updated = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_whois_mx = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_mx_ips = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_ns = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_ns_ips = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_city = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_country = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_created = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_domain = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_email = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_expires = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_name = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_org = models.CharField(max_length=64, blank=True, null=True)
-    ioc_context_whois_registrar_email = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_whois_registrar_name = models.CharField(
-        max_length=64, blank=True, null=True
-    )
-    ioc_context_whois_updated = models.CharField(max_length=64, blank=True, null=True)
 
     # время жизни
     ttl = models.DateTimeField("Дата удаления", blank=True, null=True, default=None)

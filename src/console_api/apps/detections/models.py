@@ -3,6 +3,7 @@
 from django.db import models
 
 from apps.models.abstract import CreationDateTimeField
+from apps.feed.models import Feed
 
 
 class Detection(models.Model):
@@ -30,6 +31,40 @@ class Detection(models.Model):
     created_at = CreationDateTimeField(
         "Создано",
     )
+
+    @property
+    def context(self) -> str:
+        return self.indicator_id.context
+
+    @property
+    def feed_name(self) -> str:
+        if Feed.objects.filter(
+            indicators__id__contains=self.indicator_id.id
+        ).exists():
+            return Feed.objects.filter(
+                indicators__id__contains=self.indicator_id.id
+            )[0].title
+
+    @property
+    def ioc_id(self):
+        return self.indicator_id.id
+
+    @property
+    def provider(self):
+        feed_provider = None
+
+        if Feed.objects.filter(
+            indicators__id__contains=self.indicator_id.id
+        ).exists():
+            feed_provider = Feed.objects.filter(
+                indicators__id__contains=self.indicator_id.id
+            )[0].provider
+
+        return feed_provider
+
+    @property
+    def tags(self):
+        return [tag.id for tag in self.indicator_id.tag.all()]
 
     def __str__(self) -> str:
         return str(self.id)

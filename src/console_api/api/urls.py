@@ -11,5 +11,6 @@ urlpatterns = [
     path("tag/", include("api.tag.urls")),
     path("users", include("apps.users.urls")),
     path("api/", include("api.system.urls")),
+    path("detections/", include("api.detections.urls")),
     path("sessions", CustomAuthTokenView.as_view()),
 ]

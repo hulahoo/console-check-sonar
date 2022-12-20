@@ -12,12 +12,16 @@ class DetectionSerializer(serializers.ModelSerializer):
         """Metainformation about the serializer"""
 
         model = Detection
+
         fields = [
-            'id', 'source_event', "detection_event", "created_at"
+            'id', "provider", "feed-name", "tags", "context", 'source-event',
+            "ioc-id", "detection-event", "created-at",
         ]
 
         extra_kwargs = {
+            'feed-name': {'source': 'feed_name'},
             'source-event': {'source': 'source_event'},
+            'ioc-id': {'source': 'ioc_id'},
             'detection-event': {'source': 'detection_event'},
             'created-at': {'source': 'created_at'},
         }

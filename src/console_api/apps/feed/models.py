@@ -1,11 +1,7 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 
-from console_api.apps.models.abstract import BaseModel
-from console_api.apps.indicator.models import Indicator
-from console_api.apps.common.enums import (
-    TypesEnum, FeedFormatEnum, AuthEnum, PollingFrequencyEnum, StatusUpdateEnum
-)
+from apps.models.abstract import BaseModel
+from apps.common.enums import FeedFormatEnum
 
 
 FEED_STATUSES = (
@@ -130,6 +126,12 @@ class Feed(BaseModel):
     max_records_count = models.DecimalField(
         decimal_places=3,
         max_digits=12,
+    )
+
+    indicators = models.ManyToManyField(
+        "indicator.Indicator",
+        blank=True,
+        null=True,
     )
 
     def __str__(self) -> str:

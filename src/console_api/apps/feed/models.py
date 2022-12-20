@@ -96,6 +96,8 @@ class Feed(BaseModel):
 
     weight = models.DecimalField(
         "Вес фида",
+        decimal_places=3,
+        max_digits=12,
     )
 
     available_fields = models.JSONField(
@@ -125,7 +127,10 @@ class Feed(BaseModel):
         default=False,
     )
 
-    max_records_count = models.DecimalField()
+    max_records_count = models.DecimalField(
+        decimal_places=3,
+        max_digits=12,
+    )
 
     def __str__(self) -> str:
         return str(self.title)

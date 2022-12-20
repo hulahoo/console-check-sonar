@@ -131,6 +131,7 @@ class Feed(BaseModel):
         decimal_places=3,
         max_digits=12,
     )
+    indicators = models.ManyToManyField(Indicator, blank=True, null=True)
 
     def __str__(self) -> str:
         return str(self.title)

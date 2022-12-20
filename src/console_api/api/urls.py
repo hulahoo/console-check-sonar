@@ -11,5 +11,6 @@ urlpatterns = [
     path("tag/", include("api.tag.urls")),
     path("users", include("apps.users.urls")),
     path("api/", include("api.system.urls")),
+    path("indicators/", include("api.indicator.urls")),
     path('sessions', views_auth.obtain_auth_token),
 ]

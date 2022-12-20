@@ -5,6 +5,11 @@ from api.indicator import views
 
 
 urlpatterns = [
+    path('', views.IndicatorView.as_view(), name='indicator_list'),
+    path('<str:uuid>/', views.IndicatorDetailView.as_view(), name='indicator_detail'),
+
+
+
     path(r'feeds', views.FeedStatiscList.as_view(), name='feed_stat'),
     path(r'indicators', views.IndicatorStatiscList.as_view(), name='indicator_stat'),
     path(r'matched-indicators', views.MatchedIndicatorStatiscList.as_view(), name='indicator_matched'),

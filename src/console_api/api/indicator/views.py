@@ -12,6 +12,13 @@ from api.indicator.serializers import (IndicatorSerializer,
 from apps.feed.models import Feed
 from apps.indicator.models import Indicator
 from apps.source.models import Source
+from django.db import connection
+from django.db.models import Count, Sum
+from django.http import JsonResponse
+from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
+
+from console_api.api.indicator.serializers import IndicatorListSerializer, IndicatorDetailSerializer
 
 
 class IndicatorStatiscList(generics.ListAPIView):
@@ -140,3 +147,22 @@ class FeedsIntersectionList(generics.ListAPIView):
                 c = a.intersection(b)
                 intersect_weight[source].update({src: len(c) / len(a) * 100})
         return intersect_weight
+
+
+class IndicatorView(generics.ListAPIView):
+    """
+    (GET) Получение списка индикаторов
+    """
+
+    serializer_class = IndicatorListSerializer
+    queryset = Indicator.objects.all()
+
+
+class IndicatorDetailView(generics.RetrieveAPIView):
+    """
+    (GET) Деталка сотрудника
+    """
+
+    serializer_class = IndicatorDetailSerializer
+    lookup_field = 'uuid'
+    queryset = Indicator.objects.all()

@@ -1,7 +1,29 @@
+from api.feed.serializers import DashboardFeedSerializer
+from apps.indicator.models import Indicator, IndicatorActivities
 from rest_framework import serializers
 
-from apps.indicator.models import Indicator
-from api.feed.serializers import DashboardFeedSerializer
+from console_api.api.feed.serializers import FeedShortSerializer
+
+
+class IndicatorActivitiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IndicatorActivities
+        fields = ['type', 'details', 'created_at']
+
+
+class IndicatorListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Indicator
+        fields = ['uuid', 'type', 'value', 'created_at', 'updated_at', 'weight', 'tag', 'feed_set']
+
+
+class IndicatorDetailSerializer(serializers.ModelSerializer):
+    feeds = FeedShortSerializer(many=True, source='feed_set')
+    activities = IndicatorActivitiesSerializer(many=True)
+
+    class Meta:
+        model = Indicator
+        fields = ['uuid', 'type', 'value', 'created_at', 'updated_at', 'weight', 'tag', 'feeds', 'activities']
 
 
 class IndicatorSerializer(serializers.ModelSerializer):
@@ -37,7 +59,7 @@ class MatchedIndicatorSerializer(serializers.ModelSerializer):
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
     feeds = DashboardFeedSerializer(many=True, read_only=True)
 
-    #name = serializers.CharField(source='feeds.name')
+    # name = serializers.CharField(source='feeds.name')
     # ts = django_filters.DateTimeFilter(field_name='feeds__ts', lookup_expr='iexact')
     class Meta:
         model = Indicator

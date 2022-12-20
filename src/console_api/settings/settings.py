@@ -152,3 +152,11 @@ CORS_ALLOWED_ORIGINS = [
     "https://0.0.0.0:8000",
     "http://0.0.0.0:8000",
 ]
+
+# DRF
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50,
+}

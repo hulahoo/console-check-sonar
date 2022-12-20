@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from rest_framework.authtoken import views as views_auth
+from apps.users.views import CustomAuthTokenView
 
 
 urlpatterns = [
@@ -11,5 +11,5 @@ urlpatterns = [
     path("tag/", include("api.tag.urls")),
     path("users", include("apps.users.urls")),
     path("api/", include("api.system.urls")),
-    path('sessions', views_auth.obtain_auth_token),
+    path("sessions", CustomAuthTokenView.as_view()),
 ]

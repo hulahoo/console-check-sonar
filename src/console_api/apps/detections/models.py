@@ -30,3 +30,14 @@ class Detection(models.Model):
     created_at = CreationDateTimeField(
         "Создано",
     )
+
+    def __str__(self) -> str:
+        return str(self.id)
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Обнаружение"
+        verbose_name_plural = "Обнаружения"
+
+        db_table = "detections"

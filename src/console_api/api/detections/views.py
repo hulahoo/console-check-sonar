@@ -11,6 +11,9 @@ class DetectionListView(generics.ListAPIView):
     """View for detections list"""
 
     def list(self, request, *args, **kwargs):
+        sort_by_param = request.GET.get('sort-by')
+        self.queryset = self.queryset.order_by(sort_by_param)
+
         return get_response_with_pagination(
             request, self.queryset, self.get_serializer,
         )

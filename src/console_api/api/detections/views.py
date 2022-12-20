@@ -12,6 +12,7 @@ class DetectionListView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         sort_by_param = request.GET.get('sort-by')
+        sort_by_param = sort_by_param[0] + sort_by_param[1:].replace('-', '_')
         self.queryset = self.queryset.order_by(sort_by_param)
 
         return get_response_with_pagination(

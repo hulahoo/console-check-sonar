@@ -109,6 +109,14 @@ class Indicator(BaseModel):
         blank=True,
     )
 
+    @property
+    def feeds(self):
+        return list(self.feed_set.all())
+
+    @property
+    def tags(self):
+        return list(self.tag_set.all())
+
     def __str__(self) -> str:
         return f"{self.value} ({self.ioc_type})"
 

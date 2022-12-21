@@ -34,6 +34,13 @@ class Detection(models.Model):
         "Создано",
     )
 
+    tags = models.ManyToManyField(
+        "tag.Tag",
+        blank=True,
+        null=True,
+        through="DetectionTagRelationship",
+    )
+
     @property
     def context(self) -> str:
         return self.indicator_id.context
@@ -78,3 +85,29 @@ class Detection(models.Model):
         verbose_name_plural = "Обнаружения"
 
         db_table = "detections"
+
+
+class DetectionTagRelationship(models.Model):
+    """Custom ManyToMany relationship table for Detection and Tag"""
+
+    detection = models.ForeignKey(
+        "detections.Detection",
+        on_delete=models.CASCADE,
+    )
+
+    tag = models.ForeignKey(
+        "tag.Tag",
+        on_delete=models.CASCADE,
+    )
+
+    created_at = CreationDateTimeField(
+        "Дата и время создания связи",
+    )
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Связь обнаружение-тег"
+        verbose_name_plural = "Связи обнаружение-тег"
+
+        db_table = "detection_tag_relationships"

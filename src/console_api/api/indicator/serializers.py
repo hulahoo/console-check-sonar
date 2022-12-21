@@ -1,10 +1,9 @@
-from api.feed.serializers import DashboardFeedSerializer
-from apps.indicator.models import Indicator, IndicatorActivities
-from rest_framework import serializers
-
-from apps.indicator.models import Indicator
 from apps.tag.models import Tag
 from apps.feed.models import Feed
+from rest_framework import serializers
+from api.feed.serializers import FeedShortSerializer
+from api.feed.serializers import DashboardFeedSerializer
+from apps.indicator.models import Indicator, IndicatorActivities
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -21,8 +20,6 @@ class FeedSerializer(serializers.ModelSerializer):
         model = Feed
         fields = ['name']
         exclude = []
-
-from api.feed.serializers import FeedShortSerializer
 
 
 class IndicatorActivitiesSerializer(serializers.ModelSerializer):
@@ -79,6 +76,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             'tags-weight': {'source': 'tags_weight'},
         }
 
+
 class IndicatorSerializer(serializers.ModelSerializer):
     tags = TagSerializer()
     feeds = FeedSerializer()
@@ -114,8 +112,6 @@ class MatchedIndicatorSerializer(serializers.ModelSerializer):
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
     feeds = DashboardFeedSerializer(many=True, read_only=True)
 
-    # name = serializers.CharField(source='feeds.name')
-    # ts = django_filters.DateTimeFilter(field_name='feeds__ts', lookup_expr='iexact')
     class Meta:
         model = Indicator
         fields = ['false_detected', 'positive_detected', 'feeds']

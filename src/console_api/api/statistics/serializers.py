@@ -26,7 +26,6 @@ class DataIndicatorSerializer(serializers.ModelSerializer):
 
 class MatchedIndicatorSerializer(serializers.ModelSerializer):
     values = serializers.IntegerField(source='value')
-    # labels = serializers.DateTimeField(source='last_detected_date')
 
     class Meta:
         model = Indicator

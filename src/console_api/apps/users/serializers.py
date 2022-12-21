@@ -5,6 +5,7 @@ from rest_framework.validators import UniqueValidator
 
 from apps.users.models import User
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

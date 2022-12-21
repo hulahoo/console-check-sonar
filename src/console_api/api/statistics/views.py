@@ -14,7 +14,6 @@ from api.statistics.serializers import (IndicatorSerializer,
                                         MatchedIndicatorSerializer)
 
 
-
 class IndicatorStatiscList(generics.ListAPIView):
     queryset = Indicator.objects.all()
     serializer_class = IndicatorSerializer

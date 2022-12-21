@@ -1,21 +1,15 @@
-from django.shortcuts import render
-
 from rest_framework import viewsets
-from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django_filters import rest_framework as filters
-from django.views.decorators.csrf import csrf_exempt
 
 from apps.feed.models import Feed
-from api.feed.filters import FeedFilter
 from api.feed.serializers import FeedSerializer
 from apps.services.format_selector import choose_type
 
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 
-# @csrf_exempt
 @api_view(["POST"])
 def feed_add(request):
     if request.method == "POST":
@@ -27,7 +21,6 @@ def feed_add(request):
             return Response(serializer.data, status=HTTP_201_CREATED)
 
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
 
 
 def feed_create(request):
@@ -43,4 +36,3 @@ class FeedListView(viewsets.ModelViewSet):
     queryset = Feed.objects.all()
     serializer_class = FeedSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = FeedFilter

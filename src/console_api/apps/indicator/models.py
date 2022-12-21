@@ -23,6 +23,8 @@ ACTIVITIES_TYPE = (
     ("move_from_archive", "move-from-archive"),
 )
 
+RELATE_TO = "users.User"
+
 
 class Indicator(BaseModel):
     """Indicator"""
@@ -101,7 +103,7 @@ class Indicator(BaseModel):
     )
 
     created_by = models.ForeignKey(
-        "users.User",
+        RELATE_TO,
         help_text="Указывается, когда Индикатор создан пользователем",
         on_delete=models.PROTECT,
         verbose_name="Кем создано",
@@ -153,7 +155,7 @@ class IndicatorActivities(models.Model):
     )
 
     created_by = models.ForeignKey(
-        "users.User",
+        RELATE_TO,
         on_delete=models.PROTECT,
         verbose_name="Кем создано",
     )
@@ -171,7 +173,7 @@ class Session(models.Model):
     """User session"""
 
     user_id = models.ForeignKey(
-        "users.User",
+        RELATE_TO,
         on_delete=models.PROTECT,
         verbose_name="ID пользователя",
     )

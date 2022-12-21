@@ -22,6 +22,7 @@ def liveness(request):
     logger.info("Liveness checking started")
     return Response({"status": "UP"})
 
+
 @api_view(["GET"])
 def metrics(request):
     """
@@ -131,4 +132,3 @@ def api_routes(request):
             },
         }
     })
-

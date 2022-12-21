@@ -3,7 +3,7 @@ import os
 
 from django.db import connection
 
-from src.settings.settings import BASE_DIR
+from settings.settings import BASE_DIR
 
 
 def run_sql_file(file_name, module_name=None, sql_folder='sql', params=None):

@@ -4,7 +4,7 @@ from rest_framework import generics
 
 from apps.detections.models import Detection
 from api.detections.serializers import DetectionSerializer
-from api.detections.services import get_response_with_pagination
+from api.services import get_response_with_pagination
 
 
 class DetectionListView(generics.ListAPIView):

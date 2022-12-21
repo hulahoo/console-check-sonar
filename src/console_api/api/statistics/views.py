@@ -7,6 +7,7 @@ from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 
 from apps.feed.models import Feed
+from api.statistics.base import BaseIndicatorList
 from apps.indicator.models import Indicator
 from apps.source.models import Source
 from api.statistics.serializers import (IndicatorSerializer,
@@ -14,7 +15,7 @@ from api.statistics.serializers import (IndicatorSerializer,
                                         MatchedIndicatorSerializer)
 
 
-class IndicatorStatiscList(generics.ListAPIView):
+class IndicatorStatiscList(BaseIndicatorList):
     queryset = Indicator.objects.all()
     serializer_class = IndicatorSerializer
 
@@ -43,63 +44,15 @@ class FeedStatiscList(generics.ListAPIView):
 
 
 class MatchedIndicatorStatiscList(generics.ListAPIView):
-    queryset = Indicator.objects.all()
     serializer_class = MatchedIndicatorSerializer
-
-    def get_queryset(self):
-        start_period = self.param_dict.get('start_period')
-        finish_period = self.param_dict.get('finish_period')
-        return (Indicator.objects
-                .values('value')
-                .filter(last_detected_date__range=(start_period, finish_period))
-                .annotate(detected_count=Sum('detected'))
-                .order_by('last_detected_date'))
-
-    def get(self, request, * args, **kwargs):
-        start_period = request.GET.get('start-period-at')
-        finish_period = request.GET.get('finish-period-at')
-        self.param_dict = {'start_period': start_period, 'finish_period': finish_period}
-        return self.list(request, *args, **kwargs)
 
 
 class MatchedObjectsStatiscList(generics.ListAPIView):
-    queryset = Indicator.objects.all()
     serializer_class = MatchedIndicatorSerializer
-
-    def get_queryset(self):
-        start_period = self.param_dict.get('start_period')
-        finish_period = self.param_dict.get('finish_period')
-        return (Indicator.objects
-                .values('value')
-                .filter(last_detected_date__range=(start_period, finish_period))
-                .annotate(detected_count=Sum('detected'))
-                .order_by('last_detected_date'))
-
-    def get(self, request, * args, **kwargs):
-        start_period = request.GET.get('start-period-at')
-        finish_period = request.GET.get('finish-period-at')
-        self.param_dict = {'start_period': start_period, 'finish_period': finish_period}
-        return self.list(request, *args, **kwargs)
 
 
 class CheckedObjectsStatiscList(generics.ListAPIView):
-    queryset = Indicator.objects.all()
     serializer_class = MatchedIndicatorSerializer
-
-    def get_queryset(self):
-        start_period = self.param_dict.get('start_period')
-        finish_period = self.param_dict.get('finish_period')
-        return (Indicator.objects
-                .values('value')
-                .filter(last_detected_date__range=(start_period, finish_period))
-                .annotate(detected_count=Count('detected'))
-                .order_by('last_detected_date'))
-
-    def get(self, request, * args, **kwargs):
-        start_period = request.GET.get('start-period-at')
-        finish_period = request.GET.get('finish-period-at')
-        self.param_dict = {'start_period': start_period, 'finish_period': finish_period}
-        return self.list(request, *args, **kwargs)
 
 
 class FeedsIntersectionList(generics.ListAPIView):
@@ -134,9 +87,9 @@ class FeedsIntersectionList(generics.ListAPIView):
         for source, _ in sorted(sources_ind.items()):
             new_sources_ind = list(sources_ind.keys())
             new_sources_ind.remove(source)
-            a = set(sources_ind.get(source).keys())
+            unique_source_ind = set(sources_ind.get(source).keys())
             for src in new_sources_ind:
-                b = set(sources_ind.get(src).keys())
-                c = a.intersection(b)
-                intersect_weight[source].update({src: len(c) / len(a) * 100})
+                unique_source_keys = set(sources_ind.get(src).keys())
+                intersection_of_source_inds = unique_source_ind.intersection(unique_source_keys)
+                intersect_weight[source].update({src: len(intersection_of_source_inds) / len(unique_source_ind) * 100})
         return intersect_weight

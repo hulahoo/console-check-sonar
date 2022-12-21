@@ -2,7 +2,7 @@
 from rest_framework import generics, viewsets
 
 from apps.indicator.models import Indicator
-from api.indicator.services import get_response_with_pagination
+from api.services import get_response_with_pagination
 from api.indicator.serializers import IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer
 
 

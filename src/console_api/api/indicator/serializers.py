@@ -99,16 +99,6 @@ class DataIndicatorSerializer(serializers.ModelSerializer):
         exclude = []
 
 
-class MatchedIndicatorSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(source='detected_count')
-    label = serializers.DateTimeField(source='last_detected_date')
-
-    class Meta:
-        model = Indicator
-        fields = ['label', 'value']
-        exclude = []
-
-
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
     feeds = DashboardFeedSerializer(many=True, read_only=True)
 
@@ -124,11 +114,19 @@ class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
         return queryset
 
 
-class MXyiSerializer(serializers.ModelSerializer):
-    data = serializers.IntegerField(source='detected_count')
+class MatchedIndicatorSerializer(serializers.ModelSerializer):
+    value = serializers.IntegerField(source='detected_count')
     label = serializers.DateTimeField(source='last_detected_date')
 
     class Meta:
         model = Indicator
         fields = ['label', 'value']
         exclude = []
+
+
+class MXyiSerializer(serializers.ModelSerializer):
+    data = serializers.IntegerField(source='detected_count')
+    label = serializers.DateTimeField(source='last_detected_date')
+
+    class Meta(MatchedIndicatorSerializer.Meta):
+        ...

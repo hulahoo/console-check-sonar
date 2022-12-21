@@ -96,9 +96,9 @@ class Feed(BaseModel):
         max_digits=12,
     )
 
-    # available_fields = models.JSONField(
-    #     "Список доступных полей в индикаторах фида",
-    # )
+    available_fields = models.JSONField(
+        "Список доступных полей в индикаторах фида",
+    )
 
     parsing_rules = models.JSONField(
         "Настройки парсинга",
@@ -127,7 +127,6 @@ class Feed(BaseModel):
         decimal_places=3,
         max_digits=12,
     )
-    indicators = models.ManyToManyField("indicator.Indicator", blank=True, null=True)
 
     indicators = models.ManyToManyField(
         "indicator.Indicator",

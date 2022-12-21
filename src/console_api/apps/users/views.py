@@ -18,7 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class RegisterUserAPIView(generics.CreateAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = RegisterSerializer
 
 

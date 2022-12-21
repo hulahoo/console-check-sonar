@@ -57,3 +57,7 @@ class FeedShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed
         fields = ['id', 'title']
+
+        extra_kwargs = {
+            'name': {'source': 'title'},
+        }

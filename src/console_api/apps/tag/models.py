@@ -2,9 +2,8 @@
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils import timezone
 
-from apps.models.abstract import BaseModel
+from apps.models.abstract import BaseModel, CreationDateTimeField
 
 
 class Tag(BaseModel):
@@ -47,6 +46,13 @@ class Tag(BaseModel):
         editable=False,
     )
 
+    indicators = models.ManyToManyField(
+        "indicator.Indicator",
+        blank=True,
+        null=True,
+        through="IndicatorTagRelationship",
+    )
+
     def __str__(self):
         return f"{self.title} | {self.weight}"
 
@@ -57,3 +63,37 @@ class Tag(BaseModel):
         verbose_name_plural = "Теги"
 
         db_table = "tags"
+
+
+class IndicatorTagRelationship(models.Model):
+    """Custom ManyToMany relationship table for Indicator and Feed"""
+
+    indicator = models.ForeignKey(
+        "indicator.Indicator",
+        on_delete=models.CASCADE,
+    )
+
+    tag = models.ForeignKey(
+        "tag.Tag",
+        on_delete=models.CASCADE,
+    )
+
+    created_at = CreationDateTimeField(
+        "Дата и время создания связи",
+    )
+
+    deleted_at = models.DateTimeField(
+        "Дата и время удаления связи",
+        help_text="Если значение пустое, значит связь существующая",
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Связь индикатор-фид"
+        verbose_name_plural = "Связи индикатор-фид"
+
+        db_table = "indicator_tag_relationships"

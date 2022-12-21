@@ -29,12 +29,31 @@ class IndicatorActivitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndicatorActivities
         fields = ['type', 'details', 'created_at']
+        extra_kwargs = {
+            'created-at': {'source': 'created_at'},
+        }
 
 
 class IndicatorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Indicator
-        fields = ['uuid', 'type', 'value', 'created_at', 'updated_at', 'weight', 'tag', 'feed_set']
+
+        fields = [
+            'id', 'ioc-type', 'value',
+            'created-at', 'updated-at',
+            'ioc-weight',
+            'tags', "tags-weight",
+            "feed-names"
+        ]
+
+        extra_kwargs = {
+            'ioc-type': {'source': 'ioc_type'},
+            'created-at': {'source': 'created_at'},
+            'updated-at': {'source': 'updated_at'},
+            'ioc-weight': {'source': 'weight'},
+            'tags-weight': {'source': 'tags_weight'},
+            'feed-names': {'source': 'feeds_list'},
+        }
 
 
 class IndicatorDetailSerializer(serializers.ModelSerializer):
@@ -43,8 +62,22 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Indicator
-        fields = ['uuid', 'type', 'value', 'created_at', 'updated_at', 'weight', 'tag', 'feeds', 'activities']
 
+        fields = [
+            'id', 'ioc-type', 'value', 'context',
+            'created-at', 'updated-at',
+            'ioc-weight',
+            'tags', "tags-weight",
+            "feeds", "activities",
+        ]
+
+        extra_kwargs = {
+            'ioc-type': {'source': 'ioc_type'},
+            'created-at': {'source': 'created_at'},
+            'updated-at': {'source': 'updated_at'},
+            'ioc-weight': {'source': 'weight'},
+            'tags-weight': {'source': 'tags_weight'},
+        }
 
 class IndicatorSerializer(serializers.ModelSerializer):
     tags = TagSerializer()
@@ -52,11 +85,11 @@ class IndicatorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Indicator
-        fields = ['uuid', 'type_indicator', 'value',
-                  'created_at', 'updated_at',
-                  'weight', 'tags', 'feeds']
-        fields = ['type_indicator', 'checked_count', 'detected_count']
-        exclude = []
+        fields = [
+            'id', 'ioc_type', 'value',
+            'created_at', 'updated_at',
+            'weight', 'tags', 'tags_weight',
+        ]
 
 
 class DataIndicatorSerializer(serializers.ModelSerializer):

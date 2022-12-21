@@ -15,8 +15,8 @@ from apps.services.format_selector import choose_type
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 
+# @csrf_exempt
 @api_view(["POST"])
-@csrf_exempt
 def feed_add(request):
     if request.method == "POST":
         serializer = FeedSerializer(data=request.data)

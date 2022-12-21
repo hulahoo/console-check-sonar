@@ -13,27 +13,74 @@ from rest_framework.pagination import PageNumberPagination
 
 from api.indicator.serializers import IndicatorListSerializer, IndicatorDetailSerializer
 
+"""Views for detections app"""
+
+
+from apps.indicator.models import Indicator
+from api.indicator.serializers import IndicatorSerializer
+from api.indicator.services import get_response_with_pagination
+
 
 class IndicatorStatiscList(generics.ListAPIView):
-    queryset = Indicator.objects.all()
-    serializer_class = IndicatorSerializer
-
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        sort_by_param = request.GET.get('sort-by')
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        id_ = request.GET.get('filter[id]')
+        ioc_type = request.GET.get('filter[ioc-type]')
+        value = request.GET.get('filter[value]')
+        is_sending_to_detections = request.GET.get('filter[is_sending_to_detections]')
+        is_false_positive = request.GET.get('filter[is_false_positive]')
+        weight = request.GET.get('filter[weight]')
+        tags_weight = request.GET.get('filter[tags_weight]')
+        is_archived = request.GET.get('filter[is_archived]')
+        false_detected_counter = request.GET.get('filter[false_detected_counter]')
+        positive_detected_counter = request.GET.get('filter[positive_detected_counter]')
+        total_detected_counter = request.GET.get('filter[total_detected_counter]')
+        first_detected_at = request.GET.get('filter[first_detected_at]')
+        last_detected_at = request.GET.get('filter[last_detected_at]')
 
-        serializer = self.get_serializer(queryset, many=True)
-        return JsonResponse({"data": serializer.data})
+        if id_:
+            self.queryset = self.queryset.filter(id=id_)
+        if ioc_type:
+            self.queryset = self.queryset.filter(ioc_type=ioc_type)
+        if value:
+            self.queryset = self.queryset.filter(value=value)
+        if is_sending_to_detections:
+            self.queryset = self.queryset.filter(is_sending_to_detections=is_sending_to_detections)
+        if is_false_positive:
+            self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
+        if weight:
+            self.queryset = self.queryset.filter(weight=weight)
+        if tags_weight:
+            self.queryset = self.queryset.filter(tags_weight=tags_weight)
+        if is_archived:
+            self.queryset = self.queryset.filter(is_archived=is_archived)
+        if false_detected_counter:
+            self.queryset = self.queryset.filter(false_detected_counter=false_detected_counter)
+        if positive_detected_counter:
+            self.queryset = self.queryset.filter(positive_detected_counter=positive_detected_counter)
+        if total_detected_counter:
+            self.queryset = self.queryset.filter(total_detected_counter=total_detected_counter)
+        if first_detected_at:
+            self.queryset = self.queryset.filter(first_detected_at=first_detected_at)
+        if last_detected_at:
+            self.queryset = self.queryset.filter(last_detected_at=last_detected_at)
 
-    def get_queryset(self):
-        return (Indicator.objects
-                .values('type', 'detected')
-                .annotate(checked_count=Count('type'), detected_count=Sum('detected'))
-                .order_by('type'))
+
+        if sort_by_param:
+            print(sort_by_param)
+            sort_by_param = sort_by_param[0] + sort_by_param[1:].replace('-', '_')
+            if sort_by_param == 'ioc_weight' or sort_by_param == '-ioc_weight':
+                sort_by_param = 'weight'
+
+            self.queryset = self.queryset.order_by(sort_by_param)
+
+        return get_response_with_pagination(
+            request, self.queryset, self.get_serializer,
+        )
+
+    serializer_class = IndicatorListSerializer
+    queryset = Indicator.objects.all()
 
 
 class IndicatorCreateView(viewsets.ModelViewSet):
@@ -150,5 +197,5 @@ class IndicatorDetailView(generics.RetrieveAPIView):
     """
 
     serializer_class = IndicatorDetailSerializer
-    lookup_field = 'uuid'
+    lookup_field = 'id'
     queryset = Indicator.objects.all()

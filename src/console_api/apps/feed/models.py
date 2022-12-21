@@ -1,8 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from apps.models.abstract import BaseModel
-
+from apps.models.abstract import BaseModel, CreationDateTimeField
 
 FEED_STATUSES = (
     ("failed_to_update", "failed-to-update"),
@@ -135,6 +134,7 @@ class Feed(BaseModel):
         "indicator.Indicator",
         blank=True,
         null=True,
+        through="IndicatorFeedRelationship",
     )
 
     def __str__(self) -> str:
@@ -151,3 +151,37 @@ class Feed(BaseModel):
         verbose_name_plural = "Фиды"
 
         db_table = "feeds"
+
+
+class IndicatorFeedRelationship(models.Model):
+    """Custom ManyToMany relationship table for Indicator and Feed"""
+
+    indicator = models.ForeignKey(
+        "indicator.Indicator",
+        on_delete=models.CASCADE,
+    )
+
+    feed = models.ForeignKey(
+        "feed.Feed",
+        on_delete=models.CASCADE,
+    )
+
+    created_at = CreationDateTimeField(
+        "Дата и время создания связи",
+    )
+
+    deleted_at = models.DateTimeField(
+        "Дата и время удаления связи",
+        help_text="Если значение пустое, значит связь существующая",
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Связь индикатор-фид"
+        verbose_name_plural = "Связи индикатор-фид"
+
+        db_table = "indicator_feed_relationships"

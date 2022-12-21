@@ -3,8 +3,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 import uuid as uuid
 
-from apps.tag.models import Tag
-from apps.common.enums import TypesEnum
 from apps.models.abstract import BaseModel
 
 

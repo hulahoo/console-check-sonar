@@ -110,7 +110,7 @@ class Indicator(BaseModel):
     )
 
     @property
-    def feeds(self):
+    def feeds_list(self):
         return list(self.feed_set.all())
 
     @property

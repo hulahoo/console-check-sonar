@@ -197,5 +197,5 @@ class IndicatorDetailView(generics.RetrieveAPIView):
     """
 
     serializer_class = IndicatorDetailSerializer
-    lookup_field = 'uuid'
+    lookup_field = 'id'
     queryset = Indicator.objects.all()

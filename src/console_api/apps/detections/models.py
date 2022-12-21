@@ -1,6 +1,7 @@
 """Models for detections app"""
 
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from apps.models.abstract import CreationDateTimeField
 from apps.feed.models import Feed
@@ -11,7 +12,7 @@ class Detection(models.Model):
 
     source_event = models.JSONField(
         "Информация о событии",
-        help_text="Информация об объекте из Kafka",
+        help_text="Информация о Событии (Объект из Kafka)",
     )
 
     indicator_id = models.ForeignKey(
@@ -24,8 +25,9 @@ class Detection(models.Model):
         "Информация о событии, которая отправляется во внешнюю ИС (SIEM)",
     )
 
-    tags_weight = models.PositiveBigIntegerField(
+    tags_weight = models.BigIntegerField(
         "Вес тегов",
+        validators=[MaxValueValidator(100), MinValueValidator(1)],
     )
 
     created_at = CreationDateTimeField(

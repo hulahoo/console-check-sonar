@@ -2,50 +2,55 @@
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.utils import timezone
+
+
+USER_ROLES = (
+    ("analyst", "analyst"),
+    ("admin", "admin"),
+    ("auditor", "auditor"),
+)
 
 
 class UserManager(BaseUserManager):
     """Manager for User model"""
 
-    def create_user(self, email, password=None):
-        """
-        Creates and saves a User with the given email and password.
-        """
-        if not email:
-            raise ValueError('Users must have an email address')
+    def create_user(self, login: str, password: str = None, **extra_fields):
+        """Create and save user with the given login and password"""
 
-        user = self.model(
-            email=self.normalize_email(email),
-        )
+        user = self.model(login=login, **extra_fields)
 
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_staffuser(self, email, password):
-        """
-        Creates and saves a staff user with the given email and password.
-        """
+    def create_staffuser(self, login: str, password: str, **extra_fields):
+        """Create and save a staff user with the given login and password"""
+
         user = self.create_user(
-            email,
+            login=login,
             password=password,
+            **extra_fields,
         )
+
         user.staff = True
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, email, password):
-        """
-        Creates and saves a superuser with the given email and password.
-        """
+    def create_superuser(self, login: str, password: str, **extra_fields):
+        """Create and save a superuser with the given login and password"""
+
         user = self.create_user(
-            email,
+            login=login,
             password=password,
+            **extra_fields,
         )
+
         user.staff = True
         user.admin = True
+        user.role = "admin"
         user.save(using=self._db)
 
         return user
@@ -56,47 +61,103 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-    email = models.EmailField(
-        verbose_name='email address',
-        max_length=255,
+    login = models.TextField(
+        "Логин",
         unique=True,
     )
-    is_active = models.BooleanField(default=True)
-    staff = models.BooleanField(default=False) # a admin user; non super-user
-    admin = models.BooleanField(default=False) # a superuser
 
-    # notice the absence of a "Password field", that is built in.
+    password = models.TextField(
+        "Хэшированный пароль",
+        db_column="pass_hash",
+    )
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [] # Email & Password are required by default.
+    full_name = models.TextField(
+        "Полное имя",
+    )
 
-    def get_full_name(self):
-        # The user is identified by their email address
-        return self.email
+    role = models.TextField(
+        "Роль",
+        choices=USER_ROLES,
+    )
 
-    def get_short_name(self):
-        # The user is identified by their email address
-        return self.email
+    is_active = models.BooleanField(
+        "Есть ли у пользователя доступ к системе (не отключен ли он?)",
+        default=True,
+    )
 
-    def __str__(self):
-        return self.email
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        verbose_name="ID Пользователя, кто создал этого Пользователя",
+        null=True,
+        blank=True,
+        db_column="created_by",
+    )
 
-    def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
-        return True
+    created_at = models.DateTimeField(
+        "Дата и время создания Пользователя",
+        auto_now_add=True,
+    )
 
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
+    updated_at = models.DateTimeField(
+        "Дата и время обновления Пользователя",
+        auto_now=True,
+    )
+
+    deleted_at = models.DateTimeField(
+        "Дата и время удаления Пользователя",
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    staff = models.BooleanField(
+        "Персонал?",
+        default=False
+    )
+
+    admin = models.BooleanField(
+        "Админ?",
+        default=False
+    )
+
+    USERNAME_FIELD = 'login'
+
+    # Login & Password are required by default
+    REQUIRED_FIELDS = []
+
+    def get_full_name(self) -> str:
+        return self.full_name
+
+    def get_short_name(self) -> str:
+        return self.login
+
+    def __str__(self) -> str:
+        return self.login
+
+    def has_perm(self, perm, obj=None) -> bool:
+        """Does the user have a specific permission?"""
+
+        return self.is_active
+
+    def has_module_perms(self, app_label) -> bool:
+        """Does the user have permissions to view the app `app_label`?"""
+
+        return self.is_active
 
     @property
-    def is_staff(self):
-        "Is the user a member of staff?"
+    def is_staff(self) -> bool:
+        """Is the staff user?"""
+
         return self.staff
 
     @property
-    def is_admin(self):
-        "Is the user a admin member?"
+    def is_admin(self) -> bool:
+        """Is the admin user?"""
+
         return self.admin
+
+    class Meta:
+        """Metainformation about the model"""
+
+        db_table = "users"

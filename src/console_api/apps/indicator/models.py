@@ -1,6 +1,7 @@
-import uuid as uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
+import uuid as uuid
 
 from apps.tag.models import Tag
 from apps.common.enums import TypesEnum
@@ -62,7 +63,7 @@ class Indicator(BaseModel):
     class Meta:
         verbose_name = "Индикатор"
         verbose_name_plural = "Индикаторы"
-        db_table = "sessions"
+        db_table = "indicators"
 
 
 class IndicatorActivities(BaseModel):
@@ -86,3 +87,40 @@ class IndicatorActivities(BaseModel):
         verbose_name_plural = "Активности по Индикатору"
         db_table = "activities"
 
+
+class Session(models.Model):
+    """Пользовательская сессия"""
+
+    user_id = models.ForeignKey(
+        "users.User",
+        on_delete=models.PROTECT,
+        verbose_name="ID пользователя",
+    )
+
+    access_token = models.CharField(
+        "Токен доступа MD5",
+        max_length=255,
+    )
+
+    last_activity_at = models.DateTimeField(
+        "Дата и время последней активности",
+        editable=False,
+    )
+
+    created_at = models.DateTimeField(
+        "Дата и время создания сессии",
+        auto_now_add=True,
+    )
+
+    def save(self, *args, **kwargs) -> None:
+        self.last_activity_at = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Сессия"
+        verbose_name_plural = "Сессии"
+
+        db_table = "sessions"

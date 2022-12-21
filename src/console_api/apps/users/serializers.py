@@ -12,24 +12,27 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
+    login = serializers.CharField(
         max_length=255,
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
-    password = serializers.CharField(
+    pass_hash = serializers.CharField(
         write_only=True, required=True, validators=[validate_password])
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password')
-        extra_kwargs = {'id': {'read_only': True}}
+        fields = ('login', 'pass_hash')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'pass-hash': {'source': "pass_hash"}
+        }
 
     def create(self, validated_data):
         user = User.objects.create(
-            username=validated_data['username'],
+            login=validated_data['login'],
         )
-        user.set_password(validated_data['password'])
+        user.set_password(validated_data['pass_hash'])
         user.save()
         return user
 

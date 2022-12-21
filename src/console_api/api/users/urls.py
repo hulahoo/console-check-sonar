@@ -1,10 +1,10 @@
 from django.urls import path
-from rest_framework.authtoken import views as views_auth
 
 from api.users import views
+from apps.users.views import RegisterUserAPIView, Logout
 
 
 urlpatterns = [
-    path('sessions/', views_auth.obtain_auth_token),
-    path('logout/', views.Logout.as_view()),
+    path("/", RegisterUserAPIView.as_view()),
+    path('logout', views.Logout.as_view()),
 ]

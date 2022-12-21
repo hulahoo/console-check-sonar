@@ -9,10 +9,14 @@ from apps.models.abstract import BaseModel
 
 
 class Indicator(BaseModel):
-    """
-    Модель индикатора.
-    """
-    uuid = models.CharField(max_length=100, primary_key=True, default=uuid.uuid4, editable=False)
+    """Индикатор"""
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+
     type = models.CharField(
         "Тип индикатора", max_length=13, default=TypesEnum.IP.value
     )

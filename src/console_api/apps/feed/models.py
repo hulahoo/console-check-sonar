@@ -1,10 +1,22 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 
-from console_api.apps.models.abstract import BaseModel
-from console_api.apps.indicator.models import Indicator
-from console_api.apps.common.enums import (
-    TypesEnum, FeedFormatEnum, AuthEnum, PollingFrequencyEnum, StatusUpdateEnum
+from apps.models.abstract import BaseModel, CreationDateTimeField
+
+FEED_STATUSES = (
+    ("failed_to_update", "failed-to-update"),
+    ("is_loading", "is-loading"),
+    ("normal", "normal"),
+)
+
+FEED_FORMAT = (
+    ("json", "json"),
+    ("stix_1", "stix-1"),
+    ("stix_2", "stix-2"),
+    ("misp", "misp"),
+    ("csv", "csv"),
+    ("txt", "txt"),
+    ("xml", "xml"),
 )
 
 
@@ -19,75 +31,157 @@ class ParsingRule(BaseModel):
 
 
 class Feed(BaseModel):
-    """
-    Модель фида - источника данных.
-    """
+    """Фид - источник данных"""
 
-    type_of_feed = models.CharField(
-        "Тип фида", max_length=13, default=TypesEnum.IP.value
-    )
-    format_of_feed = models.CharField(
-        "Формат фида", max_length=15, default=FeedFormatEnum.TXT_FILE.value
-    )
-    auth_type = models.CharField(
-        "Тип авторизации", max_length=7, default=AuthEnum.NO_AUTH.value
-    )
-    polling_frequency = models.CharField(
-        "Частота обновления фида",
-        max_length=17,
-        choices=PollingFrequencyEnum.choices(),
-        default=PollingFrequencyEnum.NEVER.value,
+    title = models.TextField(
+        "Название Фида",
+        unique=True,
     )
 
-    auth_login = models.CharField(
-        "Логин для авторизации", max_length=32, blank=True, null=True
+    provider = models.TextField(
+        "Название поставщика Фида",
     )
-    auth_password = models.CharField(
-        "Пароль для авторизации", max_length=64, blank=True, null=True
-    )
-    auth_querystring = models.CharField(
-        "Строка для авторизации", max_length=128, blank=True, null=True
-    )
-    separator = models.CharField(
-        "Разделитель для CSV формата", max_length=8, blank=True, null=True
-    )
-    parsing_rules = models.ManyToManyField(
-        ParsingRule,
-        verbose_name="Правила для парсинга",
-        related_name="feed_parsing_rules",
+
+    description = models.TextField(
+        "Описание Фида",
+        null=True,
         blank=True,
     )
-    custom_field = models.CharField(
-        "Кастомное поле", max_length=128, blank=True, null=True
+
+    format = models.TextField(
+        "Формат фида",
+        choices=FEED_FORMAT,
+        default="txt",
     )
-    sertificate = models.FileField("Файл сертификат", blank=True, null=True)
-    vendor = models.CharField("Вендор", max_length=32)
-    name = models.CharField("Название фида", max_length=32, unique=True)
-    link = models.CharField("Ссылка на фид", max_length=255)
-    confidence = models.IntegerField(
-        "Достоверность", validators=[MaxValueValidator(100), MinValueValidator(0)]
+
+    url = models.TextField(
+        "Ссылка на файл Фида",
     )
-    records_quantity = models.IntegerField("Количество записей", blank=True, null=True)
+
+    auth_type = models.TextField(
+        "Формат фида",
+        help_text="Например: http-basic, api-token",
+        null=True,
+        blank=True,
+    )
+
+    auth_api_token = models.TextField(
+        "API токен",
+    )
+
+    auth_login = models.TextField(
+        "Логин HTTP Basic Auth",
+    )
+
+    auth_pass = models.TextField(
+        "Пароль HTTP Basic Auth",
+    )
+
+    certificate = models.BinaryField(
+        "Сертификат",
+    )
+
+    use_taxii = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+    )
+
+    polling_frequency = models.TextField(
+        "Частота обновления",
+        help_text="Формат CronTab",
+        # TODO: Добавить Regex
+    )
+
+    weight = models.DecimalField(
+        "Вес фида",
+        decimal_places=3,
+        max_digits=6,
+        validators=[MaxValueValidator(100), MinValueValidator(0)],
+    )
+
+    available_fields = models.JSONField(
+        "Список доступных полей в индикаторах фида",
+    )
+
+    parsing_rules = models.JSONField(
+        "Настройки парсинга",
+        null=True,
+        blank=True,
+    )
+
+    status = models.TextField(
+        "Статус фида",
+        choices=FEED_STATUSES,
+    )
+
+    is_active = models.BooleanField(
+        "Включен ли фид?",
+        default=True,
+    )
+
+    is_truncating = models.BooleanField(
+        "Включено ли обрезание фида?",
+        default=False,
+    )
+
+    max_records_count = models.DecimalField(
+        decimal_places=5,
+        max_digits=20,
+    )
+
     indicators = models.ManyToManyField(
-        Indicator, related_name="feeds", verbose_name="Индикатор", blank=True
+        "indicator.Indicator",
+        blank=True,
+        null=True,
+        through="IndicatorFeedRelationship",
     )
 
-    update_status = models.CharField(
-        max_length=15, choices=StatusUpdateEnum.choices(), default=StatusUpdateEnum.ENABLED.value
-    )
-
-    ts = models.DateTimeField(auto_now_add=True)
-
-    source = models.ForeignKey("source.Source", on_delete=models.SET_NULL, null=True, default=None)
-
-    def __str__(self):
-        return f"{self.name}"
+    def __str__(self) -> str:
+        return str(self.title)
 
     @classmethod
     def get_model_fields(cls):
         return [i.attname for i in cls._meta.fields]
 
     class Meta:
+        """Metainformation about the model"""
+
         verbose_name = "Фид"
         verbose_name_plural = "Фиды"
+
         db_table = "feeds"
+
+
+class IndicatorFeedRelationship(models.Model):
+    """Custom ManyToMany relationship table for Indicator and Feed"""
+
+    indicator = models.ForeignKey(
+        "indicator.Indicator",
+        on_delete=models.CASCADE,
+    )
+
+    feed = models.ForeignKey(
+        "feed.Feed",
+        on_delete=models.CASCADE,
+    )
+
+    created_at = CreationDateTimeField(
+        "Дата и время создания связи",
+    )
+
+    deleted_at = models.DateTimeField(
+        "Дата и время удаления связи",
+        help_text="Если значение пустое, значит связь существующая",
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Связь индикатор-фид"
+        verbose_name_plural = "Связи индикатор-фид"
+
+        db_table = "indicator_feed_relationships"

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from console_api.apps.indicator.models import Indicator
-from console_api.api.feed.serializers import DashboardFeedSerializer
+from apps.indicator.models import Indicator
+from api.feed.serializers import DashboardFeedSerializer
 
 
 class IndicatorSerializer(serializers.ModelSerializer):
@@ -25,12 +25,12 @@ class DataIndicatorSerializer(serializers.ModelSerializer):
 
 
 class MatchedIndicatorSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(source='detected_count')
-    label = serializers.DateTimeField(source='last_detected_date')
+    values = serializers.IntegerField(source='value')
+    # labels = serializers.DateTimeField(source='last_detected_date')
 
     class Meta:
         model = Indicator
-        fields = ['label', 'value']
+        fields = ['values']
         exclude = []
 
 

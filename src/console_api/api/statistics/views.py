@@ -6,10 +6,10 @@ from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 
-from console_api.apps.feed.models import Feed
-from console_api.apps.indicator.models import Indicator
-from console_api.apps.source.models import Source
-from console_api.api.statistics.serializers import (IndicatorSerializer,
+from apps.feed.models import Feed
+from apps.indicator.models import Indicator
+from apps.source.models import Source
+from api.statistics.serializers import (IndicatorSerializer,
                                         IndicatorWithFeedsSerializer,
                                         MatchedIndicatorSerializer)
 
@@ -51,7 +51,7 @@ class MatchedIndicatorStatiscList(generics.ListAPIView):
         start_period = self.param_dict.get('start_period')
         finish_period = self.param_dict.get('finish_period')
         return (Indicator.objects
-                .values('last_detected_date')
+                .values('value')
                 .filter(last_detected_date__range=(start_period, finish_period))
                 .annotate(detected_count=Sum('detected'))
                 .order_by('last_detected_date'))
@@ -71,7 +71,7 @@ class MatchedObjectsStatiscList(generics.ListAPIView):
         start_period = self.param_dict.get('start_period')
         finish_period = self.param_dict.get('finish_period')
         return (Indicator.objects
-                .values('last_detected_date')
+                .values('value')
                 .filter(last_detected_date__range=(start_period, finish_period))
                 .annotate(detected_count=Sum('detected'))
                 .order_by('last_detected_date'))
@@ -91,7 +91,7 @@ class CheckedObjectsStatiscList(generics.ListAPIView):
         start_period = self.param_dict.get('start_period')
         finish_period = self.param_dict.get('finish_period')
         return (Indicator.objects
-                .values('last_detected_date')
+                .values('value')
                 .filter(last_detected_date__range=(start_period, finish_period))
                 .annotate(detected_count=Count('detected'))
                 .order_by('last_detected_date'))

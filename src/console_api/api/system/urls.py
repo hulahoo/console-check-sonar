@@ -1,6 +1,6 @@
 from django.urls import path
 
-from console_api.api.system.views import readiness, liveness, api_routes, metrics
+from api.system.views import readiness, liveness, api_routes, metrics
 
 urlpatterns = [
     path("health/liveness/", liveness, name="liveness"),

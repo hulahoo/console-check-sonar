@@ -8,6 +8,13 @@ from apps.common.enums import TypesEnum
 from apps.models.abstract import BaseModel
 
 
+INDICATOR_TYPES = (
+    ("ip", "ip"),
+    ("domain", "domain"),
+    ("hash", "hash"),
+)
+
+
 class Indicator(BaseModel):
     """Индикатор"""
 
@@ -20,57 +27,91 @@ class Indicator(BaseModel):
         max_length=36,
     )
 
-    type = models.CharField(
-        "Тип индикатора", max_length=13, default=TypesEnum.IP.value
+    ioc_type = models.CharField(
+        "Тип индикатора",
+        max_length=32,
+        choices=INDICATOR_TYPES,
     )
-    category = models.CharField(
-        "Категория индикатора", max_length=128, blank=True, null=True
-    )
-    value = models.CharField("Значение индикатора", max_length=256)
-    weight = models.IntegerField(
-        "Вес", validators=[MaxValueValidator(100), MinValueValidator(0)]
-    )
-    tag = models.ManyToManyField(Tag, blank=True, null=True)
-    false_detected = models.IntegerField(
-        "счетчик ложных срабатываний", validators=[MinValueValidator(0)], default=0
-    )
-    positive_detected = models.IntegerField(
-        "счетчик позитивных срабатываний", validators=[MinValueValidator(0)], default=0
-    )
-    detected = models.IntegerField(
-        "общий счетчик срабатываний", validators=[MinValueValidator(0)], default=0
-    )
-    first_detected_date = models.DateTimeField(
-        "Дата первого срабатывания", blank=True, null=True
-    )
-    last_detected_date = models.DateTimeField(
-        "Дата последнего срабатывания", blank=True, null=True
-    )
-    # Данные об источнике
-    supplier_name = models.CharField("Название источника", max_length=128)
-    supplier_vendor_name = models.CharField("Название поставщика ", max_length=128)
-    supplier_type = models.CharField("Тип поставщика", max_length=64)
-    supplier_confidence = models.IntegerField(
-        "Достоверность", validators=[MaxValueValidator(100), MinValueValidator(0)]
-    )
-    supplier_created_date = models.DateTimeField(
-        "Дата последнего обновления", blank=True, null=True
+
+    value = models.CharField(
+        "Значение индикатора",
+        max_length=512,
     )
 
     context = models.JSONField(
         "Данные контекста из Фидов и из Сервисов Обогащения Информацией",
     )
 
-    # время жизни
-    ttl = models.DateTimeField("Дата удаления", blank=True, null=True, default=None)
+    is_sending_to_detections = models.BooleanField(
+        "Обнаружение по индикатору должно улетать в detections?",
+        default=True,
+    )
 
-    def __str__(self):
-        return f"{self.value}"
+    is_false_positive = models.BooleanField(
+        "Ложноположительный индикатор?",
+        default=False,
+    )
+
+    weight = models.DecimalField(
+        "Вес индикатора",
+        validators=[MaxValueValidator(100), MinValueValidator(0)],
+        decimal_places=3,
+        max_digits=6,
+    )
+
+    tags_weight = models.DecimalField(
+        "Средний вес тегов фида",
+        validators=[MaxValueValidator(100), MinValueValidator(0)],
+        decimal_places=3,
+        max_digits=6,
+    )
+
+    is_archived = models.BooleanField(
+        "Статус архивирования",
+        default=False,
+    )
+
+    false_detected_counter = models.BigIntegerField(
+        "Количество ложных срабатываний",
+    )
+
+    positive_detected_counter = models.BigIntegerField(
+        "Количество подтвержденных срабатываний",
+    )
+
+    total_detected_counter = models.BigIntegerField(
+        "Всего срабатываний",
+    )
+
+    first_detected_at = models.DateTimeField(
+        "Дата и время первого срабатывания",
+    )
+
+    last_detected_at = models.DateTimeField(
+        "Дата и время последнего срабатывания",
+    )
+
+    created_by = models.ForeignKey(
+        "users.User",
+        help_text="Указывается, когда Индикатор создан пользователем",
+        on_delete=models.PROTECT,
+        verbose_name="Кем создано",
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value} ({self.ioc_type})"
 
     class Meta:
+        """Metainformation about the model"""
+
         verbose_name = "Индикатор"
         verbose_name_plural = "Индикаторы"
+
         db_table = "indicators"
+
+        unique_together = ('ioc_type', 'value')
 
 
 class IndicatorActivities(BaseModel):

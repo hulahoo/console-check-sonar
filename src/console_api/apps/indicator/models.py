@@ -1,9 +1,12 @@
+"""Models for indicator app"""
+
+from uuid import uuid4
+
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-import uuid as uuid
 
-from apps.models.abstract import BaseModel
+from apps.models.abstract import BaseModel, CreationDateTimeField
 
 
 INDICATOR_TYPES = (
@@ -12,15 +15,23 @@ INDICATOR_TYPES = (
     ("hash", "hash"),
 )
 
+ACTIVITIES_TYPE = (
+    ("add_comment", "add-comment"),
+    ("add_tag", "add-tag"),
+    ("remove_tag", "remove-tag"),
+    ("move_to_archive", "move-to-archive"),
+    ("move_from_archive", "move-from-archive"),
+)
+
 
 class Indicator(BaseModel):
-    """Индикатор"""
+    """Indicator"""
 
     # Используется CharField, а не UUIDField потому что иначе
     # не получается сделать ManyToMany связь с Feed моделью
     id = models.CharField(
         primary_key=True,
-        default=uuid.uuid4,
+        default=uuid4,
         editable=False,
         max_length=36,
     )
@@ -109,33 +120,47 @@ class Indicator(BaseModel):
 
         db_table = "indicators"
 
-        unique_together = ('ioc_type', 'value')
+        unique_together = ("ioc_type", "value")
 
 
-class IndicatorActivities(BaseModel):
-    """
-    Модель Активность по Индикатору
-    """
-    ACTIVITIES_TYPE = (
-        ("add_comment", "add-comment"),
-        ("add_tag", "add-tag"),
-        ("remove_tag", "remove-tag"),
-        ("move_to_archive", "move-to-archive"),
-        ("move_from_archive", "move-from-archive"),
+class IndicatorActivities(models.Model):
+    """Timeline of activity for each Indicator"""
+
+    indicator = models.ForeignKey(
+        "indicator.Indicator",
+        on_delete=models.CASCADE,
+        verbose_name="Активность по индикатору",
+        related_name="activities",
     )
-    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE, verbose_name='Активность по индикатору',
-                                  related_name='activities')
-    type = models.CharField(max_length=50, choices=ACTIVITIES_TYPE, verbose_name='Тип')
+
+    type = models.TextField(
+        "Тип",
+        choices=ACTIVITIES_TYPE,
+    )
+
     details = models.JSONField()
 
+    created_at = CreationDateTimeField(
+        "Создано",
+    )
+
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.PROTECT,
+        verbose_name="Кем создано",
+    )
+
     class Meta:
-        verbose_name = "Активность по Индикатору"
-        verbose_name_plural = "Активности по Индикатору"
-        db_table = "activities"
+        """Metainformation about the model"""
+
+        verbose_name = "Таймлайн активности по индикатору"
+        verbose_name_plural = "Таймлайны активностей по индикаторам"
+
+        db_table = "indicator_activities"
 
 
 class Session(models.Model):
-    """Пользовательская сессия"""
+    """User session"""
 
     user_id = models.ForeignKey(
         "users.User",
@@ -143,7 +168,7 @@ class Session(models.Model):
         verbose_name="ID пользователя",
     )
 
-    access_token = models.CharField(
+    access_token = models.TextField(
         "Токен доступа MD5",
         max_length=255,
     )

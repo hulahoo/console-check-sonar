@@ -1,7 +1,10 @@
+"""Models for feed app"""
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from apps.models.abstract import BaseModel, CreationDateTimeField
+
 
 FEED_STATUSES = (
     ("failed_to_update", "failed-to-update"),
@@ -20,18 +23,8 @@ FEED_FORMAT = (
 )
 
 
-class ParsingRule(BaseModel):
-    """
-    Модель правила для парсинга (CSV)
-    """
-
-    class Meta:
-        verbose_name = "Правило парсинга"
-        verbose_name_plural = "Правила парсинга"
-
-
 class Feed(BaseModel):
-    """Фид - источник данных"""
+    """Feed - data source"""
 
     title = models.TextField(
         "Название Фида",
@@ -141,7 +134,9 @@ class Feed(BaseModel):
         return str(self.title)
 
     @classmethod
-    def get_model_fields(cls):
+    def get_model_fields(cls) -> list:
+        """Return fields of the model"""
+
         return [i.attname for i in cls._meta.fields]
 
     class Meta:

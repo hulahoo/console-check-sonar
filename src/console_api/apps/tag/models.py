@@ -38,6 +38,8 @@ class Tag(BaseModel):
     )
 
     def delete(self) -> None:
+        """Will work when deleting an object"""
+
         self.deleted_at = timezone.now()
         self.save()
 

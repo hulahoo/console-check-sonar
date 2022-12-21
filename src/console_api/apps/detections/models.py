@@ -1,10 +1,10 @@
 """Models for detections app"""
 
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
-from apps.models.abstract import CreationDateTimeField
 from apps.feed.models import Feed
+from apps.models.abstract import CreationDateTimeField
 
 
 class Detection(models.Model):
@@ -15,7 +15,7 @@ class Detection(models.Model):
         help_text="Информация о Событии (Объект из Kafka)",
     )
 
-    indicator_id = models.ForeignKey(
+    indicator = models.ForeignKey(
         "indicator.Indicator",
         verbose_name="Обнаруженный индикатор для данного события",
         on_delete=models.PROTECT,
@@ -41,39 +41,36 @@ class Detection(models.Model):
         through="DetectionTagRelationship",
     )
 
+    # TODO: переписать все проперти в сервисах
     @property
     def context(self) -> str:
-        return self.indicator_id.context
+        return self.indicator.context
 
     @property
     def feed_name(self) -> str:
         if Feed.objects.filter(
-            indicators__id__contains=self.indicator_id.id
+            indicators__id__contains=self.indicator.id
         ).exists():
             return Feed.objects.filter(
-                indicators__id__contains=self.indicator_id.id
+                indicators__id__contains=self.indicator.id
             )[0].title
 
     @property
     def ioc_id(self):
-        return self.indicator_id.id
+        return self.indicator.id
 
     @property
     def provider(self):
         feed_provider = None
 
         if Feed.objects.filter(
-            indicators__id__contains=self.indicator_id.id
+            indicators__id__contains=self.indicator.id
         ).exists():
             feed_provider = Feed.objects.filter(
-                indicators__id__contains=self.indicator_id.id
+                indicators__id__contains=self.indicator.id
             )[0].provider
 
         return feed_provider
-
-    @property
-    def tags(self):
-        return [tag.id for tag in self.indicator_id.tag.all()]
 
     def __str__(self) -> str:
         return str(self.id)

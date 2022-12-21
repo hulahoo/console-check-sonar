@@ -15,18 +15,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ParsingRule',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', apps.models.abstract.CreationDateTimeField(auto_now_add=True, verbose_name='создано')),
-                ('updated_at', apps.models.abstract.ModificationDateTimeField(auto_now=True, verbose_name='изменено')),
-            ],
-            options={
-                'verbose_name': 'Правило парсинга',
-                'verbose_name_plural': 'Правила парсинга',
-            },
-        ),
-        migrations.CreateModel(
             name='Feed',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),

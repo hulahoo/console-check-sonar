@@ -1,53 +1,56 @@
-# console-api
+# console-api - API для консоли управления
 
-API для Консоли Управления, куда ходит Веб-интерфейс Платформы и куда ходит Консольная команда управления Платформой. 
+## К API обращаются:
+- Веб-интерфейс Платформы (Console WEB)
+- Консольная команда управления Платформой (Console CLI)
 
-### Запуск приложени
+## Запуск
 
-- Скопируйте данный репозиторий
-
-- Запустить создание статических файлов
+### Без использования Docker
+- Создать файл _.env_ в корне проекта и задать в нём значения
     ```
-    python3 src/manage.py collectstatic
-    python3 src/manage.py makemigrations
-    python3 src/manage.py makemigrations feed
-    python3 src/manage.py makemigrations indicator
-    python3 src/manage.py makemigrations source
-    python3 src/manage.py makemigrations tag
-    python3 src/manage.py makemigrations users
-    python3 src/manage.py migrate
-    python3 src/manage.py loaddata fixt_user.json
-    python3 mamage.py runserver
-    ```
-- Запуск приложения
-    ```
-    python3 mamage.py runserver
+    DEBUG=<True/False>
+
+    POSTGRES_SERVER=
+    POSTGRES_PASSWORD=
+    POSTGRES_USER=
+    POSTGRES_DB=
+    POSTGRES_PORT=
+
+    SWAGGER=<True/False>
     ```
 
-## Информаци о ENV-параметрах
-Имеющиеся env-параметры в проекте:
-```
-DEBUG=
+- Собрать статику
+    ```
+    python3 src/console_api/manage.py collectstatic
+    ```
+- Создать и выполнить миграции
+    ```
+    python3 src/console_api/manage.py makemigrations
 
-POSTGRES_SERVER=
-POSTGRES_PASSWORD=
-POSTGRES_USER=
-POSTGRES_DB=
-POSTGRES_PORT=
+    python3 src/console_api/manage.py makemigrations feed
+    python3 src/console_api/manage.py makemigrations indicator
+    python3 src/console_api/manage.py makemigrations source
+    python3 src/console_api/manage.py makemigrations tag
+    python3 src/console_api/manage.py makemigrations users
+    python3 src/console_api/manage.py makemigrations detections
 
-SWAGGER=(bool)
-```
+    python3 src/console_api/manage.py migrate
+- Запустить сервер
+    ```
+    python3 src/console_api/manage.py runserver
+    ```
 
 ## Информация о файлах конфигурации
 ```text
 .
 ├── api                                 ## Директория для api эндпоинтов
-│   │                                   
-│   ├──                                
+│   │
+│   ├──
 ... ... ... ...
 │
 ├── docs                                ## Документация проекта
-│   ├──                                 
+│   ├──
 ... ... ... ...
 │
 └── settings                            ## Конфигурации, подключаемые в проект.

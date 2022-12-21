@@ -30,16 +30,22 @@ class Tag(BaseModel):
         verbose_name="Кем создано",
     )
 
+    created_at = models.DateTimeField(
+        "Дата и время создания",
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        "Дата и время обновления",
+        auto_now=True,
+    )
+
     deleted_at = models.DateTimeField(
         "Дата и время удаления",
         null=True,
         blank=True,
         editable=False,
     )
-
-    def delete(self) -> None:
-        self.deleted_at = timezone.now()
-        self.save()
 
     def __str__(self):
         return f"{self.title} | {self.weight}"

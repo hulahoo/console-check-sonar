@@ -11,10 +11,13 @@ from apps.models.abstract import BaseModel
 class Indicator(BaseModel):
     """Индикатор"""
 
-    id = models.UUIDField(
+    # Используется CharField, а не UUIDField потому что иначе
+    # не получается сделать ManyToMany связь с Feed моделью
+    id = models.CharField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
+        max_length=36,
     )
 
     type = models.CharField(

@@ -127,6 +127,7 @@ class Feed(BaseModel):
         decimal_places=3,
         max_digits=12,
     )
+    indicators = models.ManyToManyField("indicator.Indicator", blank=True, null=True)
 
     indicators = models.ManyToManyField(
         "indicator.Indicator",

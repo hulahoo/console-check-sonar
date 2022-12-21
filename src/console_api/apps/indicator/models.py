@@ -1,3 +1,4 @@
+import uuid as uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -10,12 +11,9 @@ class Indicator(BaseModel):
     """
     Модель индикатора.
     """
-
+    uuid = models.CharField(max_length=100, primary_key=True, default=uuid.uuid4, editable=False)
     type = models.CharField(
         "Тип индикатора", max_length=13, default=TypesEnum.IP.value
-    )
-    uuid = models.CharField(
-        "Уникальный идентификатор индикатора", unique=True, max_length=255
     )
     category = models.CharField(
         "Категория индикатора", max_length=128, blank=True, null=True
@@ -24,7 +22,7 @@ class Indicator(BaseModel):
     weight = models.IntegerField(
         "Вес", validators=[MaxValueValidator(100), MinValueValidator(0)]
     )
-    tag = models.ManyToManyField(Tag, "tags")
+    tag = models.ManyToManyField(Tag, blank=True, null=True)
     false_detected = models.IntegerField(
         "счетчик ложных срабатываний", validators=[MinValueValidator(0)], default=0
     )
@@ -65,3 +63,26 @@ class Indicator(BaseModel):
         verbose_name = "Индикатор"
         verbose_name_plural = "Индикаторы"
         db_table = "sessions"
+
+
+class IndicatorActivities(BaseModel):
+    """
+    Модель Активность по Индикатору
+    """
+    ACTIVITIES_TYPE = (
+        ("add_comment", "add-comment"),
+        ("add_tag", "add-tag"),
+        ("remove_tag", "remove-tag"),
+        ("move_to_archive", "move-to-archive"),
+        ("move_from_archive", "move-from-archive"),
+    )
+    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE, verbose_name='Активность по индикатору',
+                                  related_name='activities')
+    type = models.CharField(max_length=50, choices=ACTIVITIES_TYPE, verbose_name='Тип')
+    details = models.JSONField()
+
+    class Meta:
+        verbose_name = "Активность по Индикатору"
+        verbose_name_plural = "Активности по Индикатору"
+        db_table = "activities"
+

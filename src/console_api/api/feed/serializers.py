@@ -51,3 +51,9 @@ class DashboardFeedSerializer(serializers.ModelSerializer):
         model = Feed
         fields = ['name', 'ts']
         exclude = []
+
+
+class FeedShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feed
+        fields = ['id', 'title']

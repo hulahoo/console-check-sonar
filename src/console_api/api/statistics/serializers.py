@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from console_api.apps.indicator.models import Indicator
-from console_api.api.feed.serializers import DashboardFeedSerializer
 
 
 class IndicatorSerializer(serializers.ModelSerializer):
@@ -34,11 +33,9 @@ class MatchedIndicatorSerializer(serializers.ModelSerializer):
 
 
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
-    feeds = DashboardFeedSerializer(many=True, read_only=True)
-
     class Meta:
         model = Indicator
-        fields = ['false_detected', 'positive_detected', 'feeds']
+        fields = ['false_detected_counter', 'positive_detected_counter']
         exclude = []
 
     @staticmethod

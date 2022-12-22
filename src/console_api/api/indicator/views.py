@@ -3,7 +3,9 @@ from rest_framework import generics, viewsets
 
 from console_api.apps.indicator.models import Indicator
 from console_api.api.services import get_response_with_pagination
-from console_api.api.indicator.serializers import IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer
+from console_api.api.indicator.serializers import (
+    IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer,
+)
 
 
 class IndicatorStatiscList(generics.ListAPIView):
@@ -50,10 +52,12 @@ class IndicatorStatiscList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         sort_by_param = request.GET.get('sort-by')
         self.queryset = self.add_queryset_filters(request=request)
+
         if sort_by_param:
-            print(sort_by_param)
-            sort_by_param = sort_by_param[0] + sort_by_param[1:].replace('-', '_')
-            if sort_by_param == 'ioc_weight' or sort_by_param == '-ioc_weight':
+            sort_by_param = \
+                sort_by_param[0] + sort_by_param[1:].replace('-', '_')
+
+            if sort_by_param in ['ioc_weight', '-ioc_weight']:
                 sort_by_param = 'weight'
 
             self.queryset = self.queryset.order_by(sort_by_param)

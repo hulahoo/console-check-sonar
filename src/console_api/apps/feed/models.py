@@ -74,7 +74,7 @@ class Feed(BaseModel):
         "Сертификат",
     )
 
-    use_taxii = models.BooleanField(
+    is_use = models.BooleanField(
         default=False,
         null=True,
         blank=True,

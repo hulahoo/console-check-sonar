@@ -34,7 +34,7 @@ class FeedSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             'source-url': {'source': 'url'},
-            'use-taxii': {'source': 'use_taxii'},
+            'is-use': {'source': 'is_use'},
             "polling-frequency": {'source': "polling_frequency"},
             "auth-type": {'source': "auth_type"},
             "auth-api-token": {'source': "auth_api_token"},

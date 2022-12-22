@@ -3,7 +3,7 @@
 from rest_framework import generics
 
 from console_api.apps.detections.models import Detection
-from src.console_api.api.detections.serializers import DetectionSerializer
+from console_api.api.detections.serializers import DetectionSerializer
 from console_api.api.services import get_response_with_pagination
 
 

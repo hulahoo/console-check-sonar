@@ -6,7 +6,7 @@ from django.urls import include, path
 urlpatterns = [
     path("console-admin/", admin.site.urls),
     path("system/", include("console_api.api.system.urls")),
-    path("api/", include("console_api.api.urls")),
+    path("api/", include("src.console_api.api.urls")),
 ]
 
 if settings.DEBUG:
@@ -26,6 +26,6 @@ if settings.DEBUG:
 
 
 if settings.SWAGGER:
-    from src.console_api.swagger.urls import urlpatterns as swagger_urlpatterns
+    from console_api.swagger.urls import urlpatterns as swagger_urlpatterns
 
     urlpatterns += swagger_urlpatterns

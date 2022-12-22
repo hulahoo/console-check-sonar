@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from src.console_api.api.detections.views import DetectionListView
+from console_api.api.detections.views import DetectionListView
 
 
 urlpatterns = [

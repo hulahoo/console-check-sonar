@@ -34,11 +34,12 @@ class MatchedIndicatorSerializer(serializers.ModelSerializer):
 
 
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
-    feeds = DashboardFeedSerializer(many=True, read_only=True)
+    # feeds = DashboardFeedSerializer(many=True, read_only=True)
 
     class Meta:
         model = Indicator
-        fields = ['false_detected', 'positive_detected', 'feeds']
+        fields = ['false_detected_counter', 'positive_detected_counter']
+                #   , 'feeds']
         exclude = []
 
     @staticmethod

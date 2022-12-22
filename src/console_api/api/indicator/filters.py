@@ -10,7 +10,7 @@ class DashboardFilter(filters.FilterSet):
 
     class Meta:
         model = Indicator
-        fields = ["id", "positive_detected", "false_detected"]
+        fields = ["id", "positive_detected_counter", "false_detected_counter"]
 
 
 class IndicatorFilter(filters.FilterSet):

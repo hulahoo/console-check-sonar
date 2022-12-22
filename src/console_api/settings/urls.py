@@ -1,3 +1,5 @@
+"""Main urls"""
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -6,7 +8,7 @@ from django.urls import include, path
 urlpatterns = [
     path("console-admin/", admin.site.urls),
     path("system/", include("console_api.api.system.urls")),
-    path("api/", include("src.console_api.api.urls")),
+    path("api/", include("console_api.api.urls")),
 ]
 
 if settings.DEBUG:

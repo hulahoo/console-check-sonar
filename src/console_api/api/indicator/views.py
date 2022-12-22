@@ -9,6 +9,7 @@ from console_api.api.indicator.serializers import (
 
 
 class IndicatorStatiscList(generics.ListAPIView):
+    """IndicatorStatiscList"""
 
     def add_queryset_filters(self, *, request):
         is_sending_to_detections = request.GET.get('filter[is_sending_to_detections]')
@@ -71,6 +72,8 @@ class IndicatorStatiscList(generics.ListAPIView):
 
 
 class IndicatorCreateView(viewsets.ModelViewSet):
+    """IndicatorCreateView"""
+
     authentication_classes = ()
     permission_classes = []
     serializer_class = IndicatorSerializer

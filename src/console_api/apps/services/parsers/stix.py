@@ -20,27 +20,22 @@ def get_or_elevate(feed) -> dict:
         return elevate(text)
 
 
-def parse_stix(
-    feed,
-    raw_indicators=None, config: dict = {}
-):
+def parse_stix(feed, config: dict = None):
     """
     Парсит переданный json в формате STIX и отдает список индикаторов.
     """
 
-    limit = config.get('limit', None)
+    if not config:
+        config = {}
+
+    limit = config.get('limit')
 
     bundle = get_or_elevate(feed)
     objects = bundle.get("objects")
-    raw_indicators = []
-
     if limit:
         objects = list(objects)[:limit]
 
-    for obj in objects:
-        if obj.get("type") == "indicator":
-            raw_indicators.append(obj)
-
+    raw_indicators = [obj for obj in objects if obj.get("type") == "indicator"]
     indicators = []
     feed_control(feed, config)
     for raw_indicator in raw_indicators:

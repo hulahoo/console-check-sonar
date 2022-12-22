@@ -41,7 +41,6 @@ class Detection(models.Model):
         through="DetectionTagRelationship",
     )
 
-    # TODO: переписать все проперти в сервисах
     @property
     def context(self) -> str:
         return self.indicator.context

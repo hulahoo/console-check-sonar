@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
-from config.log_conf import logger
+from console_api.config.log_conf import logger
 
 
 @api_view(["GET"])

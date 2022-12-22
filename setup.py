@@ -37,7 +37,7 @@ setup(
     package_dir={"": "src"},
     entry_points={
         'console_scripts': [
-            CI_PROJECT_NAME + " = " + "main:execute"
+            CI_PROJECT_NAME + " = " + "console_api.main:execute"
         ]
     }
 )

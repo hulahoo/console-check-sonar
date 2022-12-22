@@ -1,8 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from apps.models.abstract import BaseModel
-from apps.common.enums import FormatTypeEnum, AuthEnum
+from console_api.apps.models.abstract import BaseModel
+from console_api.apps.common.enums import FormatTypeEnum, AuthEnum
 
 
 class Source(BaseModel):

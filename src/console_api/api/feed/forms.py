@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.feed.models import Feed
+from console_api.apps.feed.models import Feed
 
 
 class FeedForm(forms.ModelForm):

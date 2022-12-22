@@ -1,7 +1,7 @@
 import django_filters
 from django_filters import rest_framework as filters
 
-from apps.indicator.models import Indicator
+from console_api.apps.indicator.models import Indicator
 
 
 class DashboardFilter(filters.FilterSet):

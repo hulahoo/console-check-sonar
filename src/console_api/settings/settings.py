@@ -34,13 +34,13 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "apps.feed.apps.FeedConfig",
-    "apps.indicator.apps.IndicatorConfig",
-    "apps.source.apps.SourceConfig",
-    "apps.tag.apps.TagConfig",
-    "apps.users.apps.UsersConfig",
-    "apps.statistics.apps.StatisticsConfig",
-    "apps.detections.apps.DetectionsConfig",
+    "console_api.apps.feed.apps.FeedConfig",
+    "console_api.apps.indicator.apps.IndicatorConfig",
+    "console_api.apps.source.apps.SourceConfig",
+    "console_api.apps.tag.apps.TagConfig",
+    "console_api.apps.users.apps.UsersConfig",
+    "console_api.apps.statistics.apps.StatisticsConfig",
+    "console_api.apps.detections.apps.DetectionsConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -73,7 +73,7 @@ if SWAGGER:
     THIRD_PARTY_APPS.append('drf_yasg')
 
 
-ROOT_URLCONF = 'settings.urls'
+ROOT_URLCONF = 'console_api.settings.urls'
 
 TEMPLATES = [
     {
@@ -91,7 +91,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'settings.wsgi.application'
+WSGI_APPLICATION = 'console_api.settings.wsgi.application'
 
 
 DATABASES = {

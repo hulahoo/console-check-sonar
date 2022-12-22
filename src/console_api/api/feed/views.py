@@ -1,3 +1,5 @@
+"""Views for feed app"""
+
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -12,6 +14,8 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 @api_view(["POST"])
 def feed_add(request):
+    """Add feed"""
+
     if request.method == "POST":
         serializer = FeedSerializer(data=request.data)
 
@@ -24,6 +28,8 @@ def feed_add(request):
 
 
 def feed_create(request):
+    """Create feed"""
+
     data = request.data
     feed = Feed(**data["feed"])
     method = choose_type(data['type'])
@@ -33,6 +39,8 @@ def feed_create(request):
 
 
 class FeedListView(viewsets.ModelViewSet):
+    """View for list of feeds"""
+
     queryset = Feed.objects.all()
     serializer_class = FeedSerializer
     filter_backends = (filters.DjangoFilterBackend,)

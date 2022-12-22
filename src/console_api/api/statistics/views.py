@@ -1,3 +1,5 @@
+"""Views for statistics app"""
+
 import collections
 
 from django.db import connection
@@ -17,6 +19,8 @@ from console_api.api.statistics.serializers import (
 
 
 class IndicatorStatiscList(BaseIndicatorList):
+    """IndicatorStatiscList"""
+
     queryset = Indicator.objects.all()
     serializer_class = IndicatorSerializer
 
@@ -39,24 +43,34 @@ class IndicatorStatiscList(BaseIndicatorList):
 
 
 class FeedStatiscList(generics.ListAPIView):
+    """FeedStatiscList"""
+
     pagination_class = PageNumberPagination
     serializer_class = IndicatorWithFeedsSerializer
     queryset = Indicator.objects.all().prefetch_related('feeds')
 
 
 class MatchedIndicatorStatiscList(generics.ListAPIView):
+    """MatchedIndicatorStatiscList"""
+
     serializer_class = MatchedIndicatorSerializer
 
 
 class MatchedObjectsStatiscList(generics.ListAPIView):
+    """MatchedObjectsStatiscList"""
+
     serializer_class = MatchedIndicatorSerializer
 
 
 class CheckedObjectsStatiscList(generics.ListAPIView):
+    """CheckedObjectsStatiscList"""
+
     serializer_class = MatchedIndicatorSerializer
 
 
 class FeedsIntersectionList(generics.ListAPIView):
+    """FeedsIntersectionList"""
+
     serializer_class = MatchedIndicatorSerializer
 
     def list(self, request, *args, **kwargs):

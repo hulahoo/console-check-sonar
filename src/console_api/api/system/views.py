@@ -1,3 +1,4 @@
+from django.views.decorators.http import require_GET
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -5,7 +6,7 @@ from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from console_api.config.log_conf import logger
 
 
-@api_view(["GET"])
+@require_GET
 def readiness(request):
     """
     Текущее состояние готовности сервиса
@@ -14,7 +15,7 @@ def readiness(request):
     return Response({"status": "UP"})
 
 
-@api_view(["GET"])
+@require_GET
 def liveness(request):
     """
     Возвращает информацию о работоспособности сервиса
@@ -23,7 +24,7 @@ def liveness(request):
     return Response({"status": "UP"})
 
 
-@api_view(["GET"])
+@require_GET
 def metrics(request):
     """
     Возвращает метрики сервиса
@@ -31,8 +32,10 @@ def metrics(request):
     return Response(data=generate_latest(), content_type=CONTENT_TYPE_LATEST)
 
 
-@api_view(["GET"])
+@require_GET
 def api_routes(request):
+    """API routes"""
+
     return Response({
         "openapi:": "3.0.0",
         "info": {

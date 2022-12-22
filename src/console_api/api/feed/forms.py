@@ -9,7 +9,7 @@ class FeedForm(forms.ModelForm):
         fields = [
             "source-url",
             "format",
-            "use-taxii",
+            "is_use",
             "polling-frequency",
             "auth-type",
             "auth-api-token",

@@ -8,7 +8,7 @@ from django.urls import include, path
 urlpatterns = [
     path("console-admin/", admin.site.urls),
     path("system/", include("console_api.api.system.urls")),
-    path("api/", include("console_api.api.urls")),
+    path("api/", include("src.console_api.api.urls")),
 ]
 
 if settings.DEBUG:

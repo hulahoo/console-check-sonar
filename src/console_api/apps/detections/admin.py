@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from apps.detections.models import Detection
+from console_api.apps.detections.models import Detection
 
 
 admin.site.register(Detection)

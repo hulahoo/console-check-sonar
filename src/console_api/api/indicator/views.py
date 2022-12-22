@@ -1,9 +1,9 @@
 """Views for detections app"""
 from rest_framework import generics, viewsets
 
-from apps.indicator.models import Indicator
-from api.services import get_response_with_pagination
-from api.indicator.serializers import IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer
+from console_api.apps.indicator.models import Indicator
+from console_api.api.services import get_response_with_pagination
+from console_api.api.indicator.serializers import IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer
 
 
 class IndicatorStatiscList(generics.ListAPIView):

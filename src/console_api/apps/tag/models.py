@@ -3,7 +3,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from apps.models.abstract import BaseModel, CreationDateTimeField
+from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
 
 
 class Tag(BaseModel):

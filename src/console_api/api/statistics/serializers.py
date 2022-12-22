@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from apps.indicator.models import Indicator
-from api.feed.serializers import DashboardFeedSerializer
+from console_api.apps.indicator.models import Indicator
+from console_api.api.feed.serializers import DashboardFeedSerializer
 
 
 class IndicatorSerializer(serializers.ModelSerializer):

@@ -1,7 +1,7 @@
 import requests
 
-from config.log_conf import logger
-from apps.feed.models import Feed
+from console_api.config.log_conf import logger
+from console_api.apps.feed.models import Feed
 
 
 def get_url(url) -> str:

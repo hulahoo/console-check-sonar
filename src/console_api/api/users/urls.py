@@ -1,7 +1,7 @@
 from django.urls import path
 
-from api.users import views
-from apps.users.views import RegisterUserAPIView
+from console_api.api.users import views
+from console_api.apps.users.views import RegisterUserAPIView
 
 
 urlpatterns = [

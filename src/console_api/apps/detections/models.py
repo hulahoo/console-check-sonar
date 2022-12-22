@@ -3,8 +3,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from apps.feed.models import Feed
-from apps.models.abstract import CreationDateTimeField
+from console_api.apps.feed.models import Feed
+from console_api.apps.models.abstract import CreationDateTimeField
 
 
 class Detection(models.Model):

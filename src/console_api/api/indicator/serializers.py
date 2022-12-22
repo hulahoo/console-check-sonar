@@ -1,9 +1,9 @@
-from apps.tag.models import Tag
-from apps.feed.models import Feed
+from console_api.apps.tag.models import Tag
+from console_api.apps.feed.models import Feed
 from rest_framework import serializers
-from api.feed.serializers import FeedShortSerializer
-from api.feed.serializers import DashboardFeedSerializer
-from apps.indicator.models import Indicator, IndicatorActivities
+from console_api.api.feed.serializers import FeedShortSerializer
+from console_api.api.feed.serializers import DashboardFeedSerializer
+from console_api.apps.indicator.models import Indicator, IndicatorActivities
 
 
 class TagSerializer(serializers.ModelSerializer):

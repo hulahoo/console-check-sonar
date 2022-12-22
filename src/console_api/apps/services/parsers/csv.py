@@ -3,8 +3,8 @@ from uuid import uuid4
 
 from stix2elevator.options import initialize_options
 
-from apps.indicator.models import Indicator
-from apps.services.ext import feed_control
+from console_api.apps.indicator.models import Indicator
+from console_api.apps.services.ext import feed_control
 
 initialize_options(options={"spec_version": "2.1"})
 

@@ -6,7 +6,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
-from apps.models.abstract import BaseModel, CreationDateTimeField
+from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
 
 
 INDICATOR_TYPES = (

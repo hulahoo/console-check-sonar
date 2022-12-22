@@ -1,6 +1,6 @@
 from django.urls import path
 
-from api.statistics.views import (
+from console_api.api.statistics.views import (
     FeedStatiscList, MatchedIndicatorStatiscList,
     MatchedObjectsStatiscList, CheckedObjectsStatiscList, FeedsIntersectionList
 )

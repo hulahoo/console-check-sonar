@@ -12,8 +12,8 @@ schema_view = get_schema_view(
         description="Console API"
     ),
     patterns=[
-        path("api/statistics/", include("api.statistics.urls")),
-        path("api/users/", include("apps.users.urls")),
+        path("api/statistics/", include("console_api.api.statistics.urls")),
+        path("api/users/", include("console_api.apps.users.urls")),
     ],
 )
 
@@ -24,7 +24,7 @@ statistics_api_schema_view = get_schema_view(
         description="Statistics API"
     ),
     patterns=[
-        path("api/statistics/", include("api.statistics.urls")),
+        path("api/statistics/", include("console_api.api.statistics.urls")),
     ],
 )
 
@@ -35,7 +35,7 @@ user_api_schema_view = get_schema_view(
         description="User API"
     ),
     patterns=[
-        path("api/users/", include("apps.users.urls")),
+        path("api/users/", include("console_api.apps.users.urls")),
     ],
 )
 

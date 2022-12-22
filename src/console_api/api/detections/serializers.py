@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from apps.detections.models import Detection
+from console_api.apps.detections.models import Detection
 
 
 class DetectionSerializer(serializers.ModelSerializer):

@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from api.indicator.views import IndicatorStatiscList, IndicatorDetailView
+from console_api.api.indicator.views import IndicatorStatiscList, IndicatorDetailView
 
 
 urlpatterns = [

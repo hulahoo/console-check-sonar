@@ -95,7 +95,7 @@ class DataIndicatorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Indicator
-        fields = ['data']
+        fields = ['context']
         exclude = []
 
 
@@ -104,7 +104,7 @@ class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Indicator
-        fields = ['false_detected', 'positive_detected', 'feeds']
+        fields = ['false_detected_counter', 'positive_detected_counter', 'feeds']
         exclude = []
 
     @staticmethod

@@ -8,6 +8,7 @@ class FeedSerializer(serializers.ModelSerializer):
         model = Feed
 
         fields = [
+            "id",
             "source-url",
             "format",
             "use-taxii",
@@ -26,8 +27,10 @@ class FeedSerializer(serializers.ModelSerializer):
             "is-truncating",
             "max-records-count",
             "weight",
-            # TODO: хз с каким полем модели ассоциируется, узнать
+            "available-fields",
+            # TODO такого поля нет, посмотреть откуда оно берется
             # "importing-fields",
+            "created-at",
         ]
 
         extra_kwargs = {
@@ -41,22 +44,24 @@ class FeedSerializer(serializers.ModelSerializer):
             "parsing-rules": {'source': "parsing_rules"},
             "feed-name": {'source': "title"},
             "is-enabled": {'source': "is_active"},
-            "is-truncating": {'source': "is-truncating"},
+            "is-truncating": {'source': "is_truncating"},
             "max-records-count": {'source': "max_records_count"},
+            "available-fields": {'source': "available_fields"},
+            "created-at": {'source': "created_at"},
         }
 
 
 class DashboardFeedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed
-        fields = ['name', 'ts']
+        fields = ['title', 'ts']
         exclude = []
 
 
 class FeedShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed
-        fields = ['id', 'title']
+        fields = ['id', 'name']
 
         extra_kwargs = {
             'name': {'source': 'title'},

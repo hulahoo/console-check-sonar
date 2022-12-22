@@ -83,7 +83,6 @@ class Feed(BaseModel):
     polling_frequency = models.TextField(
         "Частота обновления",
         help_text="Формат CronTab",
-        # TODO: Добавить Regex
     )
 
     weight = models.DecimalField(

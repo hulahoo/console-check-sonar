@@ -3,7 +3,7 @@
 from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-from rest_framework import permissions
+from rest_framework.permissions import AllowAny
 
 from console_api.apps.users.views import CustomAuthTokenView
 
@@ -14,7 +14,7 @@ schema_view = get_schema_view(
         default_version="v3",
         description="Console API"
     ),
-    permission_classes=(permissions.IsAdminUser,),
+    permission_classes=(AllowAny,),
     patterns=[
         path("api/statistics/", include("console_api.api.statistics.urls")),
         path("api/users/", include("console_api.apps.users.urls")),

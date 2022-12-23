@@ -42,4 +42,6 @@ def liveness_view(request) -> Response:
 def metrics_view(request) -> Response:
     """Выдаёт метрики сервиса"""
 
-    return Response(data=generate_latest(), content_type=CONTENT_TYPE_LATEST)
+    metrics = generate_latest().replace(b'"', b'').replace(b'\n', b'<br>')
+
+    return Response(data=metrics, content_type=CONTENT_TYPE_LATEST)

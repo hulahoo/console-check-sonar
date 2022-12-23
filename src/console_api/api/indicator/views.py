@@ -1,5 +1,6 @@
 """Views for detections app"""
 from rest_framework import generics, viewsets
+from django.http import JsonResponse
 
 from console_api.apps.indicator.models import Indicator
 from console_api.api.services import get_response_with_pagination
@@ -51,10 +52,12 @@ class IndicatorStatiscList(generics.ListAPIView):
             self.queryset = self.queryset.filter(last_detected_at=last_detected_at)
 
     def list(self, request, *args, **kwargs):
-        sort_by_param = request.GET.get('sort-by')
+        if len(self.get_queryset()) == 0:
+            return JsonResponse({})
+
         self.queryset = self.add_queryset_filters(request=request)
 
-        if sort_by_param:
+        if sort_by_param := request.GET.get('sort-by'):
             sort_by_param = \
                 sort_by_param[0] + sort_by_param[1:].replace('-', '_')
 

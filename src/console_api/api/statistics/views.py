@@ -50,18 +50,21 @@ class MatchedIndicatorStatiscList(generics.ListAPIView):
     """MatchedIndicatorStatiscList"""
 
     serializer_class = MatchedIndicatorSerializer
+    queryset = Indicator.objects.all().prefetch_related('feeds')
 
 
 class MatchedObjectsStatiscList(generics.ListAPIView):
     """MatchedObjectsStatiscList"""
 
     serializer_class = MatchedIndicatorSerializer
+    queryset = Indicator.objects.all().prefetch_related('feeds')
 
 
 class CheckedObjectsStatiscList(generics.ListAPIView):
     """CheckedObjectsStatiscList"""
 
     serializer_class = MatchedIndicatorSerializer
+    queryset = Indicator.objects.all().prefetch_related('feeds')
 
 
 class FeedsIntersectionList(generics.ListAPIView):

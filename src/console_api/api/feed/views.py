@@ -2,8 +2,8 @@
 
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from django_filters import rest_framework as filters
+from django.views.decorators.http import require_POST
 
 from console_api.apps.feed.models import Feed
 from console_api.api.feed.serializers import FeedSerializer
@@ -12,7 +12,7 @@ from console_api.apps.services.format_selector import choose_type
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 
-@api_view(["POST"])
+@require_POST
 def feed_add(request):
     """Add feed"""
 
@@ -27,6 +27,7 @@ def feed_add(request):
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
+@require_POST
 def feed_create(request):
     """Create feed"""
 

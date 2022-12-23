@@ -12,7 +12,7 @@ from console_api.api.system.views import (
 
 urlpatterns = [
     path("console-admin/", admin.site.urls),
-    path("api", include("console_api.api.urls")),
+    path("api/", include("console_api.api.urls")),
     path("health/liveness", liveness_view, name="liveness"),
     path("health/readiness", readiness_view, name="readiness"),
     path("health", readiness_and_liveness_view, name="readiness_and_liveness"),

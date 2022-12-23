@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.views.decorators.http import require_POST
 from django_filters import rest_framework as filters
+from django.views.decorators.http import require_POST
 
 from console_api.apps.feed.models import Feed
 from console_api.api.feed.serializers import FeedSerializer

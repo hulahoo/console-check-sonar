@@ -3,6 +3,7 @@
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
+from rest_framework.status import HTTP_200_OK
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from console_api.config.log_conf import logger
@@ -13,7 +14,7 @@ from console_api.config.log_conf import logger
 def readiness_and_liveness_view(request) -> Response:
     """Выдаёт статус о полной готовности сервиса (readiness + liveness)"""
 
-    return Response({"status": "UP"})
+    return Response(status=HTTP_200_OK)
 
 
 @api_view(('GET',))
@@ -23,7 +24,7 @@ def readiness_view(request) -> Response:
 
     logger.info("Readiness checking started")
 
-    return Response({"status": "UP"})
+    return Response(status=HTTP_200_OK)
 
 
 @api_view(('GET',))
@@ -33,7 +34,7 @@ def liveness_view(request) -> Response:
 
     logger.info("Liveness checking started")
 
-    return Response({"status": "UP"})
+    return Response(status=HTTP_200_OK)
 
 
 @api_view(('GET',))

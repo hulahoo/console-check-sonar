@@ -12,11 +12,11 @@ from console_api.api.system.views import (
 
 urlpatterns = [
     path("console-admin/", admin.site.urls),
-    path("api/", include("console_api.api.urls")),
-    path("health/liveness/", liveness_view, name="liveness"),
-    path("health/readiness/", readiness_view, name="readiness"),
-    path("health/", readiness_and_liveness_view, name="readiness_and_liveness"),
-    path("metrics/", metrics_view, name="metrics"),
+    path("api", include("console_api.api.urls")),
+    path("health/liveness", liveness_view, name="liveness"),
+    path("health/readiness", readiness_view, name="readiness"),
+    path("health", readiness_and_liveness_view, name="readiness_and_liveness"),
+    path("metrics", metrics_view, name="metrics"),
 ]
 
 if settings.DEBUG:
@@ -33,9 +33,3 @@ if settings.DEBUG:
     urlpatterns.append(path("__debug__/", include(debug_toolbar.urls)))
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
-if settings.SWAGGER:
-    from console_api.swagger.urls import urlpatterns as swagger_urlpatterns
-
-    urlpatterns += swagger_urlpatterns

@@ -12,7 +12,6 @@ urlpatterns = [
     path("source/", include("console_api.api.source.urls")),
     path("tag/", include("console_api.api.tag.urls")),
     path("users", include("console_api.apps.users.urls")),
-    path("api/", include("console_api.api.system.urls")),
     path("detections/", include("console_api.api.detections.urls")),
     path("sessions", CustomAuthTokenView.as_view()),
     path("indicators/", include("console_api.api.indicator.urls")),

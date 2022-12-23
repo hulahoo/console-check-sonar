@@ -5,10 +5,18 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from console_api.api.system.views import (
+    readiness_and_liveness_view, readiness_view, liveness_view, metrics_view,
+)
+
+
 urlpatterns = [
     path("console-admin/", admin.site.urls),
-    path("system/", include("console_api.api.system.urls")),
     path("api/", include("console_api.api.urls")),
+    path("health/liveness/", liveness_view, name="liveness"),
+    path("health/readiness/", readiness_view, name="readiness"),
+    path("health/", readiness_and_liveness_view, name="readiness_and_liveness"),
+    path("metrics/", metrics_view, name="metrics"),
 ]
 
 if settings.DEBUG:

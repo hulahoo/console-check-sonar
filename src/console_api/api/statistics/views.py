@@ -72,39 +72,8 @@ class FeedsIntersectionList(generics.ListAPIView):
     """FeedsIntersectionList"""
 
     serializer_class = MatchedIndicatorSerializer
+    model = Feed
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         return JsonResponse({"data": queryset})
-
-    def get_queryset(self):
-        with connection.cursor() as cursor:
-            query = "select s.name as source_name, " \
-                    "s.id as source_id, " \
-                    "fi.indicator_id " \
-                    "from %s as s " \
-                    "left join %s as f on s.id=f.source_id " \
-                    "left join feeds_indicators as fi on f.id=fi.feed_id" % (Source.objects.model._meta.db_table,
-                                                                             Feed.objects.model._meta.db_table)
-            cursor.execute(query)
-            columns = [col[0] for col in cursor.description]
-            data = [
-                dict(zip(columns, row))
-                for row in cursor.fetchall()
-            ]
-            sources_ind: dict = collections.defaultdict(list)
-            intersect_weight: dict = collections.defaultdict(dict)
-            for item in data:
-                indicators = [i for i in data if i['source_id'] == item['source_id']]
-                sum_ind = collections.Counter(item["indicator_id"] for item in indicators)
-                sources_ind[item.get('source_name')] = dict(sum_ind)
-
-        for source, _ in sorted(sources_ind.items()):
-            new_sources_ind = list(sources_ind.keys())
-            new_sources_ind.remove(source)
-            unique_source_ind = set(sources_ind.get(source).keys())
-            for src in new_sources_ind:
-                unique_source_keys = set(sources_ind.get(src).keys())
-                intersection_of_source_inds = unique_source_ind.intersection(unique_source_keys)
-                intersect_weight[source].update({src: len(intersection_of_source_inds) / len(unique_source_ind) * 100})
-        return intersect_weight

@@ -28,7 +28,7 @@ class FeedSerializer(serializers.ModelSerializer):
             "max-records-count",
             "weight",
             "available-fields",
-            # TODO такого поля нет, посмотреть откуда оно берется
+            # такого поля нет, посмотреть откуда оно берется
             # "importing-fields",
             "created-at",
         ]

@@ -148,10 +148,7 @@ AUTH_USER_MODEL = "users.User"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = [
-    "https://127.0.0.1:8000",
-    "https://0.0.0.0:8000",
-]
+CORS_ALLOWED_ORIGINS = ['*']
 
 # DRF
 

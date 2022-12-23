@@ -28,8 +28,7 @@ class DetectionListView(generics.ListAPIView):
         if tags_weight:
             self.queryset = self.queryset.filter(tags_weight=tags_weight)
 
-        sort_by_param = request.GET.get('sort-by')
-        if sort_by_param:
+        if sort_by_param := request.GET.get('sort-by'):
             sort_by_param = sort_by_param[0] + sort_by_param[1:].replace('-', '_')
             self.queryset = self.queryset.order_by(sort_by_param)
 

@@ -1,3 +1,4 @@
+from django.views.decorators.http import require_GET
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -34,7 +35,7 @@ def metrics(request):
 
 @require_GET
 def api_routes(request):
-    """api_routes"""
+    """API routes"""
 
     return Response({
         "openapi:": "3.0.0",

@@ -1,8 +1,5 @@
 """Views for statistics app"""
 
-import collections
-
-from django.db import connection
 from django.db.models import Count, Sum
 from django.http import JsonResponse
 from rest_framework import generics
@@ -11,7 +8,6 @@ from rest_framework.pagination import PageNumberPagination
 from console_api.apps.feed.models import Feed
 from console_api.api.statistics.base import BaseIndicatorList
 from console_api.apps.indicator.models import Indicator
-from console_api.apps.source.models import Source
 from console_api.api.statistics.serializers import (
     IndicatorSerializer, IndicatorWithFeedsSerializer,
     MatchedIndicatorSerializer,

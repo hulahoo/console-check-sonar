@@ -2,6 +2,7 @@ from django.views.decorators.http import require_GET
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from django.views.decorators.http import require_GET
 
 from console_api.config.log_conf import logger
 

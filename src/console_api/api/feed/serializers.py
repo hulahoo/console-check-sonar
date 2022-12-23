@@ -11,7 +11,7 @@ class FeedSerializer(serializers.ModelSerializer):
             "id",
             "source-url",
             "format",
-            "use-taxii",
+            "is_use",
             "polling-frequency",
             "auth-type",
             "auth-api-token",
@@ -28,6 +28,7 @@ class FeedSerializer(serializers.ModelSerializer):
             "max-records-count",
             "weight",
             "available-fields",
+            # такого поля нет, посмотреть откуда оно берется
             # "importing-fields",
             "created-at",
         ]

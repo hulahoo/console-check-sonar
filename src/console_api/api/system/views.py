@@ -1,41 +1,45 @@
-from django.views.decorators.http import require_GET
-from rest_framework.decorators import api_view
+"""Views for system app"""
+
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
-from django.views.decorators.http import require_GET
 
 from console_api.config.log_conf import logger
 
 
-@require_GET
-def readiness(request):
-    """
-    Текущее состояние готовности сервиса
-    """
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))
+def readiness(request) -> Response:
+    """Выдаёт статус о готовности сервиса принимать входящий трафик"""
+
     logger.info("Readiness checking started")
+
     return Response({"status": "UP"})
 
 
-@require_GET
-def liveness(request):
-    """
-    Возвращает информацию о работоспособности сервиса
-    """
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))
+def liveness(request) -> Response:
+    """Выдаёт статус о работоспособности сервиса"""
+
     logger.info("Liveness checking started")
+
     return Response({"status": "UP"})
 
 
-@require_GET
-def metrics(request):
-    """
-    Возвращает метрики сервиса
-    """
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))
+def metrics(request) -> Response:
+    """Выдаёт метрики сервиса"""
+
     return Response(data=generate_latest(), content_type=CONTENT_TYPE_LATEST)
 
 
-@require_GET
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))
 def api_routes(request):
-    """API routes"""
+    """Выдаёт JSON с доступными в сервисе урлами. OpenAPI"""
 
     return Response({
         "openapi:": "3.0.0",

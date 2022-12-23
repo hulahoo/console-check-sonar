@@ -19,7 +19,6 @@ schema_view = get_schema_view(
         path("api/feeds", include("console_api.api.feed.urls")),
         path("api/source/", include("console_api.api.source.urls")),
         path("api/tag/", include("console_api.api.tag.urls")),
-        path("api/api/", include("console_api.api.system.urls")),
         path("api/detections/", include("console_api.api.detections.urls")),
         path("api/indicators/", include("console_api.api.indicator.urls")),
     ],

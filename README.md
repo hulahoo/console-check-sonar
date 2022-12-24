@@ -10,14 +10,13 @@
 - Создать файл _.env_ в корне проекта и задать в нём значения
     ```
     DEBUG=<True/False>
-
-    POSTGRES_SERVER=
-    POSTGRES_PASSWORD=
-    POSTGRES_USER=
-    POSTGRES_DB=
-    POSTGRES_PORT=
-
     SWAGGER=<True/False>
+
+    APP_POSTGRESQL_HOST=
+    APP_POSTGRESQL_PASSWORD=
+    APP_POSTGRESQL_USER=
+    APP_POSTGRESQL_NAME=
+    APP_POSTGRESQL_PORT=
     ```
 - Создать и активировать виртуальное окружение
     ```bash
@@ -35,6 +34,7 @@
     ```bash
     (venv) console-api
     ```
+
 ### С использованием Docker
 - Создать Dockerfile в корне проекта
     ```docker
@@ -93,33 +93,34 @@
         depends_on:
         - postgres_db
     ```
+
+
 - Сбилдить и запустить проект
     ```bash
     $ docker-compose up --build
     ```
+- Применить дамп файла для бд в контейнере:
+    ```bash
+    cat restore.sql | docker exec -i db psql -U dbuser -d db
+    ```
+
+- Перзапустить контейнер worker
 
 
 ## Информация о файлах конфигурации
 ```text
-.
-├── api                                 ## Директория для api эндпоинтов
-│   │
-│   ├──
-... ... ... ...
 │
-├── docs                                ## Документация проекта
-│   ├──
-... ... ... ...
-│
-└── settings                            ## Конфигурации, подключаемые в проект.
-    ├──
+└── deploy
+    ├──envs
+        ├──dev/                       ## Конфигурации k8s для dev стенда
 ... ... ... ...
 │
 └── src                                 ## Основая директория с хранением данных и доп. сервисами
-    ├── сommon                          ## Константые значения
-    ├── models                          ## Всопомогательные данные для моделей Django
-    ├── services                        ## Функции отвечающие за бизнес-логику проекта
+    ├── console_api
+            ├── api/                             ## Директория для api эндпоинтов
+            ├── apps/                            ## Модуль отвечающий за описания моделей
+            ├── config/                          ## Модуль отвечающий сторонние конфигурации
+            ├── settings/                        ## Модуль отвечающий настройки сервиса
+            ├── swagger/                         ## Модуль отвечающий за swagger api
 ... ... ... ...
-│
-└── static                              ## Статические файлы
 ```

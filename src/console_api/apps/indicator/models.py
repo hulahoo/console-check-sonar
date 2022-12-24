@@ -9,44 +9,26 @@ from django.utils import timezone
 from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
 
 
-INDICATOR_TYPES = (
-    ("ip", "ip"),
-    ("domain", "domain"),
-    ("hash", "hash"),
-)
-
-ACTIVITIES_TYPE = (
-    ("add_comment", "add-comment"),
-    ("add_tag", "add-tag"),
-    ("remove_tag", "remove-tag"),
-    ("move_to_archive", "move-to-archive"),
-    ("move_from_archive", "move-from-archive"),
-)
-
 RELATE_TO = "users.User"
 
 
 class Indicator(BaseModel):
     """Indicator"""
 
-    # Используется CharField, а не UUIDField потому что иначе
-    # не получается сделать ManyToMany связь с Feed моделью
-    id = models.CharField(
+    id = models.UUIDField(
         primary_key=True,
         default=uuid4,
         editable=False,
-        max_length=36,
     )
 
     ioc_type = models.CharField(
         "Тип индикатора",
         max_length=32,
-        choices=INDICATOR_TYPES,
     )
 
     value = models.CharField(
         "Значение индикатора",
-        max_length=512,
+        max_length=1024,
     )
 
     context = models.JSONField(
@@ -65,6 +47,20 @@ class Indicator(BaseModel):
 
     weight = models.DecimalField(
         "Вес индикатора",
+        validators=[MaxValueValidator(100), MinValueValidator(0)],
+        decimal_places=3,
+        max_digits=6,
+    )
+
+    feeds_weight = models.DecimalField(
+        "Вес фида",
+        validators=[MaxValueValidator(100), MinValueValidator(0)],
+        decimal_places=3,
+        max_digits=6,
+    )
+
+    time_weight = models.DecimalField(
+        "Вес времени индикатора",
         validators=[MaxValueValidator(100), MinValueValidator(0)],
         decimal_places=3,
         max_digits=6,
@@ -102,13 +98,8 @@ class Indicator(BaseModel):
         "Дата и время последнего срабатывания",
     )
 
-    created_by = models.ForeignKey(
-        RELATE_TO,
-        help_text="Указывается, когда Индикатор создан пользователем",
-        on_delete=models.PROTECT,
-        verbose_name="Кем создано",
-        null=True,
-        blank=True,
+    created_by = models.BigIntegerField(
+        "Указывается, когда Индикатор создан пользователем",
     )
 
     @property
@@ -136,16 +127,14 @@ class Indicator(BaseModel):
 class IndicatorActivities(models.Model):
     """Timeline of activity for each Indicator"""
 
-    indicator = models.ForeignKey(
-        "indicator.Indicator",
-        on_delete=models.CASCADE,
-        verbose_name="Активность по индикатору",
-        related_name="activities",
+    indicator_id = models.UUIDField(
+        default=uuid4,
+        editable=False
     )
 
-    type = models.TextField(
+    activity_type = models.CharField(
         "Тип",
-        choices=ACTIVITIES_TYPE,
+        max_length=32
     )
 
     details = models.JSONField()
@@ -154,11 +143,7 @@ class IndicatorActivities(models.Model):
         "Создано",
     )
 
-    created_by = models.ForeignKey(
-        RELATE_TO,
-        on_delete=models.PROTECT,
-        verbose_name="Кем создано",
-    )
+    created_by = models.BigIntegerField(null=True)
 
     class Meta:
         """Metainformation about the model"""
@@ -172,13 +157,11 @@ class IndicatorActivities(models.Model):
 class Session(models.Model):
     """User session"""
 
-    user_id = models.ForeignKey(
-        RELATE_TO,
-        on_delete=models.PROTECT,
-        verbose_name="ID пользователя",
+    user_id = models.BigIntegerField(
+        "Ссылка на users.id"
     )
 
-    access_token = models.TextField(
+    access_token = models.CharField(
         "Токен доступа MD5",
         max_length=255,
     )
@@ -188,10 +171,7 @@ class Session(models.Model):
         editable=False,
     )
 
-    created_at = models.DateTimeField(
-        "Дата и время создания сессии",
-        auto_now_add=True,
-    )
+    created_at = CreationDateTimeField("создано")
 
     def save(self, *args, **kwargs) -> None:
         self.last_activity_at = timezone.now()

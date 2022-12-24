@@ -1,7 +1,7 @@
 """Models for tag app"""
 
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
 
@@ -9,29 +9,23 @@ from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
 class Tag(BaseModel):
     """Тег"""
 
-    title = models.TextField(
+    title = models.CharField(
         "Название тега",
+        max_length=128,
         unique=True,
     )
 
     weight = models.DecimalField(
         "Вес тега",
-        blank=True,
-        null=True,
         validators=[MaxValueValidator(100), MinValueValidator(0)],
         max_digits=6,
         decimal_places=3,
     )
 
-    created_by = models.ForeignKey(
-        "users.User",
-        on_delete=models.PROTECT,
-        verbose_name="Кем создано",
-    )
+    created_at = CreationDateTimeField("Дата и время создания")
 
-    created_at = models.DateTimeField(
-        "Дата и время создания",
-        auto_now_add=True,
+    created_by = models.BigIntegerField(
+        "Кем создано"
     )
 
     updated_at = models.DateTimeField(
@@ -44,13 +38,6 @@ class Tag(BaseModel):
         null=True,
         blank=True,
         editable=False,
-    )
-
-    indicators = models.ManyToManyField(
-        "indicator.Indicator",
-        blank=True,
-        null=True,
-        through="IndicatorTagRelationship",
     )
 
     def __str__(self):
@@ -68,26 +55,12 @@ class Tag(BaseModel):
 class IndicatorTagRelationship(models.Model):
     """Custom ManyToMany relationship table for Indicator and Feed"""
 
-    indicator = models.ForeignKey(
-        "indicator.Indicator",
-        on_delete=models.CASCADE,
-    )
+    indicator_id = models.UUIDField()
 
-    tag = models.ForeignKey(
-        "tag.Tag",
-        on_delete=models.CASCADE,
-    )
+    tag_id = models.BigIntegerField()
 
     created_at = CreationDateTimeField(
         "Дата и время создания связи",
-    )
-
-    deleted_at = models.DateTimeField(
-        "Дата и время удаления связи",
-        help_text="Если значение пустое, значит связь существующая",
-        null=True,
-        blank=True,
-        editable=False,
     )
 
     class Meta:

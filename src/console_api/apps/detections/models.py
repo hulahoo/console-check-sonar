@@ -15,11 +15,7 @@ class Detection(models.Model):
         help_text="Информация о Событии (Объект из Kafka)",
     )
 
-    indicator = models.ForeignKey(
-        "indicator.Indicator",
-        verbose_name="Обнаруженный индикатор для данного события",
-        on_delete=models.PROTECT,
-    )
+    indicator_id = models.UUIDField()
 
     detection_event = models.JSONField(
         "Информация о событии, которая отправляется во внешнюю ИС (SIEM)",
@@ -32,13 +28,6 @@ class Detection(models.Model):
 
     created_at = CreationDateTimeField(
         "Создано",
-    )
-
-    tags = models.ManyToManyField(
-        "tag.Tag",
-        blank=True,
-        null=True,
-        through="DetectionTagRelationship",
     )
 
     # переписать все проперти в сервисах
@@ -87,15 +76,9 @@ class Detection(models.Model):
 class DetectionTagRelationship(models.Model):
     """Custom ManyToMany relationship table for Detection and Tag"""
 
-    detection = models.ForeignKey(
-        "detections.Detection",
-        on_delete=models.CASCADE,
-    )
+    detection_id = models.BigIntegerField()
 
-    tag = models.ForeignKey(
-        "tag.Tag",
-        on_delete=models.CASCADE,
-    )
+    tag_id = models.BigIntegerField()
 
     created_at = CreationDateTimeField(
         "Дата и время создания связи",

@@ -3,7 +3,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
+from console_api.apps.models.abstract import BaseModel, CreationDateTimeField, ModificationDateTimeField
 
 
 FEED_STATUSES = (
@@ -26,62 +26,64 @@ FEED_FORMAT = (
 class Feed(BaseModel):
     """Feed - data source"""
 
-    title = models.TextField(
+    title = models.CharField(
         "Название Фида",
-        unique=True,
+        max_length=128,
     )
 
-    provider = models.TextField(
+    provider = models.CharField(
         "Название поставщика Фида",
+        max_length=128
     )
 
-    description = models.TextField(
+    description = models.CharField(
         "Описание Фида",
-        null=True,
-        blank=True,
+        max_length=255
     )
 
-    format = models.TextField(
+    format = models.CharField(
         "Формат фида",
+        max_length=8,
         choices=FEED_FORMAT,
-        default="txt",
     )
 
-    url = models.TextField(
+    url = models.CharField(
         "Ссылка на файл Фида",
+        max_length=128
     )
 
-    auth_type = models.TextField(
+    auth_type = models.CharField(
         "Формат фида",
         help_text="Например: http-basic, api-token",
-        null=True,
-        blank=True,
+        max_length=16
     )
 
-    auth_api_token = models.TextField(
+    auth_api_token = models.CharField(
         "API токен",
+        max_length=255
     )
 
-    auth_login = models.TextField(
+    auth_login = models.CharField(
         "Логин HTTP Basic Auth",
+        max_length=32
     )
 
-    auth_pass = models.TextField(
+    auth_pass = models.CharField(
         "Пароль HTTP Basic Auth",
+        max_length=32
     )
 
     certificate = models.BinaryField(
         "Сертификат",
     )
 
-    is_use = models.BooleanField(
+    use_taxii = models.BooleanField(
         default=False,
-        null=True,
-        blank=True,
     )
 
-    polling_frequency = models.TextField(
+    polling_frequency = models.CharField(
         "Частота обновления",
+        max_length=32,
         help_text="Формат CronTab",
     )
 
@@ -102,8 +104,9 @@ class Feed(BaseModel):
         blank=True,
     )
 
-    status = models.TextField(
+    status = models.CharField(
         "Статус фида",
+        max_length=32,
         choices=FEED_STATUSES,
     )
 
@@ -114,7 +117,7 @@ class Feed(BaseModel):
 
     is_truncating = models.BooleanField(
         "Включено ли обрезание фида?",
-        default=False,
+        default=True,
     )
 
     max_records_count = models.DecimalField(
@@ -122,12 +125,7 @@ class Feed(BaseModel):
         max_digits=20,
     )
 
-    indicators = models.ManyToManyField(
-        "indicator.Indicator",
-        blank=True,
-        null=True,
-        through="IndicatorFeedRelationship",
-    )
+    updated_at = ModificationDateTimeField("Время изменения")
 
     def __str__(self) -> str:
         return str(self.title)
@@ -150,15 +148,9 @@ class Feed(BaseModel):
 class IndicatorFeedRelationship(models.Model):
     """Custom ManyToMany relationship table for Indicator and Feed"""
 
-    indicator = models.ForeignKey(
-        "indicator.Indicator",
-        on_delete=models.CASCADE,
-    )
+    indicator_id = models.UUIDField()
 
-    feed = models.ForeignKey(
-        "feed.Feed",
-        on_delete=models.CASCADE,
-    )
+    feed_id = models.BigIntegerField()
 
     created_at = CreationDateTimeField(
         "Дата и время создания связи",

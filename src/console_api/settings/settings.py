@@ -100,11 +100,11 @@ WSGI_APPLICATION = 'console_api.settings.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        "NAME": "ax2",
-        "USER": "osnova",
-        "PASSWORD": "1234",
-        "HOST": "postgres_db",
-        "PORT": 5432
+        "NAME": env("APP_POSTGRESQL_NAME"),
+        "USER": env("APP_POSTGRESQL_USER"),
+        "PASSWORD": env("APP_POSTGRESQL_PASSWORD"),
+        "HOST": env("APP_POSTGRESQL_HOST"),
+        "PORT": env("APP_POSTGRESQL_PORT")
 
     }
 }

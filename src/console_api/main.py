@@ -11,19 +11,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "console_api.settings.settings")
 django.setup()
 
 
-def execute():
-    """
-    Function to start Django app
-    """
-    logger.info("Start Django app")
-    from console_api.apps.users.models import User
+def execute() -> None:
+    """Run the Django app"""
 
-    if User.objects.filter(login="admin").exists():
-        print("Хеш пароля админа:")
-        print(User.objects.get(login="admin").password)
-    else:
-        print("Пользователь admin не создался")
+    logger.info("Start Django app")
 
     call_command(subprocess.call([
-        'gunicorn', '-b 0.0.0.0:8080', 'console_api.settings.wsgi:application', '--workers=4'
+        'gunicorn',
+        '-b 0.0.0.0:8080',
+        'console_api.settings.wsgi:application',
+        '--workers=4',
     ]))

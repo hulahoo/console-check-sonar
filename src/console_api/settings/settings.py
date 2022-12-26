@@ -100,11 +100,11 @@ WSGI_APPLICATION = 'console_api.settings.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        "NAME": env("APP_POSTGRESQL_NAME"),
-        "USER": env("APP_POSTGRESQL_USER"),
-        "PASSWORD": env("APP_POSTGRESQL_PASSWORD"),
-        "HOST": env("APP_POSTGRESQL_HOST"),
-        "PORT": env("APP_POSTGRESQL_PORT")
+        "NAME": "ax2",
+        "USER": "osnova",
+        "PASSWORD": "1234",
+        "HOST": "postgres_db",
+        "PORT": 5432
 
     }
 }
@@ -161,8 +161,4 @@ REST_FRAMEWORK = {
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]

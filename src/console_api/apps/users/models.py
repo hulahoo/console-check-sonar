@@ -116,3 +116,26 @@ class User(AbstractBaseUser):
         """Metainformation about the model"""
 
         db_table = "users"
+
+
+class Token(models.Model):
+    """
+    The default authorization token model.
+    """
+    key = models.CharField("Key", max_length=40, primary_key=True)
+    user = models.OneToOneField(
+        "User", related_name='auth_token',
+        on_delete=models.CASCADE, verbose_name="User"
+    )
+    created_at = models.DateTimeField("Created", auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.key
+
+    class Meta:
+        db_table = "token"

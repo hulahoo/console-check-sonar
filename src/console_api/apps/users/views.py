@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from rest_framework import generics, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -9,7 +11,7 @@ from rest_framework.views import APIView
 from .serializers import (
     RegisterSerializer, UserSerializer, AuthTokenSerializer,
 )
-from .models import User
+from .models import User, Token
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,13 +45,19 @@ class CustomAuthTokenView(ObtainAuthToken):
             serializer.is_valid(raise_exception=True)
 
             user = serializer.validated_data['user']
-            token, _ = Token.objects.get_or_create(user=user)
+
+            if Token.objects.filter(user_id=user.pk).exists():
+                user_token = Token.objects.get(user_id=user.pk).key
+            else:
+                user_token = uuid4()
+                t = Token.objects.create(key=user_token, user_id=user.pk)
+                t.save()
         except Exception as e:
             return Response({
                 'errors': [{"detail": str(e)}]
             })
 
         return Response({
-            'access-token': token.key,
+            'access-token': user_token,
             'user-id': user.pk,
         })

@@ -1,67 +1,102 @@
+"""Serializers for users app"""
+
+from hashlib import md5
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from rest_framework import serializers
+from rest_framework.serializers import (
+    ValidationError,
+    CharField,
+    Serializer,
+    ModelSerializer,
+)
 from rest_framework.validators import UniqueValidator
 
+from console_api.config.log_conf import logger
 from console_api.apps.users.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(ModelSerializer):
+    """Serializer for User model"""
+
     class Meta:
+        """Metainformation about the serializer"""
+
         model = User
         exclude = []
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    login = serializers.CharField(
+class RegisterSerializer(ModelSerializer):
+    """Serializer for user registration"""
+
+    login = CharField(
         max_length=255,
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[UniqueValidator(queryset=User.objects.all())],
     )
-    pass_hash = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password])
+
+    pass_hash = CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+    )
 
     class Meta:
+        """Metainformation about the serializer"""
+
         model = User
-        fields = ('login', 'pass_hash')
-        extra_kwargs = {
-            'id': {'read_only': True},
-            'pass-hash': {'source': "pass_hash"}
-        }
+        fields = ("login", "pass_hash")
+        extra_kwargs = {"id": {"read_only": True}, "pass-hash": {"source": "pass_hash"}}
 
     def create(self, validated_data):
         user = User.objects.create(
-            login=validated_data['login'],
+            login=validated_data["login"],
         )
-        user.set_password(validated_data['pass_hash'])
+        user.set_password(validated_data["pass_hash"])
         user.save()
+
         return user
 
 
-class AuthTokenSerializer(serializers.Serializer):
-    login = serializers.CharField()
-    password = serializers.CharField(source="pass")
+class AuthTokenSerializer(Serializer):
+    """Serializer for auth token generation"""
+
+    login = CharField()
+    password = CharField()
 
     def validate(self, attrs):
-        login = attrs.get('login')
-        password = attrs.get('pass')
+
+        login = attrs.get("login")
+        password = attrs.get("password")
 
         if login and password:
-            user = authenticate(username=login, password=password)
+            hashed_password = md5(bytes(password.encode()))
 
-            if user:
+            if User.objects.filter(login=login).exists():
+                user = User.objects.get(login=login)
+
+                if hashed_password.hexdigest() != user.password:
+                    raise ValidationError(
+                        "Unable to log in with provided credentials.",
+                        code="authorization",
+                    )
+
                 if not user.is_active:
-                    msg = 'User account is disabled.'
-                    raise serializers.ValidationError(
-                        msg, code='authorization',
+                    raise ValidationError(
+                        "User account is disabled.",
+                        code="authorization",
                     )
             else:
-                msg = 'Unable to log in with provided credentials.'
-                raise serializers.ValidationError(msg, code='authorization')
+                raise ValidationError(
+                    "Unable to log in with provided credentials.",
+                    code="authorization",
+                )
         else:
-            msg = 'Must include "username" and "password".'
-            raise serializers.ValidationError(msg, code='authorization')
+            raise ValidationError(
+                'Must include "login" and "password".',
+                code="authorization",
+            )
 
-        attrs['user'] = user
+        attrs["user"] = user
 
         return attrs

@@ -35,6 +35,13 @@
     (venv) console-api
     ```
 
+### Требования к инфраструктуре
+1. Минимальная версия Postgres:
+  ```yaml
+    postgres:>=14-alpine
+  ```
+
+
 ### С использованием Docker
 - Создать Dockerfile в корне проекта
     ```docker
@@ -66,7 +73,7 @@
 
     services:
     postgres_db:
-        image: postgres:13.8-alpine
+        image: postgres:14-alpine
         container_name: db
         restart: unless-stopped
         expose:

@@ -1,5 +1,5 @@
 """Views for system app"""
-
+from django.views.decorators.http import require_http_methods
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -10,6 +10,7 @@ from console_api.config.log_conf import logger
 
 
 @api_view(('GET',))
+@require_http_methods(["GET"])
 @renderer_classes((JSONRenderer,))
 def readiness_and_liveness_view(request) -> Response:
     """Выдаёт статус о полной готовности сервиса (readiness + liveness)"""

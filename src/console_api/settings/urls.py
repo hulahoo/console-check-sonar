@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from console_api.api.system.views import (
-    readiness_and_liveness_view, readiness_view, liveness_view, metrics_view,
+    readiness_and_liveness_view, readiness_view, liveness_view, metrics_view, api_res
 )
 
 
@@ -17,6 +17,7 @@ urlpatterns = [
     path("health/readiness", readiness_view, name="readiness"),
     path("health", readiness_and_liveness_view, name="readiness_and_liveness"),
     path("metrics", metrics_view, name="metrics"),
+    path("host/api", api_res, name="api")
 ]
 
 if settings.DEBUG:

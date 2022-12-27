@@ -45,3 +45,17 @@ def metrics_view(request) -> Response:
     metrics = generate_latest().replace(b'"', b'').replace(b'\n', b'<br>')
 
     return Response(data=metrics, content_type=CONTENT_TYPE_LATEST)
+
+
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))
+def api_res(request) -> Response:
+    data = {
+        "openapi:": "3.0.0",
+        "info": {
+            "title": "Событийный шлюз",
+            "version": "0.3",
+        },
+        "paths": {}
+        }
+    return Response(data=data)

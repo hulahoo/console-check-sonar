@@ -1,8 +1,7 @@
 """Serializers for users app"""
 
-from hashlib import md5
+from hashlib import sha256
 
-from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.serializers import (
     ValidationError,
@@ -12,7 +11,6 @@ from rest_framework.serializers import (
 )
 from rest_framework.validators import UniqueValidator
 
-from console_api.config.log_conf import logger
 from console_api.apps.users.models import User
 
 
@@ -70,7 +68,7 @@ class AuthTokenSerializer(Serializer):
         password = attrs.get("password")
 
         if login and password:
-            hashed_password = md5(bytes(password.encode()))
+            hashed_password = sha256(bytes(password.encode()))
 
             if User.objects.filter(login=login).exists():
                 user = User.objects.get(login=login)

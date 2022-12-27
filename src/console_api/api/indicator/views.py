@@ -1,9 +1,12 @@
 """Views for detections app"""
-from rest_framework import generics, viewsets
-from django.http import JsonResponse
 
-from console_api.apps.indicator.models import Indicator
+from django.http import JsonResponse
+from rest_framework import generics, viewsets
+from rest_framework.response import Response
+from rest_framework.request import Request
+
 from console_api.api.services import get_response_with_pagination
+from console_api.apps.indicator.models import Indicator
 from console_api.api.indicator.serializers import (
     IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer,
 )
@@ -11,6 +14,9 @@ from console_api.api.indicator.serializers import (
 
 class IndicatorStatiscList(generics.ListAPIView):
     """IndicatorStatiscList"""
+
+    queryset = Indicator.objects.all()
+    serializer_class = IndicatorListSerializer
 
     def add_queryset_filters(self, *, request):
         is_sending_to_detections = request.GET.get('filter[is_sending_to_detections]')
@@ -51,11 +57,15 @@ class IndicatorStatiscList(generics.ListAPIView):
         if last_detected_at:
             self.queryset = self.queryset.filter(last_detected_at=last_detected_at)
 
-    def list(self, request, *args, **kwargs):
-        if len(self.get_queryset()) == 0:
-            return JsonResponse({})
+    def list(self, request: Request) -> Response:
+        """Return response with list of indicators"""
 
-        self.queryset = self.add_queryset_filters(request=request)
+        self.queryset = self.get_queryset()
+
+        if not self.queryset:
+            return JsonResponse({"data": []})
+
+        self.add_queryset_filters(request=request)
 
         if sort_by_param := request.GET.get('sort-by'):
             sort_by_param = \
@@ -69,9 +79,6 @@ class IndicatorStatiscList(generics.ListAPIView):
         return get_response_with_pagination(
             request, self.queryset, self.get_serializer,
         )
-
-    serializer_class = IndicatorListSerializer
-    queryset = Indicator.objects.all()
 
 
 class IndicatorCreateView(viewsets.ModelViewSet):
@@ -105,9 +112,7 @@ class IndicatorView(generics.ListAPIView):
 
 
 class IndicatorDetailView(generics.RetrieveAPIView):
-    """
-    (GET) Деталка сотрудника
-    """
+    """Indicator detail view"""
 
     serializer_class = IndicatorDetailSerializer
     lookup_field = 'id'

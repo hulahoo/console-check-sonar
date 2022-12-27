@@ -19,6 +19,7 @@ def readiness_and_liveness_view(request) -> Response:
 
 
 @api_view(('GET',))
+@require_http_methods(["GET"])
 @renderer_classes((JSONRenderer,))
 def readiness_view(request) -> Response:
     """Выдаёт статус о готовности сервиса принимать входящий трафик"""
@@ -29,6 +30,7 @@ def readiness_view(request) -> Response:
 
 
 @api_view(('GET',))
+@require_http_methods(["GET"])
 @renderer_classes((JSONRenderer,))
 def liveness_view(request) -> Response:
     """Выдаёт статус о работоспособности сервиса"""
@@ -39,6 +41,7 @@ def liveness_view(request) -> Response:
 
 
 @api_view(('GET',))
+@require_http_methods(["GET"])
 @renderer_classes((JSONRenderer,))
 def metrics_view(request) -> Response:
     """Выдаёт метрики сервиса"""
@@ -49,6 +52,7 @@ def metrics_view(request) -> Response:
 
 
 @api_view(('GET',))
+@require_http_methods(["GET"])
 @renderer_classes((JSONRenderer,))
 def api_res(request) -> Response:
     data = {

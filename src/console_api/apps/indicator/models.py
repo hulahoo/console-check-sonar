@@ -6,6 +6,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
+from console_api.apps.feed.models import Feed, IndicatorFeedRelationship
 from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
 
 
@@ -104,7 +105,14 @@ class Indicator(BaseModel):
 
     @property
     def feeds_list(self):
-        return list(self.feed_set.all())
+        feeds = [
+            relationship.feed_id for relationship in
+            IndicatorFeedRelationship.objects.filter(
+                indicator_id=self.id,
+            )
+        ]
+
+        return [Feed.objects.get(id=feed_id).title for feed_id in feeds]
 
     @property
     def tags(self):

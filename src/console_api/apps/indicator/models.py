@@ -6,8 +6,9 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
-from console_api.apps.feed.models import Feed, IndicatorFeedRelationship
 from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
+from console_api.apps.feed.models import IndicatorFeedRelationship, Feed
+from console_api.apps.tag.models import IndicatorTagRelationship
 
 
 RELATE_TO = "users.User"
@@ -104,7 +105,9 @@ class Indicator(BaseModel):
     )
 
     @property
-    def feeds_list(self):
+    def feeds_names(self) -> tuple:
+        """Return tuple of names for feeds that linked with the indicator"""
+
         feeds = [
             relationship.feed_id for relationship in
             IndicatorFeedRelationship.objects.filter(
@@ -112,11 +115,18 @@ class Indicator(BaseModel):
             )
         ]
 
-        return [Feed.objects.get(id=feed_id).title for feed_id in feeds]
+        return (Feed.objects.get(id=feed_id).title for feed_id in feeds)
 
     @property
-    def tags(self):
-        return list(self.tag_set.all())
+    def tags_ids(self) -> tuple:
+        """Return tuple of tags ids that linked with the indicator"""
+
+        return (
+            relationship.tag_id for relationship in
+            IndicatorTagRelationship.objects.filter(
+                indicator_id=self.id,
+            )
+        )
 
     def __str__(self) -> str:
         return f"{self.value} ({self.ioc_type})"

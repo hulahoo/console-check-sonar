@@ -50,8 +50,9 @@ class IndicatorListSerializer(serializers.ModelSerializer):
             "created-at": {"source": "created_at"},
             "updated-at": {"source": "updated_at"},
             "ioc-weight": {"source": "weight"},
+            "tags": {"source": "tags_ids"},
             "tags-weight": {"source": "tags_weight"},
-            "feed-names": {"source": "feeds_list"},
+            "feed-names": {"source": "feeds_names"},
         }
 
 

@@ -5,6 +5,9 @@ from django.db import models
 
 from console_api.apps.feed.models import Feed
 from console_api.apps.models.abstract import CreationDateTimeField
+from console_api.apps.indicator.models import Indicator
+from console_api.apps.tag.models import IndicatorTagRelationship
+from console_api.apps.feed.models import IndicatorFeedRelationship
 
 
 class Detection(models.Model):
@@ -30,34 +33,55 @@ class Detection(models.Model):
         "Создано",
     )
 
-    # переписать все проперти в сервисах
     @property
     def context(self) -> str:
-        return self.indicator.context
+        """Return context for the indicator"""
+
+        if Indicator.objects.filter(id=self.indicator_id).exists():
+            return Indicator.objects.get(id=self.indicator_id).context
+
+        return "{}"
 
     @property
-    def feed_name(self) -> str:
-        if Feed.objects.filter(
-            indicators__id__contains=self.indicator.id
+    def tags_ids(self) -> tuple:
+        """Return tuple of tags ids that linked with the detection"""
+
+        return (
+            relationship.tag_id for relationship in
+            IndicatorTagRelationship.objects.filter(
+                indicator_id=self.indicator_id,
+            )
+        )
+
+    @property
+    def feed_name(self) -> str | None:
+        """Return feed's name linked with the detection"""
+
+        if IndicatorFeedRelationship.objects.filter(
+            indicator_id=self.indicator_id
         ).exists():
-            return Feed.objects.filter(
-                indicators__id__contains=self.indicator.id
-            )[0].title
+            relationship = IndicatorFeedRelationship.objects.get(
+                indicator_id=self.indicator_id
+            )
+            feed = Feed.objects.get(id=relationship.feed_id)
+
+            return feed.title
+
+        return None
 
     @property
-    def ioc_id(self):
-        return self.indicator.id
+    def provider(self) -> str | None:
+        """Return detection's provider from it's feed"""
 
-    @property
-    def provider(self):
         feed_provider = None
 
-        if Feed.objects.filter(
-            indicators__id__contains=self.indicator.id
+        if IndicatorFeedRelationship.objects.filter(
+            indicator_id=self.indicator_id
         ).exists():
-            feed_provider = Feed.objects.filter(
-                indicators__id__contains=self.indicator.id
-            )[0].provider
+            relationship = IndicatorFeedRelationship.objects.get(
+                indicator_id=self.indicator_id
+            )
+            feed_provider = Feed.objects.get(id=relationship.feed_id).provider
 
         return feed_provider
 

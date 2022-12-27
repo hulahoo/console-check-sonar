@@ -14,14 +14,22 @@ class DetectionSerializer(serializers.ModelSerializer):
         model = Detection
 
         fields = [
-            'id', "provider", "feed-name", "tags", "context", 'source-event',
-            "ioc-id", "detection-event", "created-at",
+            "id",
+            # "provider",
+            # "feed-name",
+            "tags",
+            "context",
+            "source-event",
+            "ioc-id",
+            "detection-event",
+            "created-at",
         ]
 
         extra_kwargs = {
-            'feed-name': {'source': 'feed_name'},
-            'source-event': {'source': 'source_event'},
-            'ioc-id': {'source': 'ioc_id'},
-            'detection-event': {'source': 'detection_event'},
-            'created-at': {'source': 'created_at'},
+            "tags": {"source": "tags_ids"},
+            # "feed-name": {"source": "feed_name"},
+            "source-event": {"source": "source_event"},
+            "ioc-id": {"source": "indicator_id"},
+            "detection-event": {"source": "detection_event"},
+            "created-at": {"source": "created_at"},
         }

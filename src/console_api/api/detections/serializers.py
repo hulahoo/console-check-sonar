@@ -15,21 +15,27 @@ class DetectionSerializer(serializers.ModelSerializer):
 
         fields = [
             "id",
-            # "provider",
-            # "feed-name",
+            "feeds",
             "tags",
-            "context",
+            "tags-weight",
+            "indicator-id",
+            "indicator-weight",
             "source-event",
-            "ioc-id",
+            "source-message",
             "detection-event",
+            "detection-message",
             "created-at",
         ]
 
         extra_kwargs = {
+            "feeds": {"source": "feeds_ids"},
             "tags": {"source": "tags_ids"},
-            # "feed-name": {"source": "feed_name"},
+            "tags-weight": {"source": "tags_weight"},
+            "indicator-id": {"source": "indicator_id"},
+            "indicator-weight": {"source": "indicator_weight"},
             "source-event": {"source": "source_event"},
-            "ioc-id": {"source": "indicator_id"},
+            "source-message": {"source": "source_message"},
             "detection-event": {"source": "detection_event"},
+            "detection-message": {"source": "detection_message"},
             "created-at": {"source": "created_at"},
         }

@@ -2,10 +2,24 @@
 
 from django.urls import path
 
-from console_api.api.indicator.views import IndicatorStatiscList, IndicatorDetailView
+from console_api.api.indicator.views import (
+    IndicatorDetailView,
+    IndicatorStatiscList,
+)
 
 
 urlpatterns = [
-    path('', IndicatorStatiscList.as_view(), name='indicator_list'),
-    path('<uuid:id>/', IndicatorDetailView.as_view(), name='indicator_detail'),
+    # Indicators list
+    path(
+        "",
+        IndicatorStatiscList.as_view(),
+        name="indicator_list",
+    ),
+
+    # Indicator detail
+    path(
+        "<uuid:id>/",
+        IndicatorDetailView.as_view(),
+        name="indicator_detail",
+    ),
 ]

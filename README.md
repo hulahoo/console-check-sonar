@@ -44,54 +44,54 @@
 
 ### С использованием Docker
 - Создать Dockerfile в корне проекта
-    ```docker
-    FROM python:3.10.8-slim as deps
-    WORKDIR /app
-    COPY . ./
-    RUN apt-get update -y && apt-get -y install gcc python3-dev
-    RUN pip --no-cache-dir install -r requirements.txt
-    RUN pip --no-cache-dir install -r requirements.setup.txt
-    RUN pip install -e .
+```dockerfile
+FROM python:3.10.8-slim as deps
+WORKDIR /app
+COPY . ./
+RUN apt-get update -y && apt-get -y install gcc python3-dev
+RUN pip --no-cache-dir install -r requirements.txt
+RUN pip --no-cache-dir install -r requirements.setup.txt
+RUN pip install -e .
 
-    FROM deps as build
-    ARG ARTIFACT_VERSION=local
-    RUN python setup.py sdist bdist_wheel
-    RUN ls -ll /app/
-    RUN ls -ll /app/dist/
+FROM deps as build
+ARG ARTIFACT_VERSION=local
+RUN python setup.py sdist bdist_wheel
+RUN ls -ll /app/
+RUN ls -ll /app/dist/
 
 
-    FROM python:3.10.8-slim as runtime
-    COPY --from=build /app/dist/*.whl /app/
-    RUN apt-get update -y && apt-get -y install gcc python3-dev
-    RUN pip --no-cache-dir install /app/*.whl
+FROM python:3.10.8-slim as runtime
+COPY --from=build /app/dist/*.whl /app/
+RUN apt-get update -y && apt-get -y install gcc python3-dev
+RUN pip --no-cache-dir install /app/*.whl
 
-    ENTRYPOINT ["console-api"]
-    ```
+ENTRYPOINT ["console-api"]
+```
 - Создать docker-compose.yml в корне проекта
-    ```docker
-    version: '3'
+```yaml
+version: '3'
 
-    services:
-        db:
-            image: rshb-cti-db-postgres:staging
+services:
+    db:
+        image: rshb-cti-db-postgres:staging
 
-        platform:
-            restart: always
-            build: ./
-            ports:
-            - "8080:8080"
-            environment:
-                TOPIC_CONSUME_EVENTS: syslog
-                APP_POSTGRESQL_USER: dbuser
-                APP_POSTGRESQL_PASSWORD: test
-                APP_POSTGRESQL_NAME: db
-                APP_POSTGRESQL_HOST: db
-                APP_POSTGRESQL_PORT: 5432
-                DEBUG: True
-                SWAGGER: True
-            depends_on:
-            - db
-    ```
+    platform:
+        restart: always
+        build: ./
+        ports:
+        - "8080:8080"
+        environment:
+            TOPIC_CONSUME_EVENTS: syslog
+            APP_POSTGRESQL_USER: dbuser
+            APP_POSTGRESQL_PASSWORD: test
+            APP_POSTGRESQL_NAME: db
+            APP_POSTGRESQL_HOST: db
+            APP_POSTGRESQL_PORT: 5432
+            DEBUG: True
+            SWAGGER: True
+        depends_on:
+        - db
+```
 
 
 - Сбилдить и запустить проект

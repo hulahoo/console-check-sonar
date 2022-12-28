@@ -3,6 +3,12 @@
 from rest_framework import serializers
 
 from console_api.apps.indicator.models import Indicator
+from console_api.apps.detections.models import Detection
+from console_api.apps.statistics.models import (
+    StatCheckedObjects,
+    StatMatchedObjects,
+)
+
 
 
 class IndicatorSerializer(serializers.ModelSerializer):
@@ -33,17 +39,34 @@ class DataIndicatorSerializer(serializers.ModelSerializer):
         exclude = []
 
 
-class MatchedIndicatorSerializer(serializers.ModelSerializer):
-    """Serializer for Indicator model with values"""
-
-    values = serializers.IntegerField(source='value')
+class DetectedIndicatorsSerializer(serializers.ModelSerializer):
+    """Serializer for detected indicators"""
 
     class Meta:
         """Metainformation about the serializer"""
 
-        model = Indicator
-        fields = ['values']
-        exclude = []
+        model = Detection
+        fields = ['indicator_id', "created_at"]
+
+
+class DetectedObjectsSerializer(serializers.ModelSerializer):
+    """Serializer for detected objects"""
+
+    class Meta:
+        """Metainformation about the serializer"""
+
+        model = StatMatchedObjects
+        fields = ['indicator_id', "created_at"]
+
+
+class CheckedObjectsSerializer(serializers.ModelSerializer):
+    """Serializer for detected objects"""
+
+    class Meta:
+        """Metainformation about the serializer"""
+
+        model = StatCheckedObjects
+        fields = ['id', "created_at"]
 
 
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
@@ -54,7 +77,6 @@ class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
 
         model = Indicator
         fields = ['false_detected_counter', 'positive_detected_counter']
-        exclude = []
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -74,4 +96,3 @@ class MXyiSerializer(serializers.ModelSerializer):
 
         model = Indicator
         fields = ['label', 'value']
-        exclude = []

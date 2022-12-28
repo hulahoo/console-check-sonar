@@ -105,6 +105,40 @@ class Indicator(BaseModel):
     )
 
     @property
+    def feeds(self) -> tuple:
+        """Return tuple of feeds that linked with the indicator"""
+
+        feeds_ids = [
+            relationship.feed_id for relationship in
+            IndicatorFeedRelationship.objects.filter(
+                indicator_id=self.id,
+            )
+        ]
+
+        return (
+            {
+                "id": feed_id,
+                "name": Feed.objects.get(id=feed_id).title
+            }
+            for feed_id in feeds_ids
+        )
+
+    @property
+    def activities(self) -> tuple:
+        """Return tuple of activities that linked with the indicator"""
+
+        return (
+            {
+                "type": activity.activity_type,
+                "details": activity.details,
+                "created-at": activity.created_at
+            }
+            for activity in IndicatorActivities.objects.filter(
+                indicator_id=self.id,
+            )
+        )
+
+    @property
     def feeds_names(self) -> tuple:
         """Return tuple of names for feeds that linked with the indicator"""
 

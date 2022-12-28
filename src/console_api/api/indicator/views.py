@@ -34,9 +34,15 @@ class IndicatorStatiscList(generics.ListAPIView):
         context = get_filter_query_param(request, "context")
         is_sending_to_detections = get_filter_query_param(request, "is-sending-to-detections")
         is_false_positive = get_filter_query_param(request, "is-false-positive")
-        weight = get_filter_query_param(request, "weight")
+
+        weight_from = get_filter_query_param(request, "weight-from")
+        weight_to = get_filter_query_param(request, "weight-to")
+
         feeds_weight = get_filter_query_param(request, "feeds-weight")
-        tags_weight = get_filter_query_param(request, "tags-weight")
+
+        tags_weight_from = get_filter_query_param(request, "tags-weight-from")
+        tags_weight_to = get_filter_query_param(request, "tags-weight-to")
+
         time_weight = get_filter_query_param(request, "time-weight")
         is_archived = get_filter_query_param(request, "is-archived")
         false_detected_counter = get_filter_query_param(request, "false-detected-counter")
@@ -44,9 +50,14 @@ class IndicatorStatiscList(generics.ListAPIView):
         total_detected_counter = get_filter_query_param(request, "total-detected-counter")
         first_detected_at = get_filter_query_param(request, "first-detected-at")
         last_detected_at = get_filter_query_param(request, "last-detected-at")
-        created_at = get_filter_query_param(request, "created-at")
+
+        created_at_from = get_filter_query_param(request, "created-at-from")
+        created_at_to = get_filter_query_param(request, "created-at-to")
+
         created_by = get_filter_query_param(request, "created-by")
-        updated_at = get_filter_query_param(request, "updated-at")
+
+        updated_at_from = get_filter_query_param(request, "updated-at-from")
+        updated_at_to = get_filter_query_param(request, "updated-at-to")
 
         if id_:
             self.queryset = self.queryset.filter(id=id_)
@@ -60,12 +71,32 @@ class IndicatorStatiscList(generics.ListAPIView):
             self.queryset = self.queryset.filter(is_sending_to_detections=is_sending_to_detections)
         if is_false_positive:
             self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
-        if weight:
-            self.queryset = self.queryset.filter(weight=weight)
+
+        if weight_from or weight_to:
+            if not weight_from:
+                weight_from = 0
+
+            if not weight_to:
+                weight_to = 100
+            print(weight_from, weight_to)
+
+            self.queryset = self.queryset.filter(
+                weight__range=(weight_from, weight_to),
+            )
+
+        if tags_weight_from or tags_weight_to:
+            if not tags_weight_from:
+                tags_weight_from = 0
+
+            if not tags_weight_to:
+                tags_weight_to = 100
+
+            self.queryset = self.queryset.filter(
+                tags_weight__range=(tags_weight_from, tags_weight_to),
+            )
+
         if feeds_weight:
             self.queryset = self.queryset.filter(feeds_weight=feeds_weight)
-        if tags_weight:
-            self.queryset = self.queryset.filter(tags_weight=tags_weight)
         if time_weight:
             self.queryset = self.queryset.filter(time_weight=time_weight)
         if is_archived:
@@ -80,12 +111,35 @@ class IndicatorStatiscList(generics.ListAPIView):
             self.queryset = self.queryset.filter(first_detected_at=first_detected_at)
         if last_detected_at:
             self.queryset = self.queryset.filter(last_detected_at=last_detected_at)
-        if created_at:
-            self.queryset = self.queryset.filter(created_at=created_at)
+
+        if created_at_from and created_at_to:
+            self.queryset = self.queryset.filter(
+                created_at__range=(created_at_from, created_at_to),
+            )
+        elif created_at_from:
+            self.queryset = self.queryset.filter(
+                created_at__gte=created_at_from,
+            )
+        elif created_at_to:
+            self.queryset = self.queryset.filter(
+                created_at__lte=created_at_to,
+            )
+
         if created_by:
             self.queryset = self.queryset.filter(created_by=created_by)
-        if updated_at:
-            self.queryset = self.queryset.filter(updated_at=updated_at)
+
+        if updated_at_from and updated_at_to:
+            self.queryset = self.queryset.filter(
+                updated_at__range=(updated_at_from, updated_at_to),
+            )
+        elif updated_at_from:
+            self.queryset = self.queryset.filter(
+                updated_at__gte=updated_at_from,
+            )
+        elif updated_at_to:
+            self.queryset = self.queryset.filter(
+                updated_at__lte=updated_at_to,
+            )
 
         # tags and feed_name should be below others
         if tags:

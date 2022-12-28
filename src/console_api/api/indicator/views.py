@@ -17,8 +17,8 @@ from console_api.apps.tag.models import IndicatorTagRelationship
 from console_api.apps.feed.models import IndicatorFeedRelationship, Feed
 
 
-class IndicatorStatiscList(generics.ListAPIView):
-    """IndicatorStatiscList"""
+class IndicatorListView(generics.ListAPIView):
+    """List of indicators"""
 
     queryset = Indicator.objects.all()
     serializer_class = IndicatorListSerializer

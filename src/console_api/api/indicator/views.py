@@ -5,11 +5,16 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.request import Request
 
-from console_api.api.services import get_response_with_pagination
+from console_api.api.services import (
+    get_filter_query_param,
+    get_response_with_pagination,
+)
 from console_api.apps.indicator.models import Indicator
 from console_api.api.indicator.serializers import (
     IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer,
 )
+from console_api.apps.tag.models import IndicatorTagRelationship
+from console_api.apps.feed.models import IndicatorFeedRelationship, Feed
 
 
 class IndicatorStatiscList(generics.ListAPIView):
@@ -18,32 +23,51 @@ class IndicatorStatiscList(generics.ListAPIView):
     queryset = Indicator.objects.all()
     serializer_class = IndicatorListSerializer
 
-    def add_queryset_filters(self, *, request):
-        is_sending_to_detections = request.GET.get('filter[is_sending_to_detections]')
-        is_false_positive = request.GET.get('filter[is_false_positive]')
-        weight = request.GET.get('filter[weight]')
-        tags_weight = request.GET.get('filter[tags_weight]')
-        is_archived = request.GET.get('filter[is_archived]')
-        false_detected_counter = request.GET.get('filter[false_detected_counter]')
-        positive_detected_counter = request.GET.get('filter[positive_detected_counter]')
-        total_detected_counter = request.GET.get('filter[total_detected_counter]')
-        first_detected_at = request.GET.get('filter[first_detected_at]')
-        last_detected_at = request.GET.get('filter[last_detected_at]')
+    def add_queryset_filters(self, request: Request) -> None:
+        """Filter the queryset"""
 
-        if request.GET.get('filter[id]'):
-            self.queryset = self.queryset.filter(id=request.GET.get('filter[id]'))
-        if request.GET.get('filter[ioc-type]'):
-            self.queryset = self.queryset.filter(ioc_type=request.GET.get('filter[ioc-type]'))
-        if request.GET.get('filter[value]'):
-            self.queryset = self.queryset.filter(value=request.GET.get('filter[value]'))
+        id_ = get_filter_query_param(request, "id")
+        ioc_type = get_filter_query_param(request, "ioc-type")
+        tags = get_filter_query_param(request, "tags")
+        feed_name = get_filter_query_param(request, "feed-name")
+        value = get_filter_query_param(request, "value")
+        context = get_filter_query_param(request, "context")
+        is_sending_to_detections = get_filter_query_param(request, "is-sending-to-detections")
+        is_false_positive = get_filter_query_param(request, "is-false-positive")
+        weight = get_filter_query_param(request, "weight")
+        feeds_weight = get_filter_query_param(request, "feeds-weight")
+        tags_weight = get_filter_query_param(request, "tags-weight")
+        time_weight = get_filter_query_param(request, "time-weight")
+        is_archived = get_filter_query_param(request, "is-archived")
+        false_detected_counter = get_filter_query_param(request, "false-detected-counter")
+        positive_detected_counter = get_filter_query_param(request, "positive-detected-counter")
+        total_detected_counter = get_filter_query_param(request, "total-detected-counter")
+        first_detected_at = get_filter_query_param(request, "first-detected-at")
+        last_detected_at = get_filter_query_param(request, "last-detected-at")
+        created_at = get_filter_query_param(request, "created-at")
+        created_by = get_filter_query_param(request, "created-by")
+        updated_at = get_filter_query_param(request, "updated-at")
+
+        if id_:
+            self.queryset = self.queryset.filter(id=id_)
+        if ioc_type:
+            self.queryset = self.queryset.filter(ioc_type=ioc_type)
+        if value:
+            self.queryset = self.queryset.filter(value=value)
+        if context:
+            self.queryset = self.queryset.filter(context=context)
         if is_sending_to_detections:
             self.queryset = self.queryset.filter(is_sending_to_detections=is_sending_to_detections)
         if is_false_positive:
             self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
         if weight:
             self.queryset = self.queryset.filter(weight=weight)
+        if feeds_weight:
+            self.queryset = self.queryset.filter(feeds_weight=feeds_weight)
         if tags_weight:
             self.queryset = self.queryset.filter(tags_weight=tags_weight)
+        if time_weight:
+            self.queryset = self.queryset.filter(time_weight=time_weight)
         if is_archived:
             self.queryset = self.queryset.filter(is_archived=is_archived)
         if false_detected_counter:
@@ -56,6 +80,57 @@ class IndicatorStatiscList(generics.ListAPIView):
             self.queryset = self.queryset.filter(first_detected_at=first_detected_at)
         if last_detected_at:
             self.queryset = self.queryset.filter(last_detected_at=last_detected_at)
+        if created_at:
+            self.queryset = self.queryset.filter(created_at=created_at)
+        if created_by:
+            self.queryset = self.queryset.filter(created_by=created_by)
+        if updated_at:
+            self.queryset = self.queryset.filter(updated_at=updated_at)
+
+        # tags and feed_name should be below others
+        if tags:
+            tags = tags.replace(' ', '').replace('[', '').replace(']', '')
+            tags = tags.split(',')
+
+            if tags == ['']:
+                tags = []
+
+            tags = [int(number) for number in tags]
+
+            tags_filtered_list = []
+
+            for indicator in self.queryset:
+                indicator_tags = [
+                    relationship.tag_id for relationship in
+                    IndicatorTagRelationship.objects.filter(
+                        indicator_id=indicator.id,
+                    )
+                ]
+
+                if tags == []:
+                    if indicator_tags == []:
+                        tags_filtered_list.append(indicator)
+                else:
+                    if set(tags).issubset(set(indicator_tags)):
+                        tags_filtered_list.append(indicator)
+
+            self.queryset = tags_filtered_list
+        if feed_name and feed_name != '':
+            feed_filtered_list = []
+
+            for indicator in self.queryset:
+                feeds = [
+                    Feed.objects.get(id=relationship.feed_id).title
+                    for relationship in
+                    IndicatorFeedRelationship.objects.filter(
+                        indicator_id=indicator.id,
+                    )
+                ]
+
+                if feed_name in feeds:
+                    feed_filtered_list.append(indicator)
+
+            self.queryset = feed_filtered_list
 
     def list(self, request: Request) -> Response:
         """Return response with list of indicators"""

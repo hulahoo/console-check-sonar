@@ -33,3 +33,9 @@ def _get_page_size(request: Request) -> int:
         page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
 
     return int(page_size)
+
+
+def get_filter_query_param(request, field: str) -> str:
+    """Return filter query parameter for the field"""
+
+    return request.GET.get(f'filter[{field}]')

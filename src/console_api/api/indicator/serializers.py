@@ -4,6 +4,7 @@ from rest_framework import serializers
 from console_api.api.feed.serializers import FeedShortSerializer
 from console_api.api.feed.serializers import DashboardFeedSerializer
 from console_api.apps.indicator.models import Indicator, IndicatorActivities
+from console_api.apps.feed.models import IndicatorFeedRelationship
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -21,12 +22,35 @@ class FeedSerializer(serializers.ModelSerializer):
 
 
 class IndicatorActivitiesSerializer(serializers.ModelSerializer):
+    """Serializer for model IndicatorActivities"""
+
     class Meta:
+        """Metainformation for serializer"""
+
         model = IndicatorActivities
+
         fields = ["type", "details", "created_at"]
+
         extra_kwargs = {
             "created-at": {"source": "created_at"},
         }
+
+
+class IndicatorFeedSerializer(serializers.ModelSerializer):
+    """Serializer for model IndicatorFeedRelationship"""
+
+    class Meta:
+        """Metainformation for serializer"""
+
+        model = IndicatorFeedRelationship
+
+        fields = ["type", "details", "created_at"]
+
+        extra_kwargs = {
+            "created-at": {"source": "created_at"},
+        }
+
+
 
 
 class IndicatorListSerializer(serializers.ModelSerializer):
@@ -59,9 +83,6 @@ class IndicatorListSerializer(serializers.ModelSerializer):
 class IndicatorDetailSerializer(serializers.ModelSerializer):
     """Serializer for IndicatorDetailView"""
 
-    feeds = FeedShortSerializer(many=True, source="feed_set")
-    activities = IndicatorActivitiesSerializer(many=True)
-
     class Meta:
         """Metainformation about the serializer"""
 
@@ -86,6 +107,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "created-at": {"source": "created_at"},
             "updated-at": {"source": "updated_at"},
             "ioc-weight": {"source": "weight"},
+            "tags": {"source": "tags_ids"},
             "tags-weight": {"source": "tags_weight"},
         }
 

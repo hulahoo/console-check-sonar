@@ -17,7 +17,8 @@ install_requires = [
     ('django-debug-toolbar', '3.7.0'),
     ('django-rest-swagger', '2.2.0'),
     ('django-cors-headers', '3.13.0'),
-    ('gunicorn', '20.1.0')
+    ('gunicorn', '20.1.0'),
+    ('pandas', '1.4.3')
 ]
 
 CI_PROJECT_NAME = os.environ.get("CI_PROJECT_NAME", "console-api")

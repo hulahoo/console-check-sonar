@@ -4,10 +4,10 @@ from django.urls import path
 
 from console_api.api.statistics.views import (
     CheckedObjectsView,
-    DetectedIndicatorsView,
     DetectedObjectsView,
     FeedsIntersectionList,
     FeedStatiscList,
+    detected_indicators_view
 )
 
 urlpatterns = [
@@ -18,7 +18,7 @@ urlpatterns = [
     ),
     path(
         "/matched-indicators",
-        DetectedIndicatorsView.as_view(),
+        detected_indicators_view,
         name="matched_indicator",
     ),
     path(

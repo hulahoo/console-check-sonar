@@ -18,7 +18,7 @@ urlpatterns = [
 
     # Indicator detail
     path(
-        "/<uuid:id>/",
+        "/<uuid:id>",
         IndicatorDetailView.as_view(),
         name="indicator_detail",
     ),

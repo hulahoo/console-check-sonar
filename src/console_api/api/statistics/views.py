@@ -1,7 +1,6 @@
 """Views for statistics app"""
 
 from django.http import JsonResponse
-from pandas import date_range
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
@@ -10,17 +9,14 @@ from console_api.apps.feed.models import Feed
 from console_api.apps.indicator.models import Indicator
 from console_api.apps.detections.models import Detection
 from console_api.api.statistics.serializers import (
-    CheckedObjectsSerializer,
     DetectedIndicatorsSerializer,
-    DetectedObjectsSerializer,
     IndicatorWithFeedsSerializer,
 )
 from console_api.apps.statistics.models import (
     StatCheckedObjects,
     StatMatchedObjects,
 )
-from console_api.api.statistics.constants import FREQUENCY_AND_FORMAT
-from console_api.api.statistics.services import get_period_query_params
+from console_api.api.statistics.services import get_objects_data_for_statistics
 
 
 class FeedStatiscList(generics.ListAPIView):
@@ -34,63 +30,31 @@ class FeedStatiscList(generics.ListAPIView):
 def detected_indicators_view(request: Request) -> JsonResponse:
     """Return JSON with detected indicators statistic"""
 
-    # 1 minute by default
-    frequency = request.GET.get('frequency', "T")
-    period_format = FREQUENCY_AND_FORMAT[frequency]
+    statistics_data = get_objects_data_for_statistics(request, Detection)
 
-    start_period_at, finish_period_at = get_period_query_params(request)
+    return JsonResponse(statistics_data)
 
-    detections = Detection.objects.filter(
-        created_at__range=(start_period_at, finish_period_at),
+
+def detected_objects_view(request: Request) -> JsonResponse:
+    """Return JSON with detected objects statistic"""
+
+    statistics_data = get_objects_data_for_statistics(
+        request,
+        StatMatchedObjects
     )
 
-    date_and_detection_amount = {
-        str(date.strftime(period_format)): 0
-        for date in
-        date_range(start_period_at, finish_period_at, freq=frequency)
-    }
-
-    for detection_obj in detections:
-        date = detection_obj.created_at.strftime(period_format)
-
-        date_and_detection_amount[date] += 1
-
-    return JsonResponse({
-        "labels": list(date_and_detection_amount.keys()),
-        "values": list(date_and_detection_amount.values()),
-    })
+    return JsonResponse(statistics_data)
 
 
-class DetectedObjectsView(generics.ListAPIView):
-    """Detected objects"""
+def checked_objects_view(request: Request) -> JsonResponse:
+    """Return JSON with checked objects statistic"""
 
-    serializer_class = DetectedObjectsSerializer
+    statistics_data = get_objects_data_for_statistics(
+        request,
+        StatCheckedObjects,
+    )
 
-    def get_queryset(self):
-        start_period_at = self.request.GET.get('start-period-at')
-        finish_period_at = self.request.GET.get('finish-period-at')
-
-        objects = StatMatchedObjects.objects.filter(
-            created_at__range=(start_period_at, finish_period_at),
-        )
-
-        return objects.values("indicator_id", "created_at")
-
-
-class CheckedObjectsView(generics.ListAPIView):
-    """Detected objects"""
-
-    serializer_class = CheckedObjectsSerializer
-
-    def get_queryset(self):
-        start_period_at = self.request.GET.get('start-period-at')
-        finish_period_at = self.request.GET.get('finish-period-at')
-
-        objects = StatCheckedObjects.objects.filter(
-            created_at__range=(start_period_at, finish_period_at),
-        )
-
-        return objects.values("id", "created_at")
+    return JsonResponse(statistics_data)
 
 
 class FeedsIntersectionList(generics.ListAPIView):

@@ -68,6 +68,22 @@ class Detection(models.Model):
             )
         ]
 
+    @property
+    def feeds_names(self) -> tuple:
+        """Return tuple of feeds that linked with detection's indicator"""
+
+        feeds_ids = [
+            relationship.feed_id for relationship in
+            IndicatorFeedRelationship.objects.filter(
+                indicator_id=self.indicator_id,
+            )
+        ]
+
+        return (
+            Feed.objects.get(id=feed_id).title
+            for feed_id in feeds_ids
+        )
+
     def __str__(self) -> str:
         return str(self.id)
 

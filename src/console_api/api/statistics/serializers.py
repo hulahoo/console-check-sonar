@@ -4,11 +4,6 @@ from rest_framework import serializers
 
 from console_api.apps.indicator.models import Indicator
 from console_api.apps.detections.models import Detection
-from console_api.apps.statistics.models import (
-    StatCheckedObjects,
-    StatMatchedObjects,
-)
-
 
 
 class IndicatorSerializer(serializers.ModelSerializer):
@@ -47,26 +42,6 @@ class DetectedIndicatorsSerializer(serializers.ModelSerializer):
 
         model = Detection
         fields = ['indicator_id', "created_at"]
-
-
-class DetectedObjectsSerializer(serializers.ModelSerializer):
-    """Serializer for detected objects"""
-
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = StatMatchedObjects
-        fields = ['indicator_id', "created_at"]
-
-
-class CheckedObjectsSerializer(serializers.ModelSerializer):
-    """Serializer for detected objects"""
-
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = StatCheckedObjects
-        fields = ['id', "created_at"]
 
 
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):

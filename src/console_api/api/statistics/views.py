@@ -1,6 +1,7 @@
 """Views for statistics app"""
 
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
@@ -27,6 +28,7 @@ class FeedStatiscList(generics.ListAPIView):
     queryset = Indicator.objects.all().prefetch_related("feeds")
 
 
+@require_http_methods(["GET"])
 def detected_indicators_view(request: Request) -> JsonResponse:
     """Return JSON with detected indicators statistic"""
 
@@ -35,6 +37,7 @@ def detected_indicators_view(request: Request) -> JsonResponse:
     return JsonResponse(statistics_data)
 
 
+@require_http_methods(["GET"])
 def detected_objects_view(request: Request) -> JsonResponse:
     """Return JSON with detected objects statistic"""
 
@@ -46,6 +49,7 @@ def detected_objects_view(request: Request) -> JsonResponse:
     return JsonResponse(statistics_data)
 
 
+@require_http_methods(["GET"])
 def checked_objects_view(request: Request) -> JsonResponse:
     """Return JSON with checked objects statistic"""
 

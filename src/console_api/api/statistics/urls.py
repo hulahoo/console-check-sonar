@@ -3,11 +3,11 @@
 from django.urls import path
 
 from console_api.api.statistics.views import (
-    CheckedObjectsView,
-    DetectedObjectsView,
+    checked_objects_view,
+    detected_objects_view,
+    detected_indicators_view,
     FeedsIntersectionList,
     FeedStatiscList,
-    detected_indicators_view
 )
 
 urlpatterns = [
@@ -23,12 +23,12 @@ urlpatterns = [
     ),
     path(
         "/matched-objects",
-        DetectedObjectsView.as_view(),
+        detected_objects_view,
         name="matched_objects",
     ),
     path(
         "/checked-objects",
-        CheckedObjectsView.as_view(),
+        checked_objects_view,
         name="checked_objects",
     ),
     path(

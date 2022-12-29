@@ -4,7 +4,7 @@ from datetime import datetime
 
 from rest_framework.request import Request
 
-from console_api.api.statistics.constants import PERIOD_FORMAT
+from console_api.api.statistics.constants import MINUTE_PERIOD_FORMAT
 
 
 def get_period_query_params(request: Request) -> tuple:
@@ -12,12 +12,12 @@ def get_period_query_params(request: Request) -> tuple:
 
     start_period_at = datetime.strptime(
         request.GET.get('start-period-at'),
-        PERIOD_FORMAT,
+        MINUTE_PERIOD_FORMAT,
     )
 
     finish_period_at = datetime.strptime(
         request.GET.get('finish-period-at'),
-        PERIOD_FORMAT,
+        MINUTE_PERIOD_FORMAT,
     )
 
     return start_period_at, finish_period_at

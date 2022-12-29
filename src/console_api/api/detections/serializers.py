@@ -15,6 +15,7 @@ class DetectionSerializer(serializers.ModelSerializer):
 
         fields = [
             "id",
+            "feeds-names",
             "feeds",
             "tags",
             "tags-weight",
@@ -29,6 +30,7 @@ class DetectionSerializer(serializers.ModelSerializer):
         ]
 
         extra_kwargs = {
+            "feeds-names": {"source": "feeds_names"},
             "feeds": {"source": "feeds_ids"},
             "tags": {"source": "tags_ids"},
             "tags-weight": {"source": "tags_weight"},

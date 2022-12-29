@@ -19,7 +19,7 @@ from console_api.apps.statistics.models import (
     StatCheckedObjects,
     StatMatchedObjects,
 )
-from console_api.api.statistics.constants import PERIOD_FORMAT
+from console_api.api.statistics.constants import FREQUENCY_AND_FORMAT
 from console_api.api.statistics.services import get_period_query_params
 
 
@@ -36,6 +36,7 @@ def detected_indicators_view(request: Request) -> JsonResponse:
 
     # 1 minute by default
     frequency = request.GET.get('frequency', "T")
+    period_format = FREQUENCY_AND_FORMAT[frequency]
 
     start_period_at, finish_period_at = get_period_query_params(request)
 
@@ -44,15 +45,13 @@ def detected_indicators_view(request: Request) -> JsonResponse:
     )
 
     date_and_detection_amount = {
-        str(date.strftime(PERIOD_FORMAT)): 0
-        for date in date_range(start_period_at, finish_period_at, freq=frequency)
+        str(date.strftime(period_format)): 0
+        for date in
+        date_range(start_period_at, finish_period_at, freq=frequency)
     }
 
     for detection_obj in detections:
-        if frequency == "T":
-            date = detection_obj.created_at.strftime(PERIOD_FORMAT)
-        elif frequency == "H":
-            date = start_period_at.replace(hour=detection_obj.created_at.hour)
+        date = detection_obj.created_at.strftime(period_format)
 
         date_and_detection_amount[date] += 1
 

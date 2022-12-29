@@ -2,9 +2,14 @@
 
 from datetime import datetime
 
+from django.http import JsonResponse
 from rest_framework.request import Request
+from pandas import date_range
 
-from console_api.api.statistics.constants import MINUTE_PERIOD_FORMAT
+from console_api.api.statistics.constants import (
+    FREQUENCY_AND_FORMAT,
+    MINUTE_PERIOD_FORMAT,
+)
 
 
 def get_period_query_params(request: Request) -> tuple:
@@ -21,3 +26,29 @@ def get_period_query_params(request: Request) -> tuple:
     )
 
     return start_period_at, finish_period_at
+
+
+def get_objects_data_for_statistics(request: Request, model) -> dict:
+    """Return date and objects amount for the date"""
+
+    # 1 minute by default
+    frequency = request.GET.get('frequency', "T")
+    start_period_at, finish_period_at = get_period_query_params(request)
+
+    period_format = FREQUENCY_AND_FORMAT[frequency]
+
+    objects = model.objects.filter(
+        created_at__range=(start_period_at, finish_period_at),
+    )
+
+    date_and_objects_amount = {
+        str(date.strftime(period_format)): 0
+        for date in
+        date_range(start_period_at, finish_period_at, freq=frequency)
+    }
+
+    for obj in objects:
+        date = obj.created_at.strftime(period_format)
+        date_and_objects_amount[date] += 1
+
+    return date_and_objects_amount

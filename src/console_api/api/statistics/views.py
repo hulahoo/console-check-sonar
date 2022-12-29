@@ -61,6 +61,66 @@ def detected_indicators_view(request: Request) -> JsonResponse:
     })
 
 
+def detected_objects_view(request: Request) -> JsonResponse:
+    """Return JSON with detected objects statistic"""
+
+    # 1 minute by default
+    frequency = request.GET.get('frequency', "T")
+    period_format = FREQUENCY_AND_FORMAT[frequency]
+
+    start_period_at, finish_period_at = get_period_query_params(request)
+
+    matched_objects = StatMatchedObjects.objects.filter(
+        created_at__range=(start_period_at, finish_period_at),
+    )
+
+    date_and_detection_amount = {
+        str(date.strftime(period_format)): 0
+        for date in
+        date_range(start_period_at, finish_period_at, freq=frequency)
+    }
+
+    for obj in matched_objects:
+        date = obj.created_at.strftime(period_format)
+
+        date_and_detection_amount[date] += 1
+
+    return JsonResponse({
+        "labels": list(date_and_detection_amount.keys()),
+        "values": list(date_and_detection_amount.values()),
+    })
+
+
+def checked_objects_view(request: Request) -> JsonResponse:
+    """Return JSON with checked objects statistic"""
+
+    # 1 minute by default
+    frequency = request.GET.get('frequency', "T")
+    period_format = FREQUENCY_AND_FORMAT[frequency]
+
+    start_period_at, finish_period_at = get_period_query_params(request)
+
+    matched_objects = StatCheckedObjects.objects.filter(
+        created_at__range=(start_period_at, finish_period_at),
+    )
+
+    date_and_detection_amount = {
+        str(date.strftime(period_format)): 0
+        for date in
+        date_range(start_period_at, finish_period_at, freq=frequency)
+    }
+
+    for obj in matched_objects:
+        date = obj.created_at.strftime(period_format)
+
+        date_and_detection_amount[date] += 1
+
+    return JsonResponse({
+        "labels": list(date_and_detection_amount.keys()),
+        "values": list(date_and_detection_amount.values()),
+    })
+
+
 class DetectedObjectsView(generics.ListAPIView):
     """Detected objects"""
 

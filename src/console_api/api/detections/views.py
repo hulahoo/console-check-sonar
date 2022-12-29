@@ -15,6 +15,7 @@ class DetectionListView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         id_ = get_filter_query_param(request, "id")
+        source = get_filter_query_param(request, "source")
         source_message = get_filter_query_param(request, "source-message")
         source_event = get_filter_query_param(request, "source-event")
         indicator_id = get_filter_query_param(request, "indicator-id")
@@ -26,6 +27,8 @@ class DetectionListView(generics.ListAPIView):
 
         if id_:
             self.queryset = self.queryset.filter(id=id_)
+        if source:
+            self.queryset = self.queryset.filter(source=source)
         if source_message:
             self.queryset = self.queryset.filter(source_message=source_message)
         if source_event:

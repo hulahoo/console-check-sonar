@@ -20,6 +20,7 @@ class DetectionSerializer(serializers.ModelSerializer):
             "tags-weight",
             "indicator-id",
             "indicator-weight",
+            "source",
             "source-event",
             "source-message",
             "detection-event",

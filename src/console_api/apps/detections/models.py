@@ -13,6 +13,8 @@ from console_api.apps.feed.models import IndicatorFeedRelationship
 class Detection(models.Model):
     """Event detection"""
 
+    source = models.TextField()
+
     source_message = models.TextField()
 
     source_event = models.JSONField(

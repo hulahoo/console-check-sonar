@@ -8,11 +8,8 @@ class FeedSerializer(serializers.ModelSerializer):
         model = Feed
 
         fields = [
-            "id",
             "source-url",
             "format",
-            "is_use",
-            "polling-frequency",
             "auth-type",
             "auth-api-token",
             "auth-login",
@@ -23,19 +20,15 @@ class FeedSerializer(serializers.ModelSerializer):
             "provider",
             "description",
             "is-enabled",
-            "status",
             "is-truncating",
             "max-records-count",
             "weight",
             "available-fields",
-            # такого поля нет, посмотреть откуда оно берется
-            # "importing-fields",
-            "created-at",
+            "is-use-taxii"
         ]
 
         extra_kwargs = {
             'source-url': {'source': 'url'},
-            'is-use': {'source': 'is_use'},
             "polling-frequency": {'source': "polling_frequency"},
             "auth-type": {'source': "auth_type"},
             "auth-api-token": {'source': "auth_api_token"},
@@ -47,7 +40,7 @@ class FeedSerializer(serializers.ModelSerializer):
             "is-truncating": {'source': "is_truncating"},
             "max-records-count": {'source': "max_records_count"},
             "available-fields": {'source': "available_fields"},
-            "created-at": {'source': "created_at"},
+            "is-use-taxii": {'source': "is_use_taxii"}
         }
 
 

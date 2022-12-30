@@ -22,6 +22,8 @@ class Detection(models.Model):
         help_text="Информация о Событии (Объект из Kafka)",
     )
 
+    details = models.JSONField()
+
     indicator_id = models.UUIDField()
 
     detection_event = models.JSONField(

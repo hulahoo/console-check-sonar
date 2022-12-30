@@ -18,6 +18,7 @@ class DetectionListView(generics.ListAPIView):
         source = get_filter_query_param(request, "source")
         source_message = get_filter_query_param(request, "source-message")
         source_event = get_filter_query_param(request, "source-event")
+        details = get_filter_query_param(request, "details")
         indicator_id = get_filter_query_param(request, "indicator-id")
         detection_event = get_filter_query_param(request, "detection-event")
         detection_message = get_filter_query_param(request, "detection-message")
@@ -31,6 +32,8 @@ class DetectionListView(generics.ListAPIView):
             self.queryset = self.queryset.filter(source=source)
         if source_message:
             self.queryset = self.queryset.filter(source_message=source_message)
+        if details:
+            self.queryset = self.queryset.filter(details=details)
         if source_event:
             self.queryset = self.queryset.filter(source_event=source_event)
         if indicator_id:

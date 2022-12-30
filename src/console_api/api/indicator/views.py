@@ -1,9 +1,15 @@
 """Views for detections app"""
 
+from uuid import UUID
+
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from rest_framework import generics, viewsets
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.renderers import JSONRenderer
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from console_api.api.services import (
     get_filter_query_param,
@@ -13,7 +19,7 @@ from console_api.apps.indicator.models import Indicator
 from console_api.api.indicator.serializers import (
     IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer,
 )
-from console_api.apps.tag.models import IndicatorTagRelationship
+from console_api.apps.tag.models import IndicatorTagRelationship, Tag
 from console_api.apps.feed.models import IndicatorFeedRelationship, Feed
 
 
@@ -248,3 +254,38 @@ class IndicatorDetailView(generics.RetrieveAPIView):
     serializer_class = IndicatorDetailSerializer
     lookup_field = 'id'
     queryset = Indicator.objects.all()
+
+
+@api_view(('POST',))
+@require_http_methods(["POST"])
+@renderer_classes((JSONRenderer,))
+def change_indicator_tags_view(
+        request: Request, indicator_id: UUID) -> Response:
+    """Change tags list for the indicator"""
+
+    new_tags = [
+        int(tag) for tag in
+        request.data.get('tags').replace('[', '').replace(']', '').split(',')
+        if tag != ''
+    ]
+
+    if request.method == "POST":
+        if Indicator.objects.filter(id=indicator_id).exists():
+            if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
+                return Response("Tags wrong", status=HTTP_400_BAD_REQUEST)
+
+            IndicatorTagRelationship.objects.filter(
+                indicator_id=indicator_id,
+            ).delete()
+
+            for tag in new_tags:
+                IndicatorTagRelationship.objects.create(
+                    indicator_id=indicator_id,
+                    tag_id=tag,
+                )
+
+            return Response(status=HTTP_200_OK)
+
+        request.errors = {"detail": "Indicator not found"}
+
+    return Response(request.errors, status=HTTP_400_BAD_REQUEST)

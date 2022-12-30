@@ -286,6 +286,6 @@ def change_indicator_tags_view(
 
             return Response(status=HTTP_200_OK)
 
-        return Response("Indicator not found", status=HTTP_400_BAD_REQUEST)
+        request.errors = {"detail": "Indicator not found"}
 
     return Response(request.errors, status=HTTP_400_BAD_REQUEST)

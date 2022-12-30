@@ -10,13 +10,11 @@ from console_api.api.feed.serializers import FeedSerializer
 from console_api.apps.services.format_selector import choose_type
 from rest_framework.request import Request
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
 
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_406_NOT_ACCEPTABLE
 
 
-@csrf_exempt
 @api_view(["POST"])
 def feed_add(request: Request):
     """Add feed"""

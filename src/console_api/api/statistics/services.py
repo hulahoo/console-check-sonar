@@ -34,7 +34,10 @@ def get_objects_data_for_statistics(request: Request, model) -> dict:
     frequency = request.GET.get("frequency", "T")
     start_period_at, finish_period_at = get_period_query_params(request)
 
-    period_format = FREQUENCY_AND_FORMAT[frequency]
+    period_format = FREQUENCY_AND_FORMAT.get(frequency)
+
+    if not period_format:
+        return {"error": "Invalid frequency"}
 
     objects = model.objects.filter(
         created_at__range=(start_period_at, finish_period_at),

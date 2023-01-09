@@ -15,6 +15,7 @@ from django.db.utils import IntegrityError
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_406_NOT_ACCEPTABLE
 
 
+@require_POST
 @api_view(["POST"])
 def feed_add(request: Request):
     """Add feed"""

@@ -303,6 +303,7 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
 
     if request.method == "POST":
         activity = IndicatorActivities(
+            id=IndicatorActivities.objects.order_by('id').last().id + 1,
             indicator_id=indicator_id,
             activity_type="add-comment",
             details=request.data.get("details"),

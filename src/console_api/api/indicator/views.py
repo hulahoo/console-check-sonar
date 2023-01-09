@@ -9,13 +9,17 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.renderers import JSONRenderer
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+)
 
 from console_api.api.services import (
     get_filter_query_param,
     get_response_with_pagination,
 )
-from console_api.apps.indicator.models import Indicator
+from console_api.apps.indicator.models import Indicator, IndicatorActivities
 from console_api.api.indicator.serializers import (
     IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer,
 )
@@ -287,5 +291,25 @@ def change_indicator_tags_view(
             return Response(status=HTTP_200_OK)
 
         request.errors = {"detail": "Indicator not found"}
+
+    return Response(request.errors, status=HTTP_400_BAD_REQUEST)
+
+
+@api_view(('POST',))
+@require_http_methods(["POST"])
+@renderer_classes((JSONRenderer,))
+def add_comment_view(request: Request, indicator_id: UUID) -> Response:
+    """Change tags list for the indicator"""
+
+    if request.method == "POST":
+        activity = IndicatorActivities(
+            indicator_id=indicator_id,
+            activity_type="add-comment",
+            details=request.data.get("details"),
+            created_by=request.data.get("created-by"),
+        )
+        activity.save()
+
+        return Response(status=HTTP_201_CREATED)
 
     return Response(request.errors, status=HTTP_400_BAD_REQUEST)

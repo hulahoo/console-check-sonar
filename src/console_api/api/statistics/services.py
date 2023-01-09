@@ -42,8 +42,11 @@ def get_objects_data_for_statistics(request: Request, model) -> dict:
 
     date_and_objects_amount = {
         str(date.strftime(period_format)): 0
-        for date in
-        date_range(start_period_at, finish_period_at, freq=frequency)
+        for date in date_range(
+            start_period_at.strftime(period_format),
+            finish_period_at.strftime(period_format),
+            freq=frequency,
+        )
     }
 
     for obj in objects:

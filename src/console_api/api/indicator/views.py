@@ -1,7 +1,6 @@
 """Views for detections app"""
 
 from uuid import UUID
-from json import loads
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -307,7 +306,7 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
             id=IndicatorActivities.objects.order_by('id').last().id + 1,
             indicator_id=indicator_id,
             activity_type="add-comment",
-            details=loads(request.data.get("details")),
+            details=request.data.get("details"),
             created_by=request.data.get("created-by"),
         )
         activity.save()

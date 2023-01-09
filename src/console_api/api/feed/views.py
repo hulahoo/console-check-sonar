@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django_filters import rest_framework as filters
 from django.views.decorators.http import require_POST
 
+from console_api.api.services import get_response_with_pagination
 from console_api.apps.feed.models import Feed
 from console_api.api.feed.serializers import FeedSerializer
 from console_api.apps.services.format_selector import choose_type
@@ -15,8 +16,7 @@ from django.db.utils import IntegrityError
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_406_NOT_ACCEPTABLE
 
 
-@require_POST
-@api_view(["POST"])
+@api_view(["POST", "GET"])
 def feed_add(request: Request):
     """Add feed"""
 
@@ -29,7 +29,11 @@ def feed_add(request: Request):
             except IntegrityError:
                 data = {'detail': "Error during save data"}
                 return Response(data, status=HTTP_406_NOT_ACCEPTABLE)
-
+    if request.method == "GET":
+        feeds_list = Feed.objects.all()
+        return get_response_with_pagination(
+            request=request, objects=feeds_list, serializer=FeedSerializer,
+        )
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 

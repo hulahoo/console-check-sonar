@@ -8,6 +8,8 @@ from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_403_FORBIDDEN
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer
 
 from console_api.apps.feed.models import Feed
 from console_api.apps.indicator.models import Indicator
@@ -34,6 +36,8 @@ class FeedStatiscList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
 
+@api_view(("GET",))
+@renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
 def detected_indicators_view(request: Request) -> JsonResponse:
     """Return JSON with detected indicators statistic"""
@@ -46,6 +50,8 @@ def detected_indicators_view(request: Request) -> JsonResponse:
     return JsonResponse(statistics_data)
 
 
+@api_view(("GET",))
+@renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
 def detected_objects_view(request: Request) -> JsonResponse:
     """Return JSON with detected objects statistic"""
@@ -61,6 +67,8 @@ def detected_objects_view(request: Request) -> JsonResponse:
     return JsonResponse(statistics_data)
 
 
+@api_view(("GET",))
+@renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
 def checked_objects_view(request: Request) -> JsonResponse:
     """Return JSON with checked objects statistic"""

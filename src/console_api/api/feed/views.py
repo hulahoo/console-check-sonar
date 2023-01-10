@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 
 from console_api.api.services import get_response_with_pagination
 from console_api.apps.feed.models import Feed
-from console_api.api.feed.serializers import FeedSerializer
+from console_api.api.feed.serializers import FeedSerializer, FeedListObjectSerializer
 from console_api.apps.services.format_selector import choose_type
 from rest_framework.request import Request
 from rest_framework.decorators import api_view
@@ -32,7 +32,7 @@ def feed_add(request: Request):
     if request.method == "GET":
         feeds_list = Feed.objects.all()
         return get_response_with_pagination(
-            request=request, objects=feeds_list, serializer=FeedSerializer,
+            request=request, objects=feeds_list, serializer=FeedListObjectSerializer,
         )
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 

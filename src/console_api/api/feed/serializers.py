@@ -87,8 +87,8 @@ class FeedListObjectSerializer(serializers.ModelSerializer):
             "max-records-count": {'source': "max_records_count"},
             "available-fields": {'source': "available_fields"},
             "use-taxii": {'source': "is_use_taxii"},
-            "importing-fields": {'source': "importing-fields"},
-            "created-at": {'source': "created-at"},
+            "importing-fields": {'source': "available_fields"},
+            "created-at": {'source': "created_at"},
         }
 
 

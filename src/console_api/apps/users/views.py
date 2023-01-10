@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 
 from .serializers import (
@@ -53,9 +54,10 @@ class CustomAuthTokenView(ObtainAuthToken):
                 t = Token.objects.create(key=user_token, user_id=user.pk)
                 t.save()
         except Exception as e:
-            return Response({
-                'errors': [{"detail": str(e)}]
-            })
+            return Response(
+                {'errors': [{"detail": str(e)}]},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
         return Response({
             'access-token': user_token,

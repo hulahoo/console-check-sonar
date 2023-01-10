@@ -1,10 +1,12 @@
 """Views for detections app"""
 
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 from console_api.apps.detections.models import Detection
 from console_api.api.detections.serializers import DetectionSerializer
 from console_api.api.services import (
+    CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
 )
@@ -59,3 +61,5 @@ class DetectionListView(generics.ListAPIView):
 
     serializer_class = DetectionSerializer
     queryset = Detection.objects.all()
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]

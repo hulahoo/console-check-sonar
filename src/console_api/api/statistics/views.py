@@ -5,6 +5,9 @@ from django.views.decorators.http import require_http_methods
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_403_FORBIDDEN
+from rest_framework.response import Response
 
 from console_api.apps.feed.models import Feed
 from console_api.apps.indicator.models import Indicator
@@ -18,6 +21,7 @@ from console_api.apps.statistics.models import (
     StatMatchedObjects,
 )
 from console_api.api.statistics.services import get_objects_data_for_statistics
+from console_api.api.services import CustomTokenAuthentication
 
 
 class FeedStatiscList(generics.ListAPIView):
@@ -26,11 +30,16 @@ class FeedStatiscList(generics.ListAPIView):
     pagination_class = PageNumberPagination
     serializer_class = IndicatorWithFeedsSerializer
     queryset = Indicator.objects.all().prefetch_related("feeds")
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
 
 @require_http_methods(["GET"])
 def detected_indicators_view(request: Request) -> JsonResponse:
     """Return JSON with detected indicators statistic"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(status=HTTP_403_FORBIDDEN)
 
     statistics_data = get_objects_data_for_statistics(request, Detection)
 
@@ -40,6 +49,9 @@ def detected_indicators_view(request: Request) -> JsonResponse:
 @require_http_methods(["GET"])
 def detected_objects_view(request: Request) -> JsonResponse:
     """Return JSON with detected objects statistic"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(status=HTTP_403_FORBIDDEN)
 
     statistics_data = get_objects_data_for_statistics(
         request,
@@ -52,6 +64,9 @@ def detected_objects_view(request: Request) -> JsonResponse:
 @require_http_methods(["GET"])
 def checked_objects_view(request: Request) -> JsonResponse:
     """Return JSON with checked objects statistic"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(status=HTTP_403_FORBIDDEN)
 
     statistics_data = get_objects_data_for_statistics(
         request,
@@ -66,6 +81,8 @@ class FeedsIntersectionList(generics.ListAPIView):
 
     serializer_class = DetectedIndicatorsSerializer
     model = Feed
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

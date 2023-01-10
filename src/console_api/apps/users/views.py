@@ -13,6 +13,7 @@ from .serializers import (
     RegisterSerializer, UserSerializer, AuthTokenSerializer,
 )
 from .models import User, Token
+from console_api.api.services import CustomTokenAuthentication
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -23,9 +24,11 @@ class UserViewSet(viewsets.ModelViewSet):
 class RegisterUserAPIView(generics.CreateAPIView):
     permission_classes = (IsAdminUser,)
     serializer_class = RegisterSerializer
+    authentication_classes = [CustomTokenAuthentication]
 
 
 class Logout(APIView):
+    authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):

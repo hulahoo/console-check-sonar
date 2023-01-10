@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from console_api.apps.indicator.models import Indicator
+from console_api.indicator.models import Indicator
 from console_api.apps.detections.models import Detection
 
 
@@ -18,19 +18,6 @@ class IndicatorSerializer(serializers.ModelSerializer):
 
         model = Indicator
         fields = ['type_indicator', 'checked_count', 'detected_count']
-        exclude = []
-
-
-class DataIndicatorSerializer(serializers.ModelSerializer):
-    """Serializer for Indicator model with data"""
-
-    data = IndicatorSerializer(source='*')
-
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = Indicator
-        fields = ['data']
         exclude = []
 
 
@@ -58,16 +45,3 @@ class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
         queryset = queryset.prefetch_related('feeds')
 
         return queryset
-
-
-class MXyiSerializer(serializers.ModelSerializer):
-    """Serializer for Indicator model with data and lable"""
-
-    data = serializers.IntegerField(source='detected_count')
-    label = serializers.DateTimeField(source='last_detected_date')
-
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = Indicator
-        fields = ['label', 'value']

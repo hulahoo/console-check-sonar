@@ -17,14 +17,13 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 
-
 from console_api.api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
 )
-from console_api.apps.indicator.models import Indicator, IndicatorActivities
-from console_api.api.indicator.serializers import (
+from console_api.indicator.models import Indicator, IndicatorActivities
+from console_api.indicator.serializers import (
     IndicatorListSerializer,
     IndicatorDetailSerializer,
     IndicatorSerializer,
@@ -280,17 +279,16 @@ class IndicatorDetailView(generics.RetrieveAPIView):
 @api_view(("POST",))
 @require_http_methods(["POST"])
 @renderer_classes((JSONRenderer,))
-def change_indicator_tags_view(
-        request: Request, indicator_id: UUID) -> Response:
+def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response:
     """Change tags list for the indicator"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(status=HTTP_403_FORBIDDEN)
 
     new_tags = [
-        int(tag) for tag in
-        request.data.get('tags').replace('[', '').replace(']', '').split(',')
-        if tag != ''
+        int(tag)
+        for tag in request.data.get("tags").replace("[", "").replace("]", "").split(",")
+        if tag != ""
     ]
 
     if request.method == "POST":

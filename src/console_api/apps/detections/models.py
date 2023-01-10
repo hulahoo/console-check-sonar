@@ -5,7 +5,7 @@ from django.db import models
 
 from console_api.apps.feed.models import Feed
 from console_api.apps.models.abstract import CreationDateTimeField
-from console_api.apps.indicator.models import Indicator
+from console_api.indicator.models import Indicator
 from console_api.apps.tag.models import IndicatorTagRelationship
 from console_api.apps.feed.models import IndicatorFeedRelationship
 

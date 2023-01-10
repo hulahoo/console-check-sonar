@@ -4,7 +4,7 @@ from uuid import uuid4
 from stix2elevator import elevate
 
 from console_api.config.log_conf import logger
-from console_api.apps.indicator.models import Indicator
+from console_api.indicator.models import Indicator
 from console_api.apps.services.ext import get_url, feed_control
 
 

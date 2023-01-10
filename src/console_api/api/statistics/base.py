@@ -1,7 +1,7 @@
 from rest_framework import generics
 from django.db.models import Count
 
-from console_api.apps.indicator.models import Indicator
+from console_api.indicator.models import Indicator
 
 
 class BaseIndicatorList(generics.ListAPIView):

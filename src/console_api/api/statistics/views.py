@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
 from console_api.apps.feed.models import Feed
-from console_api.apps.indicator.models import Indicator
+from console_api.indicator.models import Indicator
 from console_api.apps.detections.models import Detection
 from console_api.api.statistics.serializers import (
     DetectedIndicatorsSerializer,

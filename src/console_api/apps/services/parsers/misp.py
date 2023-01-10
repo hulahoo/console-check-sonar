@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 from console_api.apps.services.ext import get_url
 from console_api.config.log_conf import logger
-from console_api.apps.indicator.models import Indicator
+from console_api.indicator.models import Indicator
 
 
 def parse_misp_event(urls_for_parsing, feed):

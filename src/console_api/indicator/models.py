@@ -113,17 +113,14 @@ class Indicator(BaseModel):
         """Return tuple of feeds that linked with the indicator"""
 
         feeds_ids = [
-            relationship.feed_id for relationship in
-            IndicatorFeedRelationship.objects.filter(
+            relationship.feed_id
+            for relationship in IndicatorFeedRelationship.objects.filter(
                 indicator_id=self.id,
             )
         ]
 
         return (
-            {
-                "id": feed_id,
-                "name": Feed.objects.get(id=feed_id).title
-            }
+            {"id": feed_id, "name": Feed.objects.get(id=feed_id).title}
             for feed_id in feeds_ids
         )
 
@@ -135,7 +132,7 @@ class Indicator(BaseModel):
             {
                 "type": activity.activity_type,
                 "details": activity.details,
-                "created-at": activity.created_at
+                "created-at": activity.created_at,
             }
             for activity in IndicatorActivities.objects.filter(
                 indicator_id=self.id,
@@ -147,8 +144,8 @@ class Indicator(BaseModel):
         """Return tuple of names for feeds that linked with the indicator"""
 
         feeds = [
-            relationship.feed_id for relationship in
-            IndicatorFeedRelationship.objects.filter(
+            relationship.feed_id
+            for relationship in IndicatorFeedRelationship.objects.filter(
                 indicator_id=self.id,
             )
         ]
@@ -160,8 +157,8 @@ class Indicator(BaseModel):
         """Return tuple of tags ids that linked with the indicator"""
 
         return (
-            relationship.tag_id for relationship in
-            IndicatorTagRelationship.objects.filter(
+            relationship.tag_id
+            for relationship in IndicatorTagRelationship.objects.filter(
                 indicator_id=self.id,
             )
         )
@@ -183,15 +180,9 @@ class Indicator(BaseModel):
 class IndicatorActivities(models.Model):
     """Timeline of activity for each Indicator"""
 
-    indicator_id = models.UUIDField(
-        default=uuid4,
-        editable=False
-    )
+    indicator_id = models.UUIDField(default=uuid4, editable=False)
 
-    activity_type = models.CharField(
-        "Тип",
-        max_length=32
-    )
+    activity_type = models.CharField("Тип", max_length=32)
 
     details = models.JSONField()
 
@@ -213,9 +204,7 @@ class IndicatorActivities(models.Model):
 class Session(models.Model):
     """User session"""
 
-    user_id = models.BigIntegerField(
-        "Ссылка на users.id"
-    )
+    user_id = models.BigIntegerField("Ссылка на users.id")
 
     access_token = models.CharField(
         "Токен доступа MD5",

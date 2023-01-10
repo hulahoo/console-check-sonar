@@ -4,7 +4,7 @@ from uuid import uuid4
 from flatdict import FlatterDict
 
 from console_api.apps.services.ext import feed_control, get_url
-from console_api.apps.indicator.models import Indicator
+from console_api.indicator.models import Indicator
 
 
 def parse_custom_json(feed, config: dict = {}):

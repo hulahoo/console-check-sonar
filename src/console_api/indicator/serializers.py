@@ -1,10 +1,11 @@
-from console_api.apps.tag.models import Tag
-from console_api.apps.feed.models import Feed
+"""Serializers for indicator app"""
+
 from rest_framework import serializers
-from console_api.api.feed.serializers import FeedShortSerializer
+
+from console_api.apps.feed.models import Feed, IndicatorFeedRelationship
+from console_api.apps.tag.models import Tag
 from console_api.api.feed.serializers import DashboardFeedSerializer
-from console_api.apps.indicator.models import Indicator, IndicatorActivities
-from console_api.apps.feed.models import IndicatorFeedRelationship
+from console_api.indicator.models import Indicator
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -21,21 +22,6 @@ class FeedSerializer(serializers.ModelSerializer):
         exclude = []
 
 
-class IndicatorActivitiesSerializer(serializers.ModelSerializer):
-    """Serializer for model IndicatorActivities"""
-
-    class Meta:
-        """Metainformation for serializer"""
-
-        model = IndicatorActivities
-
-        fields = ["type", "details", "created_at"]
-
-        extra_kwargs = {
-            "created-at": {"source": "created_at"},
-        }
-
-
 class IndicatorFeedSerializer(serializers.ModelSerializer):
     """Serializer for model IndicatorFeedRelationship"""
 
@@ -49,8 +35,6 @@ class IndicatorFeedSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "created-at": {"source": "created_at"},
         }
-
-
 
 
 class IndicatorListSerializer(serializers.ModelSerializer):
@@ -132,15 +116,6 @@ class IndicatorSerializer(serializers.ModelSerializer):
         ]
 
 
-class DataIndicatorSerializer(serializers.ModelSerializer):
-    data = IndicatorSerializer(source="*")
-
-    class Meta:
-        model = Indicator
-        fields = ["context"]
-        exclude = []
-
-
 class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
     feeds = DashboardFeedSerializer(many=True, read_only=True)
 
@@ -154,21 +129,3 @@ class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
         queryset = queryset.prefetch_related("feeds")
 
         return queryset
-
-
-class MatchedIndicatorSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(source="detected_count")
-    label = serializers.DateTimeField(source="last_detected_date")
-
-    class Meta:
-        model = Indicator
-        fields = ["label", "value"]
-        exclude = []
-
-
-class MXyiSerializer(serializers.ModelSerializer):
-    data = serializers.IntegerField(source="detected_count")
-    label = serializers.DateTimeField(source="last_detected_date")
-
-    class Meta(MatchedIndicatorSerializer.Meta):
-        ...

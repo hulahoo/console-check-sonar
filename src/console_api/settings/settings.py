@@ -37,7 +37,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "console_api.apps.feed.apps.FeedConfig",
-    "console_api.apps.indicator.apps.IndicatorConfig",
+    "console_api.indicator.apps.IndicatorConfig",
     "console_api.apps.source.apps.SourceConfig",
     "console_api.apps.tag.apps.TagConfig",
     "console_api.apps.users.apps.UsersConfig",

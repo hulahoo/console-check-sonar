@@ -22,7 +22,7 @@ schema_view = get_schema_view(
         path("api/source/", include("console_api.api.source.urls")),
         path("api/tag/", include("console_api.api.tag.urls")),
         path("api/detections/", include("console_api.api.detections.urls")),
-        path("api/indicators/", include("console_api.api.indicator.urls")),
+        path("api/indicators/", include("console_api.indicator.urls")),
     ],
 )
 
@@ -34,7 +34,7 @@ urlpatterns = [
     path("users", include("console_api.apps.users.urls")),
     path("detections", include("console_api.api.detections.urls")),
     path("sessions", CustomAuthTokenView.as_view()),
-    path("indicators", include("console_api.api.indicator.urls")),
+    path("indicators", include("console_api.indicator.urls")),
     path(
         "",
         schema_view.with_ui("swagger", cache_timeout=0),

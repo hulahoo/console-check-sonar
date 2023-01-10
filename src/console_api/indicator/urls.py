@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from console_api.api.indicator.views import (
+from console_api.indicator.views import (
     add_comment_view,
     change_indicator_tags_view,
     IndicatorDetailView,

@@ -3,6 +3,7 @@
 from django.urls import path
 
 from console_api.api.indicator.views import (
+    add_comment_view,
     change_indicator_tags_view,
     IndicatorDetailView,
     IndicatorListView,
@@ -22,6 +23,13 @@ urlpatterns = [
         "/<uuid:indicator_id>/change/tags",
         change_indicator_tags_view,
         name="indicator_change_tags",
+    ),
+
+    # Add action with add-comment type
+    path(
+        "/<uuid:indicator_id>/add-comment",
+        add_comment_view,
+        name="add_comment",
     ),
 
     # Indicator detail

@@ -1,3 +1,7 @@
+init_postgres.sql
+Dockerfile
+docker-compose.yml
+.scannerwork
 .DS_Store
 .huskyrc.json
 out

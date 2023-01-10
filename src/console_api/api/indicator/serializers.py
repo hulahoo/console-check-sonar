@@ -98,6 +98,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "ioc-weight",
             "tags",
             "tags-weight",
+            "external-source-link",
             "feeds",
             "activities",
         ]
@@ -109,6 +110,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "ioc-weight": {"source": "weight"},
             "tags": {"source": "tags_ids"},
             "tags-weight": {"source": "tags_weight"},
+            "external-source-link": {"source": "external_source_link"},
         }
 
 

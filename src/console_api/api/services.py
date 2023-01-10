@@ -1,9 +1,36 @@
+"""Services for api app"""
+
 from django.conf import settings
 from django.db.models.query import QuerySet
+from rest_framework.authentication import BaseAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import SerializerMetaclass
+
+from console_api.apps.users.models import User, Token
+
+
+class CustomTokenAuthentication(BaseAuthentication):
+    """Custom token authentication class"""
+
+    def authenticate(self, request):
+        if token := request.META.get('HTTP_AUTHORIZATION'):
+            token = token.split()[1]
+
+            if not Token.objects.filter(key=token).exists():
+                return None
+
+            user_id = Token.objects.get(key=token).user.id
+
+            if User.objects.filter(id=user_id).exists():
+                user = User.objects.get(id=user_id)
+
+                # Authentication successful
+                return user, None
+
+        # Authentication failed
+        return None
 
 
 def get_response_with_pagination(

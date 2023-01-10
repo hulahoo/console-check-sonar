@@ -9,13 +9,20 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.renderers import JSONRenderer
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+)
 
 from console_api.api.services import (
+    CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
 )
-from console_api.apps.indicator.models import Indicator
+from console_api.apps.indicator.models import Indicator, IndicatorActivities
 from console_api.api.indicator.serializers import (
     IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer,
 )
@@ -28,6 +35,8 @@ class IndicatorListView(generics.ListAPIView):
 
     queryset = Indicator.objects.all()
     serializer_class = IndicatorListSerializer
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def add_counter_queryset_filters(self, request: Request) -> None:
         """Filter the queryset"""
@@ -221,8 +230,8 @@ class IndicatorListView(generics.ListAPIView):
 class IndicatorCreateView(viewsets.ModelViewSet):
     """IndicatorCreateView"""
 
-    authentication_classes = ()
-    permission_classes = []
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = IndicatorSerializer
     queryset = Indicator.objects.all()
 
@@ -239,21 +248,14 @@ class IndicatorCreateView(viewsets.ModelViewSet):
         return self.list(request, *args, **kwargs)
 
 
-class IndicatorView(generics.ListAPIView):
-    """
-    (GET) Получение списка индикаторов
-    """
-
-    serializer_class = IndicatorListSerializer
-    queryset = Indicator.objects.all()
-
-
 class IndicatorDetailView(generics.RetrieveAPIView):
     """Indicator detail view"""
 
     serializer_class = IndicatorDetailSerializer
     lookup_field = 'id'
     queryset = Indicator.objects.all()
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
 
 @api_view(('POST',))
@@ -287,5 +289,29 @@ def change_indicator_tags_view(
             return Response(status=HTTP_200_OK)
 
         request.errors = {"detail": "Indicator not found"}
+
+    return Response(request.errors, status=HTTP_400_BAD_REQUEST)
+
+
+@api_view(('POST',))
+@require_http_methods(["POST"])
+@renderer_classes((JSONRenderer,))
+def add_comment_view(request: Request, indicator_id: UUID) -> Response:
+    """Change tags list for the indicator"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(status=HTTP_403_FORBIDDEN)
+
+    if request.method == "POST":
+        activity = IndicatorActivities(
+            id=IndicatorActivities.objects.order_by('id').last().id + 1,
+            indicator_id=indicator_id,
+            activity_type="add-comment",
+            details=request.data.get("details"),
+            created_by=request.data.get("created-by"),
+        )
+        activity.save()
+
+        return Response(status=HTTP_201_CREATED)
 
     return Response(request.errors, status=HTTP_400_BAD_REQUEST)

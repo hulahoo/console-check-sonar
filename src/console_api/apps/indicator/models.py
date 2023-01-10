@@ -104,6 +104,10 @@ class Indicator(BaseModel):
         "Указывается, когда Индикатор создан пользователем",
     )
 
+    external_source_link = models.CharField(
+        max_length=255,
+    )
+
     @property
     def feeds(self) -> tuple:
         """Return tuple of feeds that linked with the indicator"""

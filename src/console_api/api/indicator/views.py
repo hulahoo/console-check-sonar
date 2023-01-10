@@ -8,14 +8,6 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.renderers import JSONRenderer
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
-    HTTP_403_FORBIDDEN,
-)
 
 from console_api.api.services import (
     CustomTokenAuthentication,
@@ -301,6 +293,62 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(status=HTTP_403_FORBIDDEN)
+
+    if request.method == "POST":
+        activity = IndicatorActivities(
+            id=IndicatorActivities.objects.order_by('id').last().id + 1,
+            indicator_id=indicator_id,
+            activity_type="add-comment",
+            details=request.data.get("details"),
+            created_by=request.data.get("created-by"),
+        )
+        activity.save()
+
+        return Response(status=HTTP_201_CREATED)
+
+    return Response(request.errors, status=HTTP_400_BAD_REQUEST)
+
+
+@api_view(('POST',))
+@require_http_methods(["POST"])
+@renderer_classes((JSONRenderer,))
+def change_indicator_tags_view(
+        request: Request, indicator_id: UUID) -> Response:
+    """Change tags list for the indicator"""
+
+    new_tags = [
+        int(tag) for tag in
+        request.data.get('tags').replace('[', '').replace(']', '').split(',')
+        if tag != ''
+    ]
+
+    if request.method == "POST":
+        if Indicator.objects.filter(id=indicator_id).exists():
+            if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
+                return Response("Tags wrong", status=HTTP_400_BAD_REQUEST)
+
+            IndicatorTagRelationship.objects.filter(
+                indicator_id=indicator_id,
+            ).delete()
+
+            for tag in new_tags:
+                IndicatorTagRelationship.objects.create(
+                    indicator_id=indicator_id,
+                    tag_id=tag,
+                )
+
+            return Response(status=HTTP_200_OK)
+
+        request.errors = {"detail": "Indicator not found"}
+
+    return Response(request.errors, status=HTTP_400_BAD_REQUEST)
+
+
+@api_view(('POST',))
+@require_http_methods(["POST"])
+@renderer_classes((JSONRenderer,))
+def add_comment_view(request: Request, indicator_id: UUID) -> Response:
+    """Change tags list for the indicator"""
 
     if request.method == "POST":
         activity = IndicatorActivities(

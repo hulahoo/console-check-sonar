@@ -10,6 +10,6 @@ router.register(r'feeds', FeedListView)
 
 urlpatterns = router.urls
 urlpatterns += [
-    path("/", feed_add, name="feed_add"),
+    path("", feed_add, name="feed_add|feed_get"),
     path('feed_create/', feed_create, name="feed_create"),
 ]

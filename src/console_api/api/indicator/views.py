@@ -8,6 +8,15 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.renderers import JSONRenderer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+)
+
 
 from console_api.api.services import (
     CustomTokenAuthentication,
@@ -16,7 +25,9 @@ from console_api.api.services import (
 )
 from console_api.apps.indicator.models import Indicator, IndicatorActivities
 from console_api.api.indicator.serializers import (
-    IndicatorListSerializer, IndicatorDetailSerializer, IndicatorSerializer,
+    IndicatorListSerializer,
+    IndicatorDetailSerializer,
+    IndicatorSerializer,
 )
 from console_api.apps.tag.models import IndicatorTagRelationship, Tag
 from console_api.apps.feed.models import IndicatorFeedRelationship, Feed
@@ -33,26 +44,42 @@ class IndicatorListView(generics.ListAPIView):
     def add_counter_queryset_filters(self, request: Request) -> None:
         """Filter the queryset"""
 
-        false_detected_counter = get_filter_query_param(request, "false-detected-counter")
-        positive_detected_counter = get_filter_query_param(request, "positive-detected-counter")
-        total_detected_counter = get_filter_query_param(request, "total-detected-counter")
+        false_detected_counter = get_filter_query_param(
+            request, "false-detected-counter"
+        )
+        positive_detected_counter = get_filter_query_param(
+            request, "positive-detected-counter"
+        )
+        total_detected_counter = get_filter_query_param(
+            request, "total-detected-counter"
+        )
 
         if false_detected_counter:
-            self.queryset = self.queryset.filter(false_detected_counter=false_detected_counter)
+            self.queryset = self.queryset.filter(
+                false_detected_counter=false_detected_counter
+            )
         if positive_detected_counter:
-            self.queryset = self.queryset.filter(positive_detected_counter=positive_detected_counter)
+            self.queryset = self.queryset.filter(
+                positive_detected_counter=positive_detected_counter
+            )
         if total_detected_counter:
-            self.queryset = self.queryset.filter(total_detected_counter=total_detected_counter)
+            self.queryset = self.queryset.filter(
+                total_detected_counter=total_detected_counter
+            )
 
     def add_boolean_filters(self, request: Request) -> None:
         """Filter the queryset"""
 
-        is_sending_to_detections = get_filter_query_param(request, "is-sending-to-detections")
+        is_sending_to_detections = get_filter_query_param(
+            request, "is-sending-to-detections"
+        )
         is_false_positive = get_filter_query_param(request, "is-false-positive")
         is_archived = get_filter_query_param(request, "is-archived")
 
         if is_sending_to_detections:
-            self.queryset = self.queryset.filter(is_sending_to_detections=is_sending_to_detections)
+            self.queryset = self.queryset.filter(
+                is_sending_to_detections=is_sending_to_detections
+            )
         if is_false_positive:
             self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
         if is_archived:
@@ -171,14 +198,13 @@ class IndicatorListView(generics.ListAPIView):
 
         feed_name = get_filter_query_param(request, "feed-name")
 
-        if feed_name and feed_name != '':
+        if feed_name and feed_name != "":
             feed_filtered_list = []
 
             for indicator in self.queryset:
                 feeds = [
                     Feed.objects.get(id=relationship.feed_id).title
-                    for relationship in
-                    IndicatorFeedRelationship.objects.filter(
+                    for relationship in IndicatorFeedRelationship.objects.filter(
                         indicator_id=indicator.id,
                     )
                 ]
@@ -205,17 +231,18 @@ class IndicatorListView(generics.ListAPIView):
         # self.add_tags_filters(request=request)
         self.add_feed_name_filters(request=request)
 
-        if sort_by_param := request.GET.get('sort-by'):
-            sort_by_param = \
-                sort_by_param[0] + sort_by_param[1:].replace('-', '_')
+        if sort_by_param := request.GET.get("sort-by"):
+            sort_by_param = sort_by_param[0] + sort_by_param[1:].replace("-", "_")
 
-            if sort_by_param in ['ioc_weight', '-ioc_weight']:
-                sort_by_param = 'weight'
+            if sort_by_param in ["ioc_weight", "-ioc_weight"]:
+                sort_by_param = "weight"
 
             self.queryset = self.queryset.order_by(sort_by_param)
 
         return get_response_with_pagination(
-            request, self.queryset, self.get_serializer,
+            request,
+            self.queryset,
+            self.get_serializer,
         )
 
 
@@ -233,10 +260,10 @@ class IndicatorCreateView(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         super(IndicatorCreateView, self).update(request, *args, **kwargs)
 
-    def get(self, request, * args, **kwargs):
-        start_period = request.GET.get('start-period-at')
-        finish_period = request.GET.get('finish-period-at')
-        self.param_dict = {'start_period': start_period, 'finish_period': finish_period}
+    def get(self, request, *args, **kwargs):
+        start_period = request.GET.get("start-period-at")
+        finish_period = request.GET.get("finish-period-at")
+        self.param_dict = {"start_period": start_period, "finish_period": finish_period}
         return self.list(request, *args, **kwargs)
 
 
@@ -244,18 +271,21 @@ class IndicatorDetailView(generics.RetrieveAPIView):
     """Indicator detail view"""
 
     serializer_class = IndicatorDetailSerializer
-    lookup_field = 'id'
+    lookup_field = "id"
     queryset = Indicator.objects.all()
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
 
-@api_view(('POST',))
+@api_view(("POST",))
 @require_http_methods(["POST"])
 @renderer_classes((JSONRenderer,))
 def change_indicator_tags_view(
         request: Request, indicator_id: UUID) -> Response:
     """Change tags list for the indicator"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(status=HTTP_403_FORBIDDEN)
 
     new_tags = [
         int(tag) for tag in
@@ -285,7 +315,7 @@ def change_indicator_tags_view(
     return Response(request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@api_view(('POST',))
+@api_view(("POST",))
 @require_http_methods(["POST"])
 @renderer_classes((JSONRenderer,))
 def add_comment_view(request: Request, indicator_id: UUID) -> Response:
@@ -296,63 +326,7 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
 
     if request.method == "POST":
         activity = IndicatorActivities(
-            id=IndicatorActivities.objects.order_by('id').last().id + 1,
-            indicator_id=indicator_id,
-            activity_type="add-comment",
-            details=request.data.get("details"),
-            created_by=request.data.get("created-by"),
-        )
-        activity.save()
-
-        return Response(status=HTTP_201_CREATED)
-
-    return Response(request.errors, status=HTTP_400_BAD_REQUEST)
-
-
-@api_view(('POST',))
-@require_http_methods(["POST"])
-@renderer_classes((JSONRenderer,))
-def change_indicator_tags_view(
-        request: Request, indicator_id: UUID) -> Response:
-    """Change tags list for the indicator"""
-
-    new_tags = [
-        int(tag) for tag in
-        request.data.get('tags').replace('[', '').replace(']', '').split(',')
-        if tag != ''
-    ]
-
-    if request.method == "POST":
-        if Indicator.objects.filter(id=indicator_id).exists():
-            if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
-                return Response("Tags wrong", status=HTTP_400_BAD_REQUEST)
-
-            IndicatorTagRelationship.objects.filter(
-                indicator_id=indicator_id,
-            ).delete()
-
-            for tag in new_tags:
-                IndicatorTagRelationship.objects.create(
-                    indicator_id=indicator_id,
-                    tag_id=tag,
-                )
-
-            return Response(status=HTTP_200_OK)
-
-        request.errors = {"detail": "Indicator not found"}
-
-    return Response(request.errors, status=HTTP_400_BAD_REQUEST)
-
-
-@api_view(('POST',))
-@require_http_methods(["POST"])
-@renderer_classes((JSONRenderer,))
-def add_comment_view(request: Request, indicator_id: UUID) -> Response:
-    """Change tags list for the indicator"""
-
-    if request.method == "POST":
-        activity = IndicatorActivities(
-            id=IndicatorActivities.objects.order_by('id').last().id + 1,
+            id=IndicatorActivities.objects.order_by("id").last().id + 1,
             indicator_id=indicator_id,
             activity_type="add-comment",
             details=request.data.get("details"),

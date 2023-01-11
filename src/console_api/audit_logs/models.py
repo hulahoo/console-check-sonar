@@ -15,24 +15,29 @@ class AuditLogs(models.Model):
         "ID пользователя",
     )
 
+    user_name = models.CharField(
+        "Имя пользователя",
+        max_length=256,
+    )
+
     event_type = models.CharField(
         "Тип события",
-        max_length=128
+        max_length=128,
     )
 
     object_type = models.CharField(
         "Тип обьекта",
-        max_length=128
+        max_length=128,
     )
 
     object_name = models.CharField(
         "Информация об обьекте",
-        max_length=128
+        max_length=128,
     )
 
     description = models.CharField(
         "Описание операции",
-        max_length=256
+        max_length=256,
     )
 
     prev_value = models.JSONField(
@@ -49,3 +54,8 @@ class AuditLogs(models.Model):
         "Дата и время создания",
         auto_now_add=True,
     )
+
+    class Meta:
+        """Metainformation about the model"""
+
+        db_table = "audit_logs"

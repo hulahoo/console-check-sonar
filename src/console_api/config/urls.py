@@ -23,6 +23,7 @@ schema_view = get_schema_view(
         description="Console API",
     ),
     patterns=[
+        path("api/audit-logs", include("console_api.audit_logs.urls")),
         path("api/statistics/", include("console_api.statistics.urls")),
         path("api/users/", include("console_api.users.urls")),
         path("api/feeds", include("console_api.feed.urls")),
@@ -34,6 +35,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path("api/audit-logs", include("console_api.audit_logs.urls")),
     path("api/feeds", include("console_api.feed.urls")),
     path("api/statistics", include("console_api.statistics.urls")),
     path("api/source", include("console_api.source.urls")),

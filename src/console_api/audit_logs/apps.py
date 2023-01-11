@@ -6,5 +6,5 @@ from django.apps import AppConfig
 class AuditLogsConfig(AppConfig):
     """Config class"""
 
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'audit_logs'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "console_api.audit_logs"

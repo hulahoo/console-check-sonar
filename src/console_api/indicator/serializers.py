@@ -114,18 +114,3 @@ class IndicatorSerializer(serializers.ModelSerializer):
             "tags",
             "tags_weight",
         ]
-
-
-class IndicatorWithFeedsSerializer(serializers.ModelSerializer):
-    feeds = DashboardFeedSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Indicator
-        fields = ["false_detected_counter", "positive_detected_counter", "feeds"]
-        exclude = []
-
-    @staticmethod
-    def setup_eager_loading(queryset):
-        queryset = queryset.prefetch_related("feeds")
-
-        return queryset

@@ -7,13 +7,13 @@ from console_api.statistics.views import (
     detected_objects_view,
     detected_indicators_view,
     FeedsIntersectionList,
-    FeedStatiscList,
+    FeedsStatisticView,
 )
 
 urlpatterns = [
     path(
         "/feeds",
-        FeedStatiscList.as_view(),
+        FeedsStatisticView.as_view(),
         name="feed_stat",
     ),
     path(

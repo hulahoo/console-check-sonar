@@ -12,11 +12,10 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
 from console_api.feed.models import Feed
-from console_api.indicator.models import Indicator
 from console_api.detections.models import Detection
 from console_api.statistics.serializers import (
     DetectedIndicatorsSerializer,
-    IndicatorWithFeedsSerializer,
+    FeedsStatisticSerializer,
 )
 from console_api.statistics.models import (
     StatCheckedObjects,
@@ -26,12 +25,13 @@ from console_api.statistics.services import get_objects_data_for_statistics
 from console_api.services import CustomTokenAuthentication
 
 
-class FeedStatiscList(generics.ListAPIView):
-    """FeedStatiscList"""
+class FeedsStatisticView(generics.ListAPIView):
+    """Statistics for feeds"""
 
     pagination_class = PageNumberPagination
-    serializer_class = IndicatorWithFeedsSerializer
-    queryset = Indicator.objects.all().prefetch_related("feeds")
+    serializer_class = FeedsStatisticSerializer
+    queryset = Feed.objects.all()
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 

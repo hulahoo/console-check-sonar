@@ -3,8 +3,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from console_api.feed.models import Feed
-from console_api.feed.models import IndicatorFeedRelationship
+from console_api.feed.models import Feed, IndicatorFeedRelationship
 
 
 class Detection(models.Model):

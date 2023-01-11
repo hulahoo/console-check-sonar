@@ -136,6 +136,14 @@ class Feed(models.Model):
     def __str__(self) -> str:
         return str(self.title)
 
+    @property
+    def indicators_count(self) -> int:
+        """Return count of indicators for the feed"""
+
+        return IndicatorFeedRelationship.objects.filter(
+            feed_id=self.id,
+        ).count()
+
     @classmethod
     def get_model_fields(cls) -> list:
         """Return fields of the model"""

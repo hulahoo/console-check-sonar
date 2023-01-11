@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "console_api.users.apps.UsersConfig",
     "console_api.statistics.apps.StatisticsConfig",
     "console_api.detections.apps.DetectionsConfig",
+    "console_api.audit_logs.apps.AuditLogsConfig",
 ]
 
 DJANGO_MIDDLEWARE = [

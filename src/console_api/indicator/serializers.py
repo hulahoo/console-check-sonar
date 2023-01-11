@@ -2,9 +2,9 @@
 
 from rest_framework import serializers
 
-from console_api.apps.feed.models import Feed, IndicatorFeedRelationship
-from console_api.apps.tag.models import Tag
-from console_api.api.feed.serializers import DashboardFeedSerializer
+from console_api.feed.models import Feed, IndicatorFeedRelationship
+from console_api.tag.models import Tag
+from console_api.feed.serializers import DashboardFeedSerializer
 from console_api.indicator.models import Indicator
 
 

@@ -6,15 +6,14 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
-from console_api.apps.models.abstract import BaseModel, CreationDateTimeField
-from console_api.apps.feed.models import IndicatorFeedRelationship, Feed
-from console_api.apps.tag.models import IndicatorTagRelationship
+from console_api.feed.models import IndicatorFeedRelationship, Feed
+from console_api.tag.models import IndicatorTagRelationship
 
 
 RELATE_TO = "users.User"
 
 
-class Indicator(BaseModel):
+class Indicator(models.Model):
     """Indicator"""
 
     id = models.UUIDField(
@@ -108,6 +107,16 @@ class Indicator(BaseModel):
         max_length=255,
     )
 
+    created_at = models.DateTimeField(
+        "Дата и время создания",
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        "Дата и время обновления",
+        auto_now=True,
+    )
+
     @property
     def feeds(self) -> tuple:
         """Return tuple of feeds that linked with the indicator"""
@@ -186,8 +195,9 @@ class IndicatorActivities(models.Model):
 
     details = models.JSONField()
 
-    created_at = CreationDateTimeField(
-        "Создано",
+    created_at = models.DateTimeField(
+        "Дата и время создания",
+        auto_now_add=True,
     )
 
     created_by = models.BigIntegerField(null=True)
@@ -216,7 +226,10 @@ class Session(models.Model):
         editable=False,
     )
 
-    created_at = CreationDateTimeField("создано")
+    created_at = models.DateTimeField(
+        "Дата и время создания",
+        auto_now_add=True,
+    )
 
     def save(self, *args, **kwargs) -> None:
         self.last_activity_at = timezone.now()

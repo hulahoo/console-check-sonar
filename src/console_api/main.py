@@ -1,24 +1,29 @@
-import os
-import subprocess
+"""Run the project"""
 
-import django
+from os import environ
+from subprocess import call
+
+from django import setup
 from django.core.management import call_command
 
-from console_api.config.log_conf import logger
+from console_api.config.logger_config import logger
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "console_api.settings.settings")
 
-django.setup()
+environ.setdefault("DJANGO_SETTINGS_MODULE", "console_api.config.settings")
+
+setup()
 
 
 def execute() -> None:
-    """Run the Django app"""
+    """Run the project"""
 
-    logger.info("Start Django app")
+    logger.info("Start the project")
 
-    call_command(subprocess.call([
-        'gunicorn',
-        '-b 0.0.0.0:8080',
-        'console_api.settings.wsgi:application',
-        '--workers=4',
-    ]))
+    call_command(
+        call([
+            "gunicorn",
+            "-b 0.0.0.0:8080",
+            "console_api.config.wsgi:application",
+            "--workers=4",
+        ])
+    )

@@ -17,7 +17,7 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 
-from console_api.api.services import (
+from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
@@ -28,8 +28,8 @@ from console_api.indicator.serializers import (
     IndicatorDetailSerializer,
     IndicatorSerializer,
 )
-from console_api.apps.tag.models import IndicatorTagRelationship, Tag
-from console_api.apps.feed.models import IndicatorFeedRelationship, Feed
+from console_api.tag.models import IndicatorTagRelationship, Tag
+from console_api.feed.models import IndicatorFeedRelationship, Feed
 
 
 class IndicatorListView(generics.ListAPIView):

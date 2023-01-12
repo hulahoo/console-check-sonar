@@ -16,6 +16,7 @@ from console_api.detections.models import Detection
 from console_api.statistics.serializers import (
     DetectedIndicatorsSerializer,
     FeedsStatisticSerializer,
+    IndicatorsStatisticSerializer,
 )
 from console_api.statistics.models import (
     StatCheckedObjects,
@@ -23,6 +24,7 @@ from console_api.statistics.models import (
 )
 from console_api.statistics.services import get_objects_data_for_statistics
 from console_api.services import CustomTokenAuthentication
+from console_api.indicator.models import Indicator
 
 
 class FeedsStatisticView(generics.ListAPIView):
@@ -31,6 +33,17 @@ class FeedsStatisticView(generics.ListAPIView):
     pagination_class = PageNumberPagination
     serializer_class = FeedsStatisticSerializer
     queryset = Feed.objects.all()
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
+class IndicatorsStatisticView(generics.ListAPIView):
+    """Statistics for indicators"""
+
+    pagination_class = PageNumberPagination
+    serializer_class = IndicatorsStatisticSerializer
+    queryset = Indicator.objects.all()
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]

@@ -8,13 +8,20 @@ from console_api.statistics.views import (
     detected_indicators_view,
     FeedsIntersectionList,
     FeedsStatisticView,
+    IndicatorsStatisticView,
 )
+
 
 urlpatterns = [
     path(
         "/feeds",
         FeedsStatisticView.as_view(),
-        name="feed_stat",
+        name="feeds_stat",
+    ),
+    path(
+        "/indicators",
+        IndicatorsStatisticView.as_view(),
+        name="indicators_stat",
     ),
     path(
         "/matched-indicators",

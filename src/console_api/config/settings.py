@@ -152,3 +152,5 @@ REST_FRAMEWORK = {
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
+
+FEEDS_IMPORTING_SERVICE_URL = env("FEEDS_IMPORTING_SERVICE_URL")

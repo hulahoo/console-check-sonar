@@ -1,5 +1,8 @@
 """Views for feed app"""
 
+import requests
+from django.conf import settings
+
 from django.db.utils import IntegrityError
 from django_filters import rest_framework as filters
 from django.views.decorators.http import require_POST
@@ -24,13 +27,15 @@ from console_api.feed.serializers import FeedSerializer, FeedListObjectSerialize
 from console_api.feed.services.format_selector import choose_type
 
 
+CREDENTIALS_ERROR = "Authentication credentials were not provided."
+
 @api_view(["POST", "GET"])
 def feed_add(request: Request):
     """Add feed"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 
@@ -52,6 +57,31 @@ def feed_add(request: Request):
         )
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
+@api_view(["GET"])
+def get_feed_preview(request: Request):
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(
+            {"detail": CREDENTIALS_ERROR},
+            status=HTTP_403_FORBIDDEN
+        )
+
+    url = request.GET.get("url", None)
+    if not url:
+        return Response(status=HTTP_400_BAD_REQUEST)
+
+    auth_type = request.GET.get("auth_type", None)
+    auth_login = request.GET.get("auth_login", None)
+    auth_pass = request.GET.get("auth_pass", None)
+
+    payload = {'url': url,
+               'auth_type': auth_type,
+               'auth_login': auth_login,
+               'auth_pass': auth_pass}
+
+    url_for_get_preview = settings.FEEDS_IMPORTING_SERVICE_URL + '/api/preview'
+    r = requests.get(url_for_get_preview, params=payload)
+
+    return Response(r.content, status=r.status_code)
 
 @require_POST
 def feed_create(request):
@@ -59,7 +89,7 @@ def feed_create(request):
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 

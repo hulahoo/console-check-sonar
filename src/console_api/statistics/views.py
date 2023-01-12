@@ -153,16 +153,16 @@ def checked_objects_view(request: Request) -> JsonResponse:
     return JsonResponse(statistics_data)
 
 
-class FeedsIntersectionList(generics.ListAPIView):
-    """FeedsIntersectionList"""
+# class FeedsIntersectionList(generics.ListAPIView):
+#     """FeedsIntersectionList"""
 
-    serializer_class = DetectedIndicatorsSerializer
-    model = Feed
-    queryset = Feed.objects.all()
+#     serializer_class = DetectedIndicatorsSerializer
+#     model = Feed
+#     queryset = Feed.objects.all()
 
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
+#     authentication_classes = [CustomTokenAuthentication]
+#     permission_classes = [IsAuthenticated]
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        return JsonResponse({"data": queryset})
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     return JsonResponse({"data": queryset})

@@ -38,9 +38,9 @@ urlpatterns = [
         checked_objects_view,
         name="checked_objects",
     ),
-    path(
-        "/feeds-intersections",
-        FeedsIntersectionList.as_view(),
-        name="feeds_intersections",
-    ),
+    # path(
+    #     "/feeds-intersections",
+    #     FeedsIntersectionList.as_view(),
+    #     name="feeds_intersections",
+    # ),
 ]

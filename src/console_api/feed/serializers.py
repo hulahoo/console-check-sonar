@@ -94,13 +94,6 @@ class FeedListObjectSerializer(serializers.ModelSerializer):
         }
 
 
-class DashboardFeedSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Feed
-        fields = ['title', 'ts']
-        exclude = []
-
-
 class FeedShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed

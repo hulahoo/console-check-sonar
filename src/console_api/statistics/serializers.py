@@ -1,8 +1,6 @@
 """Serializers for statistics app"""
 
 from rest_framework.serializers import (
-    CharField,
-    IntegerField,
     ModelSerializer,
     SerializerMethodField,
 )
@@ -10,21 +8,6 @@ from rest_framework.serializers import (
 from console_api.detections.models import Detection, DetectionFeedRelationship
 from console_api.feed.models import Feed
 from console_api.indicator.models import Indicator, IndicatorFeedRelationship
-
-
-class IndicatorSerializer(ModelSerializer):
-    """Serializer for Indicator model"""
-
-    checked_count = IntegerField()
-    detected_count = IntegerField()
-    type_indicator = CharField(source="type")
-
-    class Meta:
-        """Metainformation for the serializer"""
-
-        model = Indicator
-        fields = ["type_indicator", "checked_count", "detected_count"]
-        exclude = []
 
 
 class DetectedIndicatorsSerializer(ModelSerializer):

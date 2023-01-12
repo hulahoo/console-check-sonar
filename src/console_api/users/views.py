@@ -52,7 +52,14 @@ class CustomAuthTokenView(ObtainAuthToken):
                 t.save()
         except Exception as e:
             return Response(
-                {'errors': [{"detail": str(e)}]},
+                {
+                    'errors': [
+                        {
+                            key: value[0]
+                            for key, value in e.detail.items()
+                        }
+                    ]
+                },
                 status=HTTP_400_BAD_REQUEST,
             )
 

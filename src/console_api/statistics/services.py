@@ -14,15 +14,14 @@ from console_api.statistics.constants import (
 def get_period_query_params(request: Request) -> tuple:
     """Return start_period_at and finish_period_at query params"""
 
-    start_period_at = datetime.strptime(
-        request.GET.get("start-period-at"),
-        MINUTE_PERIOD_FORMAT,
-    )
+    start_period_at = request.GET.get("start-period-at")
+    finish_period_at = request.GET.get("finish-period-at")
 
-    finish_period_at = datetime.strptime(
-        request.GET.get("finish-period-at"),
-        MINUTE_PERIOD_FORMAT,
-    )
+    if not start_period_at or not finish_period_at:
+        return None, None
+
+    start_period_at = datetime.strptime(start_period_at, MINUTE_PERIOD_FORMAT)
+    finish_period_at = datetime.strptime(finish_period_at, MINUTE_PERIOD_FORMAT)
 
     return start_period_at, finish_period_at
 
@@ -33,6 +32,9 @@ def get_objects_data_for_statistics(request: Request, model) -> dict:
     # 1 minute by default
     frequency = request.GET.get("frequency", "T")
     start_period_at, finish_period_at = get_period_query_params(request)
+
+    if not start_period_at or not finish_period_at:
+        return {"error": "Start or finish period not specified"}
 
     period_format = FREQUENCY_AND_FORMAT.get(frequency)
 

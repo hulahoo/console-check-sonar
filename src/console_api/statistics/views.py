@@ -9,7 +9,7 @@ from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_403_FORBIDDEN
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -119,6 +119,12 @@ def checked_objects_view(request: Request) -> JsonResponse:
         request,
         StatCheckedObjects,
     )
+
+    if "error" in statistics_data.keys():
+        return Response(
+            {"error": statistics_data["error"]},
+            HTTP_400_BAD_REQUEST,
+        )
 
     return JsonResponse(statistics_data)
 

@@ -14,7 +14,6 @@ from console_api.system.views import (
     metrics_view,
 )
 from console_api.users.views import CustomAuthTokenView
-from console_api.configs.views import custom_404_handler
 
 
 schema_view = get_schema_view(
@@ -56,8 +55,6 @@ urlpatterns = [
     path("metrics", metrics_view, name="metrics"),
     path("host/api", api_res, name="api"),
 ]
-
-handler404 = custom_404_handler
 
 if settings.DEBUG:
     import debug_toolbar

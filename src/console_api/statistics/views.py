@@ -89,6 +89,8 @@ class FeedsIntersectionList(generics.ListAPIView):
 
     serializer_class = DetectedIndicatorsSerializer
     model = Feed
+    queryset = Feed.objects.all()
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 

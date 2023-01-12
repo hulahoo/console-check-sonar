@@ -29,7 +29,10 @@ def feed_add(request: Request):
     """Add feed"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     if request.method == "POST":
         serializer = FeedSerializer(data=request.data)
@@ -55,7 +58,10 @@ def feed_create(request):
     """Create feed"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     data = request.data
     feed = Feed(**data["feed"])

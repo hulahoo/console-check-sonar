@@ -283,7 +283,10 @@ def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response
     """Change tags list for the indicator"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     new_tags = [
         int(tag)
@@ -320,7 +323,10 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
     """Change tags list for the indicator"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     if request.method == "POST":
         activity = IndicatorActivities(

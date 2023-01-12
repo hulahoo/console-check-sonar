@@ -47,7 +47,10 @@ def indicators_statistic_view(request: Request) -> JsonResponse:
     """Return JSON with detected indicators statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     if request.method == "GET":
         types_and_detections_count = defaultdict(int)
@@ -82,9 +85,18 @@ def detected_indicators_view(request: Request) -> JsonResponse:
     """Return JSON with detected indicators statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     statistics_data = get_objects_data_for_statistics(request, Detection)
+
+    if "error" in statistics_data.keys():
+        return Response(
+            {"error": statistics_data["error"]},
+            HTTP_400_BAD_REQUEST,
+        )
 
     return JsonResponse(statistics_data)
 
@@ -96,12 +108,21 @@ def detected_objects_view(request: Request) -> JsonResponse:
     """Return JSON with detected objects statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     statistics_data = get_objects_data_for_statistics(
         request,
         StatMatchedObjects
     )
+
+    if "error" in statistics_data.keys():
+        return Response(
+            {"error": statistics_data["error"]},
+            HTTP_400_BAD_REQUEST,
+        )
 
     return JsonResponse(statistics_data)
 
@@ -113,7 +134,10 @@ def checked_objects_view(request: Request) -> JsonResponse:
     """Return JSON with checked objects statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(status=HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Authentication credentials were not provided."},
+            status=HTTP_403_FORBIDDEN
+        )
 
     statistics_data = get_objects_data_for_statistics(
         request,

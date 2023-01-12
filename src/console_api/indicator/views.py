@@ -329,6 +329,18 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
         )
 
     if request.method == "POST":
+        if not Indicator.objects.filter(id=indicator_id).exists():
+            return Response(
+                {"error": "Indicator doesn't exists"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        if not request.data.get("details"):
+            return Response(
+                {"error": "Details not specified"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
         activity = IndicatorActivities(
             id=IndicatorActivities.objects.order_by("id").last().id + 1,
             indicator_id=indicator_id,

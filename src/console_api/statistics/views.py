@@ -1,5 +1,8 @@
 """Views for statistics app"""
 
+from collections import defaultdict
+
+from django.db.models import Count
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from rest_framework import generics
@@ -16,7 +19,6 @@ from console_api.detections.models import Detection
 from console_api.statistics.serializers import (
     DetectedIndicatorsSerializer,
     FeedsStatisticSerializer,
-    IndicatorsStatisticSerializer,
 )
 from console_api.statistics.models import (
     StatCheckedObjects,
@@ -38,15 +40,39 @@ class FeedsStatisticView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
 
-class IndicatorsStatisticView(generics.ListAPIView):
-    """Statistics for indicators"""
+@api_view(("GET",))
+@renderer_classes((JSONRenderer,))
+@require_http_methods(["GET"])
+def indicators_statistic_view(request: Request) -> JsonResponse:
+    """Return JSON with detected indicators statistic"""
 
-    pagination_class = PageNumberPagination
-    serializer_class = IndicatorsStatisticSerializer
-    queryset = Indicator.objects.all()
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(status=HTTP_403_FORBIDDEN)
 
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    if request.method == "GET":
+        types_and_detections_count = defaultdict(int)
+
+        indicators_and_types = Indicator.objects.values(
+            "id", "ioc_type",
+        ).annotate(tcount=Count("ioc_type")).order_by()
+
+        for indicator in indicators_and_types:
+            indicator_type = indicator["ioc_type"]
+            detections_count = Detection.objects.filter(
+                indicator_id=indicator["id"],
+            ).count()
+
+            types_and_detections_count[indicator_type] += detections_count
+
+        statistic = [
+            {
+                "indicator-type": type_,
+                "detections-count": dcount,
+            }
+            for type_, dcount in types_and_detections_count.items()
+        ]
+
+    return JsonResponse(statistic, safe=False)
 
 
 @api_view(("GET",))

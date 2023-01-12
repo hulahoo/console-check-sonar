@@ -8,7 +8,7 @@ from console_api.statistics.views import (
     detected_indicators_view,
     FeedsIntersectionList,
     FeedsStatisticView,
-    IndicatorsStatisticView,
+    indicators_statistic_view,
 )
 
 
@@ -20,7 +20,7 @@ urlpatterns = [
     ),
     path(
         "/indicators",
-        IndicatorsStatisticView.as_view(),
+        indicators_statistic_view,
         name="indicators_stat",
     ),
     path(

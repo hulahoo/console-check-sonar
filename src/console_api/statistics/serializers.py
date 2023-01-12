@@ -82,20 +82,3 @@ class FeedsStatisticSerializer(ModelSerializer):
             "updated-at": {"source": "updated_at"},
             "indicators-count": {"source": "indicators_count"},
         }
-
-
-class IndicatorsStatisticSerializer(ModelSerializer):
-    """Serializer for indicators statistic"""
-
-    class Meta:
-        """Metainformation for the serializer"""
-
-        model = Indicator
-
-        fields = [
-            "indicator-type",
-        ]
-
-        extra_kwargs = {
-            "indicator-type": {"source": "ioc_type"},
-        }

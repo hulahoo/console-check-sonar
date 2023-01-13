@@ -40,7 +40,10 @@ class FeedsStatisticSerializer(ModelSerializer):
             )
         ]
 
+        logger.info("indicators_ids = [relationship.indicator_id]")
+
         indicators = [Indicator.objects.get(id=id_) for id_ in indicators_ids]
+        logger.info("indicators = [Indicator.objects.get(id=id_) for id_ in indicators_ids]")
 
         return len([ind for ind in indicators if ind.is_false_positive])
 

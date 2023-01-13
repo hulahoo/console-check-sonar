@@ -34,11 +34,18 @@ def users_view(request: Request) -> Response:
         )
 
     if request.method == "POST":
+        for field in 'login', 'pass-hash', 'full-name', 'role':
+            if not request.data.get(field):
+                return Response(
+                    {"detail": f"{field} not specified"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
         user_login = request.data.get('login')
 
         if not User.objects.filter(login=user_login).exists():
             User.objects.create(
-                login=request.data.get('login'),
+                login=user_login,
                 password=request.data.get('pass-hash'),
                 full_name=request.data.get('full-name'),
                 role=request.data.get('role'),

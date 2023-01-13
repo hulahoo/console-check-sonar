@@ -17,6 +17,7 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 
+from console_api.constants import CREDENTIALS_ERROR
 from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
@@ -284,7 +285,7 @@ def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 
@@ -338,7 +339,7 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 

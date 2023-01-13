@@ -14,12 +14,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
+from console_api.constants import CREDENTIALS_ERROR
 from console_api.feed.models import Feed
 from console_api.detections.models import Detection
-from console_api.statistics.serializers import (
-    DetectedIndicatorsSerializer,
-    FeedsStatisticSerializer,
-)
+from console_api.statistics.serializers import FeedsStatisticSerializer
 from console_api.statistics.models import (
     StatCheckedObjects,
     StatMatchedObjects,
@@ -52,7 +50,7 @@ def indicators_statistic_view(request: Request) -> JsonResponse:
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 
@@ -92,7 +90,7 @@ def detected_indicators_view(request: Request) -> JsonResponse:
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 
@@ -115,7 +113,7 @@ def detected_objects_view(request: Request) -> JsonResponse:
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 
@@ -141,7 +139,7 @@ def checked_objects_view(request: Request) -> JsonResponse:
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
-            {"detail": "Authentication credentials were not provided."},
+            {"detail": CREDENTIALS_ERROR},
             status=HTTP_403_FORBIDDEN
         )
 

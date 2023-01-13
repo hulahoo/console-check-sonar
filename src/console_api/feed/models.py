@@ -157,6 +157,7 @@ class Feed(models.Model):
         verbose_name_plural = "Фиды"
 
         db_table = "feeds"
+        ordering = ['title']
 
 
 class IndicatorFeedRelationship(models.Model):

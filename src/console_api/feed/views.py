@@ -25,9 +25,8 @@ from console_api.services import (
 from console_api.feed.models import Feed
 from console_api.feed.serializers import FeedSerializer, FeedListObjectSerializer
 from console_api.feed.services.format_selector import choose_type
+from console_api.constants import CREDENTIALS_ERROR
 
-
-CREDENTIALS_ERROR = "Authentication credentials were not provided."
 
 @api_view(["POST", "GET"])
 def feed_add(request: Request):

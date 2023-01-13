@@ -6,7 +6,7 @@ from console_api.statistics.views import (
     checked_objects_view,
     detected_objects_view,
     detected_indicators_view,
-    FeedsIntersectionList,
+    # FeedsIntersectionList,
     FeedsStatisticView,
     indicators_statistic_view,
 )

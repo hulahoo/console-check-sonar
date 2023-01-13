@@ -2,58 +2,13 @@
 
 from hashlib import sha256
 
-from django.contrib.auth.password_validation import validate_password
 from rest_framework.serializers import (
     ValidationError,
     CharField,
     Serializer,
-    ModelSerializer,
 )
-from rest_framework.validators import UniqueValidator
 
 from console_api.users.models import User
-
-
-class UserSerializer(ModelSerializer):
-    """Serializer for User model"""
-
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = User
-        exclude = []
-
-
-class RegisterSerializer(ModelSerializer):
-    """Serializer for user registration"""
-
-    login = CharField(
-        max_length=255,
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
-
-    pass_hash = CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password],
-    )
-
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = User
-        fields = ("login", "pass_hash")
-        extra_kwargs = {"id": {"read_only": True}, "pass-hash": {"source": "pass_hash"}}
-
-    def create(self, validated_data):
-        user = User.objects.create(
-            login=validated_data["login"],
-        )
-        user.set_password(validated_data["pass_hash"])
-        user.save()
-
-        return user
 
 
 class AuthTokenSerializer(Serializer):

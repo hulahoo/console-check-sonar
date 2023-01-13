@@ -2,23 +2,73 @@
 
 from uuid import uuid4
 
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.views import APIView
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+)
 
 
-from .serializers import RegisterSerializer, AuthTokenSerializer
+from .serializers import AuthTokenSerializer
 from console_api.services import CustomTokenAuthentication
-from console_api.users.models import Token
+from console_api.users.models import Token, User
+from console_api.constants import CREDENTIALS_ERROR
 
 
-class RegisterUserAPIView(generics.CreateAPIView):
-    permission_classes = (IsAdminUser,)
-    serializer_class = RegisterSerializer
-    authentication_classes = [CustomTokenAuthentication]
+@api_view(["POST", "GET"])
+def users_view(request: Request) -> Response:
+    """Create a new user or return list of users"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(
+            {"detail": CREDENTIALS_ERROR},
+            status=HTTP_403_FORBIDDEN
+        )
+
+    if request.method == "POST":
+        for field in 'login', 'pass-hash', 'full-name', 'role':
+            if not request.data.get(field):
+                return Response(
+                    {"detail": f"{field} not specified"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
+        user_login = request.data.get('login')
+
+        if not User.objects.filter(login=user_login).exists():
+            User.objects.create(
+                login=user_login,
+                password=request.data.get('pass-hash'),
+                full_name=request.data.get('full-name'),
+                role=request.data.get('role'),
+            )
+
+        return Response(status=HTTP_201_CREATED)
+
+    elif request.method == "GET":
+        data = [
+            {
+                "id": user.id,
+                "login": user.login,
+                "full-name": user.full_name,
+                "role": user.role,
+                "created-at": user.created_at,
+                "updated-at": user.updated_at,
+            }
+            for user in User.objects.all()
+        ]
+
+        return Response({"results": data}, status=HTTP_200_OK)
+
+    return Response(status=HTTP_400_BAD_REQUEST)
 
 
 class Logout(APIView):

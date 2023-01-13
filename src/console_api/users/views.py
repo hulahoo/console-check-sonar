@@ -159,3 +159,25 @@ class CustomAuthTokenView(ObtainAuthToken):
             'access-token': user_token,
             'user-id': user.pk,
         })
+
+
+@api_view(["DELETE"])
+def delete_auth_token_view(request: Request, access_token: UUID) -> Response:
+    """Delete token"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(
+            {"detail": CREDENTIALS_ERROR},
+            status=HTTP_403_FORBIDDEN
+        )
+
+    if request.method == "DELETE":
+        if not Token.objects.filter(key=access_token).exists():
+            return Response(
+                {"detail": "Token doesn't exists"},
+                status=HTTP_400_BAD_REQUEST
+            )
+
+        Token.objects.get(key=access_token).delete()
+
+        return Response(status=HTTP_200_OK)

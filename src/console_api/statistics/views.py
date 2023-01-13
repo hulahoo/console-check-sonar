@@ -28,6 +28,8 @@ from console_api.statistics.services import get_objects_data_for_statistics
 from console_api.services import CustomTokenAuthentication
 from console_api.indicator.models import Indicator
 
+from console_api.config.logger_config import logger
+
 
 class FeedsStatisticView(generics.ListAPIView):
     """Statistics for feeds"""
@@ -46,13 +48,17 @@ class FeedsStatisticView(generics.ListAPIView):
 def indicators_statistic_view(request: Request) -> JsonResponse:
     """Return JSON with detected indicators statistic"""
 
+    logger.info("def indicators_statistic_view(request:")
+
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
             {"detail": "Authentication credentials were not provided."},
             status=HTTP_403_FORBIDDEN
         )
 
+    logger.info("if not CustomTokenAuthentication().authenticate(request):")
     if request.method == "GET":
+        logger.info("if request.method == 'GET':")
         types_and_detections_count = defaultdict(int)
 
         indicators_and_types = Indicator.objects.values(

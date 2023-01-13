@@ -288,16 +288,30 @@ def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response
             status=HTTP_403_FORBIDDEN
         )
 
-    new_tags = [
-        int(tag)
-        for tag in request.data.get("tags").replace("[", "").replace("]", "").split(",")
-        if tag != ""
-    ]
+    if not request.data.get("tags"):
+        return Response(
+            {"detail": "Tags not specified"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    tags = request.data.get("tags")
+    tags = tags.replace("[", "").replace("]", "").replace(" ", "").split(",")
+
+    if not all(tag.isdigit() for tag in tags):
+        return Response(
+            {"detail": "Tags not valid"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    new_tags = [int(tag) for tag in tags if tag != ""]
 
     if request.method == "POST":
         if Indicator.objects.filter(id=indicator_id).exists():
             if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
-                return Response("Tags wrong", status=HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"detail": "Tags wrong"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
 
             IndicatorTagRelationship.objects.filter(
                 indicator_id=indicator_id,

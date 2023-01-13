@@ -1,6 +1,6 @@
 """Views for users app"""
 
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -21,6 +21,48 @@ from .serializers import AuthTokenSerializer
 from console_api.services import CustomTokenAuthentication
 from console_api.users.models import Token, User
 from console_api.constants import CREDENTIALS_ERROR
+from console_api.services import get_hashed_password
+
+
+@api_view(["POST"])
+def change_user_password_view(request: Request, user_id: UUID) -> Response:
+    """Change user password"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(
+            {"detail": CREDENTIALS_ERROR},
+            status=HTTP_403_FORBIDDEN
+        )
+
+    if request.method == "POST":
+        for field in 'prev-pass', 'new-pass':
+            if not request.data.get(field):
+                return Response(
+                    {"detail": f"{field} not specified"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
+        if not User.objects.filter(id=user_id).exists():
+            return Response(
+                {"detail": "User does not exist"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        user = User.objects.get(id=user_id)
+
+        prev_pass = request.data.get("prev-pass")
+        new_pass = request.data.get("new-pass")
+
+        if get_hashed_password(prev_pass) != user.password:
+            return Response(
+                {"detail": "Password is invalid"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        user.password = get_hashed_password(new_pass)
+        user.save()
+
+        return Response(status=HTTP_200_OK)
 
 
 @api_view(["POST", "GET"])

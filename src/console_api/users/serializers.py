@@ -1,7 +1,5 @@
 """Serializers for users app"""
 
-from hashlib import sha256
-
 from rest_framework.serializers import (
     ValidationError,
     CharField,
@@ -9,6 +7,7 @@ from rest_framework.serializers import (
 )
 
 from console_api.users.models import User
+from console_api.services import get_hashed_password
 
 
 class AuthTokenSerializer(Serializer):
@@ -24,12 +23,12 @@ class AuthTokenSerializer(Serializer):
         password = attrs.get("password")
 
         if login and password:
-            hashed_password = sha256(bytes(password.encode()))
+            hashed_password = get_hashed_password(password)
 
             if User.objects.filter(login=login).exists():
                 user = User.objects.get(login=login)
 
-                if hashed_password.hexdigest() != user.password:
+                if hashed_password != user.password:
                     raise ValidationError(
                         "Unable to log in with provided credentials.",
                         code="authorization",

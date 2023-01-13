@@ -1,5 +1,7 @@
 """Services for project"""
 
+from hashlib import sha256
+
 from django.conf import settings
 from django.db.models.query import QuerySet
 from rest_framework.authentication import BaseAuthentication
@@ -9,6 +11,12 @@ from rest_framework.response import Response
 from rest_framework.serializers import SerializerMetaclass
 
 from console_api.users.models import User, Token
+
+
+def get_hashed_password(password: str):
+    """Return hashed password (SHA256)"""
+
+    return sha256(bytes(password.encode())).hexdigest()
 
 
 class CustomTokenAuthentication(BaseAuthentication):

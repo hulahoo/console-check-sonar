@@ -42,8 +42,8 @@ urlpatterns = [
     path("api/tag", include("console_api.tag.urls")),
     path("api/users", include("console_api.users.urls")),
     path("api/detections", include("console_api.detections.urls")),
-    path("api/sessions", CustomAuthTokenView.as_view()),
     path("api/sessions/<uuid:access_token>", delete_auth_token_view),
+    path("api/sessions", CustomAuthTokenView.as_view()),
     path("api/indicators", include("console_api.indicator.urls")),
     path(
         "api/",

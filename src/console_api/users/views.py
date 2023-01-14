@@ -15,6 +15,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
 )
+from django.views.decorators.http import require_POST, require_http_methods
 
 
 from .serializers import AuthTokenSerializer
@@ -25,6 +26,7 @@ from console_api.services import get_hashed_password
 
 
 @api_view(["POST"])
+@require_POST
 def change_user_password_view(request: Request, user_id: UUID) -> Response:
     """Change user password"""
 
@@ -66,6 +68,7 @@ def change_user_password_view(request: Request, user_id: UUID) -> Response:
 
 
 @api_view(["POST", "GET"])
+@require_http_methods(["POST", "GET"])
 def users_view(request: Request) -> Response:
     """Create a new user or return list of users"""
 
@@ -162,6 +165,7 @@ class CustomAuthTokenView(ObtainAuthToken):
 
 
 @api_view(["DELETE"])
+@require_http_methods(["DELETE"])
 def delete_auth_token_view(request: Request, access_token: UUID) -> Response:
     """Delete token"""
 

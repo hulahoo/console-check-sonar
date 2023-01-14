@@ -11,6 +11,7 @@ from console_api.tag.models import IndicatorTagRelationship
 
 
 RELATE_TO = "users.User"
+CREATED_AT = "Дата и время создания"
 
 
 class Indicator(models.Model):
@@ -108,7 +109,7 @@ class Indicator(models.Model):
     )
 
     created_at = models.DateTimeField(
-        "Дата и время создания",
+        CREATED_AT,
         auto_now_add=True,
     )
 
@@ -196,7 +197,7 @@ class IndicatorActivities(models.Model):
     details = models.JSONField()
 
     created_at = models.DateTimeField(
-        "Дата и время создания",
+        CREATED_AT,
         auto_now_add=True,
     )
 
@@ -227,7 +228,7 @@ class Session(models.Model):
     )
 
     created_at = models.DateTimeField(
-        "Дата и время создания",
+        CREATED_AT,
         auto_now_add=True,
     )
 

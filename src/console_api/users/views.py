@@ -15,7 +15,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
 )
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_POST, require_http_methods, require_GET
 
 
 from .serializers import AuthTokenSerializer
@@ -68,7 +68,8 @@ def change_user_password_view(request: Request, user_id: UUID) -> Response:
 
 
 @api_view(["POST", "GET"])
-@require_http_methods(["POST", "GET"])
+@require_GET
+@require_POST
 def users_view(request: Request) -> Response:
     """Create a new user or return list of users"""
 

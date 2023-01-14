@@ -1,9 +1,33 @@
 """Models for detections app"""
+from typing import List
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from console_api.feed.models import Feed, IndicatorFeedRelationship
+
+
+CREATED_AT = "Дата и время создания"
+
+class DetectionTagRelationship(models.Model):
+    """Custom ManyToMany relationship table for Detection and Tag"""
+
+    detection_id = models.BigIntegerField()
+
+    tag_id = models.BigIntegerField()
+
+    created_at = models.DateTimeField(
+        CREATED_AT,
+        auto_now_add=True,
+    )
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Связь обнаружение-тег"
+        verbose_name_plural = "Связи обнаружение-тег"
+
+        db_table = "detection_tag_relationships"
 
 
 class Detection(models.Model):
@@ -41,7 +65,7 @@ class Detection(models.Model):
     )
 
     created_at = models.DateTimeField(
-        "Дата и время создания",
+        CREATED_AT,
         auto_now_add=True,
     )
 
@@ -57,7 +81,7 @@ class Detection(models.Model):
         )
 
     @property
-    def feeds_ids(self) -> str | None:
+    def feeds_ids(self) -> List[str] | None:
         """Return feed's ids linked with the detection"""
 
         return [
@@ -95,27 +119,6 @@ class Detection(models.Model):
         db_table = "detections"
 
 
-class DetectionTagRelationship(models.Model):
-    """Custom ManyToMany relationship table for Detection and Tag"""
-
-    detection_id = models.BigIntegerField()
-
-    tag_id = models.BigIntegerField()
-
-    created_at = models.DateTimeField(
-        "Дата и время создания",
-        auto_now_add=True,
-    )
-
-    class Meta:
-        """Metainformation about the model"""
-
-        verbose_name = "Связь обнаружение-тег"
-        verbose_name_plural = "Связи обнаружение-тег"
-
-        db_table = "detection_tag_relationships"
-
-
 class DetectionFeedRelationship(models.Model):
     """Custom ManyToMany relationship table for Detection and Feed"""
 
@@ -124,7 +127,7 @@ class DetectionFeedRelationship(models.Model):
     feed_id = models.BigIntegerField()
 
     created_at = models.DateTimeField(
-        "Дата и время создания",
+        CREATED_AT,
         auto_now_add=True,
     )
 

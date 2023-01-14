@@ -1,5 +1,5 @@
 """Views for statistics app"""
-
+from typing import Union
 from collections import defaultdict
 
 from django.db.models import Count
@@ -43,7 +43,7 @@ class FeedsStatisticView(generics.ListAPIView):
 @api_view(("GET",))
 @renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
-def indicators_statistic_view(request: Request) -> JsonResponse:
+def indicators_statistic_view(request: Request) -> Union[Response, JsonResponse]:
     """Return JSON with detected indicators statistic"""
 
     logger.info("def indicators_statistic_view(request:")
@@ -85,7 +85,7 @@ def indicators_statistic_view(request: Request) -> JsonResponse:
 @api_view(("GET",))
 @renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
-def detected_indicators_view(request: Request) -> JsonResponse:
+def detected_indicators_view(request: Request) -> Union[Response, JsonResponse]:
     """Return JSON with detected indicators statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
@@ -108,7 +108,7 @@ def detected_indicators_view(request: Request) -> JsonResponse:
 @api_view(("GET",))
 @renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
-def detected_objects_view(request: Request) -> JsonResponse:
+def detected_objects_view(request: Request) -> Union[Response, JsonResponse]:
     """Return JSON with detected objects statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
@@ -134,7 +134,7 @@ def detected_objects_view(request: Request) -> JsonResponse:
 @api_view(("GET",))
 @renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
-def checked_objects_view(request: Request) -> JsonResponse:
+def checked_objects_view(request: Request) -> Union[Response, JsonResponse]:
     """Return JSON with checked objects statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
@@ -155,18 +155,3 @@ def checked_objects_view(request: Request) -> JsonResponse:
         )
 
     return JsonResponse(statistics_data)
-
-
-# class FeedsIntersectionList(generics.ListAPIView):
-#     """FeedsIntersectionList"""
-
-#     serializer_class = DetectedIndicatorsSerializer
-#     model = Feed
-#     queryset = Feed.objects.all()
-
-#     authentication_classes = [CustomTokenAuthentication]
-#     permission_classes = [IsAuthenticated]
-
-    # def list(self, request, *args, **kwargs):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     return JsonResponse({"data": queryset})

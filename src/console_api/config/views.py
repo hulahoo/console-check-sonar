@@ -3,9 +3,9 @@
 from django.http import JsonResponse
 
 
-def custom_404_handler(request, exception=None) -> JsonResponse:
+def custom_404_handler(exception=None) -> JsonResponse:
     """Custom handler for 404 error"""
 
     return JsonResponse({
-        'error': 'The resource was not found'
+        'error': f'The resource was not found: {exception}'
     }, status=404)

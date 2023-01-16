@@ -5,6 +5,11 @@ from django.conf import settings
 
 from django.db.utils import IntegrityError
 from django_filters import rest_framework as filters
+from django.views.decorators.http import (
+    require_http_methods,
+    require_POST,
+    require_safe,
+)
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -16,7 +21,6 @@ from rest_framework.status import (
     HTTP_406_NOT_ACCEPTABLE,
 )
 from rest_framework.permissions import IsAuthenticated
-from django.views.decorators.http import require_POST, require_GET, require_safe
 
 from console_api.services import (
     CustomTokenAuthentication,
@@ -29,8 +33,7 @@ from console_api.constants import CREDENTIALS_ERROR
 
 
 @api_view(["POST", "GET"])
-@require_GET
-@require_POST
+@require_http_methods(["GET", "POST"])
 def feed_add(request: Request):
     """Add feed"""
 
@@ -58,6 +61,7 @@ def feed_add(request: Request):
         )
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
+
 @api_view(["GET"])
 @require_safe
 def get_feed_preview(request: Request):
@@ -84,6 +88,7 @@ def get_feed_preview(request: Request):
     r = requests.get(url_for_get_preview, params=payload)
 
     return Response(r.content, status=r.status_code)
+
 
 @require_POST
 def feed_create(request):

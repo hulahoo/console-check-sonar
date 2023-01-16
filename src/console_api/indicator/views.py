@@ -299,6 +299,9 @@ def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response
     tags = request.data.get("tags")
     tags = tags.replace("[", "").replace("]", "").replace(" ", "").split(",")
 
+    if tags == ['']:
+        tags = []
+
     if not all(tag.isdigit() for tag in tags):
         return Response(
             {"detail": "Tags not valid"},

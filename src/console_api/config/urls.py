@@ -39,7 +39,7 @@ urlpatterns = [
     path("api/feeds", include("console_api.feed.urls")),
     path("api/statistics", include("console_api.statistics.urls")),
     path("api/source", include("console_api.source.urls")),
-    path("api/tag", include("console_api.tag.urls")),
+    path("api/tags", include("console_api.tag.urls")),
     path("api/users", include("console_api.users.urls")),
     path("api/detections", include("console_api.detections.urls")),
     path("api/sessions/<uuid:access_token>", delete_auth_token_view),

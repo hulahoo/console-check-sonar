@@ -1,11 +1,15 @@
 """Urls for tag app"""
 
-from rest_framework import routers
+from django.urls import path
 
-from console_api.tag import views
+from console_api.tag.views import tags_view
 
 
-router = routers.SimpleRouter()
-router.register(r'tag', views.TagViewSet)
-
-urlpatterns = router.urls
+urlpatterns = [
+    # Tags list
+    path(
+        "",
+        tags_view,
+        name="tag_list",
+    ),
+]

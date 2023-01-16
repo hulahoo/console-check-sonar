@@ -38,6 +38,7 @@ class IndicatorListView(generics.ListAPIView):
 
     queryset = Indicator.objects.all()
     serializer_class = IndicatorListSerializer
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 

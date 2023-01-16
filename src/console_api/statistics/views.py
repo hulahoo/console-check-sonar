@@ -43,10 +43,8 @@ class FeedsStatisticView(generics.ListAPIView):
 @api_view(("GET",))
 @renderer_classes((JSONRenderer,))
 @require_http_methods(["GET"])
-def indicators_statistic_view(request: Request) -> Union[Response, JsonResponse]:
+def indicators_statistic_view(request: Request) -> Response | JsonResponse:
     """Return JSON with detected indicators statistic"""
-
-    logger.info("def indicators_statistic_view(request:")
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
@@ -54,7 +52,6 @@ def indicators_statistic_view(request: Request) -> Union[Response, JsonResponse]
             status=HTTP_403_FORBIDDEN
         )
 
-    logger.info("if not CustomTokenAuthentication().authenticate(request):")
     if request.method == "GET":
         logger.info("if request.method == 'GET':")
         types_and_detections_count = defaultdict(int)

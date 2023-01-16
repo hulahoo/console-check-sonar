@@ -34,6 +34,7 @@ class TagCreateSerializer(ModelSerializer):
 
         model = Tag
         fields = [
+            "id",
             "title",
             "weight",
         ]

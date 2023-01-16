@@ -33,10 +33,17 @@ def tags_view(request: Request) -> Response:
         )
 
     if request.method == "POST":
+        for field in "title", "weight":
+            if not request.data.get(field):
+                return Response(
+                    {"detail": f"{field} not specified"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
         tag_data = {
             "id": Tag.objects.order_by("id").last().id + 1,
-            "title": request.data["title"],
-            "weight": request.data["weight"],
+            "title": request.data.get("title"),
+            "weight": request.data.get("weight"),
         }
         tag = TagCreateSerializer(data=tag_data)
 

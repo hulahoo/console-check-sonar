@@ -133,6 +133,10 @@ class Feed(models.Model):
         auto_now=True,
     )
 
+    importing_fields = models.JSONField(
+        "Список импортируемых полей в индикаторах фида",
+    )
+
     def __str__(self) -> str:
         return str(self.title)
 

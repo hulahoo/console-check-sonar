@@ -89,7 +89,7 @@ class FeedListObjectSerializer(serializers.ModelSerializer):
             "max-records-count": {'source': "max_records_count"},
             "available-fields": {'source': "available_fields"},
             "use-taxii": {'source': "is_use_taxii"},
-            "importing-fields": {'source': "available_fields"},
+            "importing-fields": {'source': "importing_fields"},
             "created-at": {'source': "created_at"},
         }
 
@@ -101,4 +101,43 @@ class FeedShortSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             'name': {'source': 'title'},
+        }
+
+class FeedUpdatePropertiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feed
+
+        fields = [
+            "source-url",
+            "format",
+            "use-taxii",
+            "auth-type",
+            "auth-api-token",
+            "auth-login",
+            "auth-pass",
+            "certificate",
+            "parsing-rules",
+            "feed-name",
+            "provider",
+            "description",
+            "is-enabled",
+            "is-truncating",
+            "max-records-count",
+            "weight",
+            "importing-fields"
+        ]
+
+        extra_kwargs = {
+            "source-url": {"source": "url"},
+            "use-taxii": {'source': "is_use_taxii"},
+            "auth-type": {'source': "auth_type"},
+            "auth-api-token": {'source': "auth_api_token"},
+            "auth-login": {'source': "auth_login"},
+            "auth-pass": {'source': "auth_pass"},
+            "parsing-rules": {'source': "parsing_rules"},
+            "feed-name": {'source': "title"},
+            "is-enabled": {'source': "is_active"},
+            "is-truncating": {'source': "is_truncating"},
+            "max-records-count": {'source': "max_records_count"},
+            "importing-fields": {'source': "importing_fields"}
         }

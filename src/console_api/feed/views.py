@@ -27,14 +27,14 @@ from console_api.services import (
     get_response_with_pagination,
 )
 from console_api.feed.models import Feed
-from console_api.feed.serializers import FeedSerializer, FeedListObjectSerializer
+from console_api.feed.serializers import FeedSerializer, FeedListObjectSerializer, FeedUpdatePropertiesSerializer
 from console_api.feed.services.format_selector import choose_type
 from console_api.constants import CREDENTIALS_ERROR
 
 
 @api_view(["POST", "GET"])
 @require_http_methods(["GET", "POST"])
-def feed_add(request: Request):
+def feed_add(request: Request) -> Response:
     """Add feed"""
 
     if not CustomTokenAuthentication().authenticate(request):
@@ -52,6 +52,9 @@ def feed_add(request: Request):
             except IntegrityError:
                 data = {"detail": "Error during save data"}
                 return Response(data, status=HTTP_406_NOT_ACCEPTABLE)
+
+    """Get list of feeds"""
+
     if request.method == "GET":
         feeds_list = Feed.objects.all()
         return get_response_with_pagination(
@@ -64,7 +67,9 @@ def feed_add(request: Request):
 
 @api_view(["GET"])
 @require_safe
-def get_feed_preview(request: Request):
+def get_feed_preview(request: Request) -> Response:
+    """Get feed preview"""
+
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
             {"detail": CREDENTIALS_ERROR},
@@ -91,7 +96,7 @@ def get_feed_preview(request: Request):
 
 
 @require_POST
-def feed_create(request):
+def feed_create(request: Request) -> Response:
     """Create feed"""
 
     if not CustomTokenAuthentication().authenticate(request):
@@ -116,3 +121,38 @@ class FeedListView(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend,)
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+
+@api_view(("POST",))
+@require_http_methods(["POST"])
+def change_feed_properties_view(request: Request, feed_id: int) -> Response:
+    """Change properties for the feed"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response(
+            {"detail": CREDENTIALS_ERROR},
+            status=HTTP_403_FORBIDDEN
+        )
+
+    if not request.data:
+        return Response(
+            {"detail": "Feed data not specified"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    feed = Feed.objects.filter(id=feed_id).first()
+    if not feed:
+        return Response(
+            {"error": "Feed doesn't exists"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    serializer = FeedUpdatePropertiesSerializer(feed, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+    else:
+        return Response(
+            {"error": "Wrong data received"},
+            status=HTTP_400_BAD_REQUEST,
+        )

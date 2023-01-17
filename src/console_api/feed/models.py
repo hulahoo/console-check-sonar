@@ -27,6 +27,7 @@ class Feed(models.Model):
     title = models.CharField(
         "Название Фида",
         max_length=128,
+        unique=True,
     )
 
     provider = models.CharField(

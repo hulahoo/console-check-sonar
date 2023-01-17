@@ -1,21 +1,15 @@
 """Urls for feed app"""
 
 from django.urls import path
-from rest_framework import routers
 
-from console_api.feed.views import feed_add, feed_create, FeedListView, get_feed_preview, change_feed_properties_view
+from console_api.feed.views import (
+    change_feed_properties_view,
+    feeds_view,
+    get_feed_preview,
+)
 
-router = routers.SimpleRouter()
-router.register(r'feeds', FeedListView)
 
-urlpatterns = router.urls
-urlpatterns += [
-    # Create new feed
-    path(
-        '/feed-create/',
-        feed_create,
-        name="feed-create"),
-
+urlpatterns = [
     # Get feed preview
     path(
         '/feed-preview/',
@@ -29,7 +23,10 @@ urlpatterns += [
         name="feed-change-properties",
     ),
 
-    # GET request - get feed list
-    # POST request - add feed
-    path('', feed_add, name="feed-add|feed-get")
+    # /feeds GET and POST
+    path(
+        '',
+        feeds_view,
+        name="feeds_view",
+    )
 ]

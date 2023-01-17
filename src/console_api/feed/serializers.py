@@ -5,8 +5,12 @@ from rest_framework import serializers
 from console_api.feed.models import Feed
 
 
-class FeedSerializer(serializers.ModelSerializer):
+class FeedCreateSerializer(serializers.ModelSerializer):
+    """Serializer for feed creation"""
+
     class Meta:
+        """Metainformation about the serializer"""
+
         model = Feed
 
         fields = [
@@ -26,7 +30,7 @@ class FeedSerializer(serializers.ModelSerializer):
             "max-records-count",
             "weight",
             "available-fields",
-            "use-taxii"
+            "is-use-taxii",
         ]
 
         extra_kwargs = {
@@ -42,7 +46,7 @@ class FeedSerializer(serializers.ModelSerializer):
             "is-truncating": {'source': "is_truncating"},
             "max-records-count": {'source': "max_records_count"},
             "available-fields": {'source': "available_fields"},
-            "use-taxii": {'source': "is_use_taxii"}
+            "is-use-taxii": {'source': "is_use_taxii"}
         }
 
 
@@ -51,7 +55,7 @@ class FeedsListSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Metainformation about the serializer"""
-        
+
         model = Feed
 
         fields = [
@@ -97,15 +101,6 @@ class FeedsListSerializer(serializers.ModelSerializer):
             "created-at": {'source': "created_at"},
         }
 
-
-class FeedShortSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Feed
-        fields = ['id', 'name']
-
-        extra_kwargs = {
-            'name': {'source': 'title'},
-        }
 
 class FeedUpdatePropertiesSerializer(serializers.ModelSerializer):
     class Meta:

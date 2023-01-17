@@ -46,8 +46,12 @@ class FeedSerializer(serializers.ModelSerializer):
         }
 
 
-class FeedListObjectSerializer(serializers.ModelSerializer):
+class FeedsListSerializer(serializers.ModelSerializer):
+    """Serializer for list of feeds"""
+
     class Meta:
+        """Metainformation about the serializer"""
+        
         model = Feed
 
         fields = [
@@ -68,7 +72,7 @@ class FeedListObjectSerializer(serializers.ModelSerializer):
             "max-records-count",
             "weight",
             "available-fields",
-            "use-taxii",
+            "is-use-taxii",
             "polling-frequency",
             "status",
             "importing-fields",
@@ -88,7 +92,7 @@ class FeedListObjectSerializer(serializers.ModelSerializer):
             "is-truncating": {'source': "is_truncating"},
             "max-records-count": {'source': "max_records_count"},
             "available-fields": {'source': "available_fields"},
-            "use-taxii": {'source': "is_use_taxii"},
+            "is-use-taxii": {'source': "is_use_taxii"},
             "importing-fields": {'source': "importing_fields"},
             "created-at": {'source': "created_at"},
         }

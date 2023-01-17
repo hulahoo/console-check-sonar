@@ -27,7 +27,11 @@ from console_api.services import (
     get_response_with_pagination,
 )
 from console_api.feed.models import Feed
-from console_api.feed.serializers import FeedSerializer, FeedListObjectSerializer, FeedUpdatePropertiesSerializer
+from console_api.feed.serializers import (
+    FeedSerializer,
+    FeedsListSerializer,
+    FeedUpdatePropertiesSerializer,
+)
 from console_api.feed.services.format_selector import choose_type
 from console_api.constants import CREDENTIALS_ERROR
 
@@ -53,15 +57,15 @@ def feed_add(request: Request) -> Response:
                 data = {"detail": "Error during save data"}
                 return Response(data, status=HTTP_406_NOT_ACCEPTABLE)
 
-    """Get list of feeds"""
-
-    if request.method == "GET":
+    elif request.method == "GET":
         feeds_list = Feed.objects.all()
+
         return get_response_with_pagination(
             request=request,
             objects=feeds_list,
-            serializer=FeedListObjectSerializer,
+            serializer=FeedsListSerializer,
         )
+
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 

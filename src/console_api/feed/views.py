@@ -4,10 +4,7 @@ from requests import get
 
 from django.conf import settings
 from django.db.utils import IntegrityError
-from django.views.decorators.http import (
-    require_http_methods,
-    require_safe,
-)
+from django.views.decorators.http import require_http_methods, require_safe
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -18,7 +15,7 @@ from rest_framework.status import (
     HTTP_406_NOT_ACCEPTABLE,
 )
 
-from console_api.constants import CREDENTIALS_ERROR
+from console_api.constants import CREDS_ERROR
 from console_api.feed.models import Feed
 from console_api.feed.serializers import (
     FeedCreateUpdateSerializer,
@@ -36,10 +33,7 @@ def feeds_view(request: Request) -> Response:
     """View for /feeds endpoint"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if request.method == "POST":
         feed = FeedCreateUpdateSerializer(data=request.data)
@@ -65,14 +59,11 @@ def feeds_view(request: Request) -> Response:
 
 @api_view(["GET"])
 @require_safe
-def get_feed_preview(request: Request) -> Response:
+def feed_preview_view(request: Request) -> Response:
     """Get feed preview"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     url = request.GET.get("url", None)
     if not url:
@@ -82,12 +73,14 @@ def get_feed_preview(request: Request) -> Response:
     auth_login = request.GET.get("auth_login", None)
     auth_pass = request.GET.get("auth_pass", None)
 
-    payload = {'url': url,
-               'auth_type': auth_type,
-               'auth_login': auth_login,
-               'auth_pass': auth_pass}
+    payload = {
+        "url": url,
+        "auth_type": auth_type,
+        "auth_login": auth_login,
+        "auth_pass": auth_pass,
+    }
 
-    url_for_get_preview = settings.FEEDS_IMPORTING_SERVICE_URL + '/api/preview'
+    url_for_get_preview = settings.FEEDS_IMPORTING_SERVICE_URL + "/api/preview"
     r = get(url_for_get_preview, params=payload)
 
     return Response(r.content, status=r.status_code)
@@ -99,10 +92,7 @@ def update_feed_view(request: Request, feed_id: int) -> Response:
     """Update feed's fields"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if not Feed.objects.filter(id=feed_id).exists():
         return Response(

@@ -3,30 +3,31 @@
 from django.urls import path
 
 from console_api.feed.views import (
+    feed_preview_view,
     feeds_view,
-    get_feed_preview,
     update_feed_view,
 )
 
 
 urlpatterns = [
-    # Get feed preview
+    # Feed preview
     path(
-        '/feed-preview/',
-        get_feed_preview,
-        name="feed-preview"),
+        "/feed-preview/",
+        feed_preview_view,
+        name="feed_preview",
+    ),
 
-    # Change feed properties
+    # Update feed
     path(
-        '/<int:feed_id>',
+        "/<int:feed_id>",
         update_feed_view,
         name="change_properties",
     ),
 
-    # /feeds GET and POST
+    # Create feed and get feeds list
     path(
-        '',
+        "",
         feeds_view,
         name="feeds_view",
-    )
+    ),
 ]

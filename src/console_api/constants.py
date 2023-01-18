@@ -1,3 +1,3 @@
 """Constants for the project"""
 
-CREDENTIALS_ERROR = "Authentication credentials were not provided."
+CREDS_ERROR = "Authentication credentials were not provided."

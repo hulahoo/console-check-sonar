@@ -16,7 +16,7 @@ from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
-from console_api.constants import CREDENTIALS_ERROR
+from console_api.constants import CREDS_ERROR
 from console_api.tag.models import Tag
 from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 
@@ -27,10 +27,7 @@ def tags_view(request: Request) -> Response:
     """View for /tags endpoint"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if request.method == "POST":
         for field in "title", "weight":

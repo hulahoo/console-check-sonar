@@ -21,7 +21,7 @@ from django.views.decorators.http import require_POST, require_http_methods, req
 from .serializers import AuthTokenSerializer
 from console_api.services import CustomTokenAuthentication
 from console_api.users.models import Token, User
-from console_api.constants import CREDENTIALS_ERROR
+from console_api.constants import CREDS_ERROR
 from console_api.services import get_hashed_password
 
 
@@ -31,10 +31,7 @@ def change_user_password_view(request: Request, user_id: UUID) -> Response:
     """Change user password"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if request.method == "POST":
         for field in 'prev-pass', 'new-pass':
@@ -73,10 +70,7 @@ def users_view(request: Request) -> Response:
     """Create a new user or return list of users"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if request.method == "POST":
         for field in 'login', 'pass-hash', 'full-name', 'role':
@@ -170,10 +164,7 @@ def delete_auth_token_view(request: Request, access_token: UUID) -> Response:
     """Delete token"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if request.method == "DELETE":
         if not Token.objects.filter(key=access_token).exists():

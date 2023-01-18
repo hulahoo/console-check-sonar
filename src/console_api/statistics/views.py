@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
-from console_api.constants import CREDENTIALS_ERROR
+from console_api.constants import CREDS_ERROR
 from console_api.feed.models import Feed
 from console_api.detections.models import Detection
 from console_api.statistics.serializers import FeedsStatisticSerializer
@@ -47,10 +47,7 @@ def indicators_statistic_view(request: Request) -> Response | JsonResponse:
     """Return JSON with detected indicators statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if request.method == "GET":
         logger.info("if request.method == 'GET':")
@@ -86,10 +83,7 @@ def detected_indicators_view(request: Request) -> Union[Response, JsonResponse]:
     """Return JSON with detected indicators statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     statistics_data = get_objects_data_for_statistics(request, Detection)
 
@@ -109,10 +103,7 @@ def detected_objects_view(request: Request) -> Union[Response, JsonResponse]:
     """Return JSON with detected objects statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     statistics_data = get_objects_data_for_statistics(
         request,
@@ -135,10 +126,7 @@ def checked_objects_view(request: Request) -> Union[Response, JsonResponse]:
     """Return JSON with checked objects statistic"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     statistics_data = get_objects_data_for_statistics(
         request,

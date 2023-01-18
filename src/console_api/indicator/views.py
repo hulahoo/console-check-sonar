@@ -17,7 +17,7 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 
-from console_api.constants import CREDENTIALS_ERROR
+from console_api.constants import CREDS_ERROR
 from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
@@ -285,10 +285,7 @@ def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response
     """Change tags list for the indicator"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if not request.data.get("tags"):
         return Response(
@@ -342,10 +339,7 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
     """Change tags list for the indicator"""
 
     if not CustomTokenAuthentication().authenticate(request):
-        return Response(
-            {"detail": CREDENTIALS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
     if request.method == "POST":
         if not Indicator.objects.filter(id=indicator_id).exists():

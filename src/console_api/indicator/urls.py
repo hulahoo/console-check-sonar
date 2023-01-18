@@ -5,7 +5,7 @@ from django.urls import path
 from console_api.indicator.views import (
     add_comment_view,
     change_indicator_tags_view,
-    IndicatorDetailView,
+    indicator_detail_view,
     IndicatorListView,
 )
 
@@ -32,10 +32,10 @@ urlpatterns = [
         name="add_comment",
     ),
 
-    # Indicator detail
+    # Indicator detail or indicator deletion
     path(
-        "/<uuid:id>",
-        IndicatorDetailView.as_view(),
+        "/<uuid:indicator_id>",
+        indicator_detail_view,
         name="indicator_detail",
     ),
 ]

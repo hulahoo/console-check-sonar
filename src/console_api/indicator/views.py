@@ -1,5 +1,6 @@
 """Views for detections app"""
 
+from datetime import datetime
 from uuid import UUID
 
 from django.http import JsonResponse
@@ -36,7 +37,7 @@ from console_api.feed.models import IndicatorFeedRelationship, Feed
 class IndicatorListView(generics.ListAPIView):
     """List of indicators"""
 
-    queryset = Indicator.objects.all()
+    queryset = Indicator.objects.filter(deleted_at=None)
     serializer_class = IndicatorListSerializer
 
     authentication_classes = [CustomTokenAuthentication]
@@ -268,14 +269,36 @@ class IndicatorCreateView(viewsets.ModelViewSet):
         return self.list(request, *args, **kwargs)
 
 
-class IndicatorDetailView(generics.RetrieveAPIView):
-    """Indicator detail view"""
+@api_view(("DELETE", "GET"))
+@require_http_methods(["DELETE", "GET"])
+@renderer_classes((JSONRenderer,))
+def indicator_detail_view(request: Request, indicator_id: UUID) -> Response:
+    """Detail for indicator"""
 
-    serializer_class = IndicatorDetailSerializer
-    lookup_field = "id"
-    queryset = Indicator.objects.all()
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+
+    if not Indicator.objects.filter(id=indicator_id).exists():
+        return Response(
+            {"detail": f"Indicator with id {indicator_id} doesn't exists"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    indicator = Indicator.objects.get(id=indicator_id)
+
+    if request.method == "GET":
+        return Response(
+            IndicatorDetailSerializer(indicator).data,
+            status=HTTP_200_OK,
+        )
+
+    elif request.method == "DELETE":
+        indicator.deleted_at = datetime.now()
+        indicator.save()
+
+        return Response(status=HTTP_200_OK)
+
+    return Response(status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(("POST",))

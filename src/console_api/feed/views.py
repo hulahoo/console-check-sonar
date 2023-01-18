@@ -23,7 +23,7 @@ from console_api.feed.models import Feed
 from console_api.feed.serializers import (
     FeedCreateSerializer,
     FeedsListSerializer,
-    FeedUpdatePropertiesSerializer,
+    FeedUpdateSerializer,
 )
 from console_api.services import (
     CustomTokenAuthentication,
@@ -96,8 +96,8 @@ def get_feed_preview(request: Request) -> Response:
 
 @api_view(("POST",))
 @require_http_methods(["POST"])
-def change_feed_properties_view(request: Request, feed_id: int) -> Response:
-    """Change properties for the feed"""
+def update_feed_view(request: Request, feed_id: int) -> Response:
+    """Update feed's fields"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
@@ -105,25 +105,18 @@ def change_feed_properties_view(request: Request, feed_id: int) -> Response:
             status=HTTP_403_FORBIDDEN
         )
 
-    if not request.data:
+    if not Feed.objects.filter(id=feed_id).exists():
         return Response(
-            {"detail": "Feed data not specified"},
+            {"detail": f"Feed with id {feed_id} doesn't exists"},
             status=HTTP_400_BAD_REQUEST,
         )
 
-    feed = Feed.objects.filter(id=feed_id).first()
-    if not feed:
-        return Response(
-            {"error": "Feed doesn't exists"},
-            status=HTTP_400_BAD_REQUEST,
-        )
+    feed = Feed.objects.get(id=feed_id)
+    serializer = FeedUpdateSerializer(feed, data=request.data,partial=True)
 
-    serializer = FeedUpdatePropertiesSerializer(feed, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=HTTP_201_CREATED)
-    else:
-        return Response(
-            {"error": "Wrong data received"},
-            status=HTTP_400_BAD_REQUEST,
-        )
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    serializer.save()
+
+    return Response(status=HTTP_201_CREATED)

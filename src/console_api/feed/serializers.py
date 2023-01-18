@@ -102,14 +102,18 @@ class FeedsListSerializer(serializers.ModelSerializer):
         }
 
 
-class FeedUpdatePropertiesSerializer(serializers.ModelSerializer):
+class FeedUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for feed update"""
+
     class Meta:
+        """Metainformation for the serializer"""
+
         model = Feed
 
         fields = [
             "source-url",
             "format",
-            "use-taxii",
+            "is-use-taxii",
             "auth-type",
             "auth-api-token",
             "auth-login",
@@ -128,7 +132,7 @@ class FeedUpdatePropertiesSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             "source-url": {"source": "url"},
-            "use-taxii": {'source': "is_use_taxii"},
+            "is-use-taxii": {'source': "is_use_taxii"},
             "auth-type": {'source': "auth_type"},
             "auth-api-token": {'source': "auth_api_token"},
             "auth-login": {'source': "auth_login"},

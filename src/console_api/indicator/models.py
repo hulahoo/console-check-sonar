@@ -118,6 +118,12 @@ class Indicator(models.Model):
         auto_now=True,
     )
 
+    deleted_at = models.DateTimeField(
+        "Дата и время удаления",
+        null=True,
+        blank=True,
+    )
+
     @property
     def feeds(self) -> tuple:
         """Return tuple of feeds that linked with the indicator"""

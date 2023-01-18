@@ -21,9 +21,8 @@ from rest_framework.status import (
 from console_api.constants import CREDENTIALS_ERROR
 from console_api.feed.models import Feed
 from console_api.feed.serializers import (
-    FeedCreateSerializer,
+    FeedCreateUpdateSerializer,
     FeedsListSerializer,
-    FeedUpdateSerializer,
 )
 from console_api.services import (
     CustomTokenAuthentication,
@@ -43,7 +42,7 @@ def feeds_view(request: Request) -> Response:
         )
 
     if request.method == "POST":
-        feed = FeedCreateSerializer(data=request.data)
+        feed = FeedCreateUpdateSerializer(data=request.data)
 
         if feed.is_valid():
             try:
@@ -112,7 +111,11 @@ def update_feed_view(request: Request, feed_id: int) -> Response:
         )
 
     feed = Feed.objects.get(id=feed_id)
-    serializer = FeedUpdateSerializer(feed, data=request.data,partial=True)
+    serializer = FeedCreateUpdateSerializer(
+        feed,
+        data=request.data,
+        partial=True,
+    )
 
     if not serializer.is_valid():
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

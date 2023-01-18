@@ -102,7 +102,7 @@ def users_view(request: Request) -> Response:
                 "created-at": user.created_at,
                 "updated-at": user.updated_at,
             }
-            for user in User.objects.all()
+            for user in User.objects.filter(deleted_at=None)
         ]
 
         return Response({"results": data}, status=HTTP_200_OK)

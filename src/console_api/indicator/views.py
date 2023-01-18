@@ -40,8 +40,8 @@ class IndicatorListView(generics.ListAPIView):
     queryset = Indicator.objects.filter(deleted_at=None)
     serializer_class = IndicatorListSerializer
 
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [CustomTokenAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     def add_counter_queryset_filters(self, request: Request) -> None:
         """Filter the queryset"""
@@ -146,6 +146,8 @@ class IndicatorListView(generics.ListAPIView):
         updated_at_from = get_filter_query_param(request, "updated-at-from")
         updated_at_to = get_filter_query_param(request, "updated-at-to")
 
+        comment = get_filter_query_param(request, "comment")
+
         if id_:
             self.queryset = self.queryset.filter(id=id_)
         if ioc_type:
@@ -188,6 +190,12 @@ class IndicatorListView(generics.ListAPIView):
             self.queryset = self.queryset.filter(
                 updated_at__lte=updated_at_to,
             )
+
+        if comment:
+            self.queryset = self.queryset.filter(
+                id__in=IndicatorActivities.objects.values("indicator_id").filter(details__search=comment)
+            )
+
 
     # Потом раскомментить и пофиксить
     def add_tags_filters(self, request: Request) -> None:
@@ -251,8 +259,8 @@ class IndicatorListView(generics.ListAPIView):
 class IndicatorCreateView(viewsets.ModelViewSet):
     """IndicatorCreateView"""
 
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [CustomTokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     serializer_class = IndicatorSerializer
     queryset = Indicator.objects.all()
 

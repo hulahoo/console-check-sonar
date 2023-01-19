@@ -55,6 +55,7 @@ urlpatterns = [
     path("health", readiness_and_liveness_view, name="readiness_and_liveness"),
     path("metrics", metrics_view, name="metrics"),
     path("host/api", api_res, name="api"),
+    path("api/search", include("console_api.search.urls")),
 ]
 
 if settings.DEBUG:

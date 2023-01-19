@@ -238,6 +238,7 @@ class IndicatorListView(generics.ListAPIView):
         self.add_counter_queryset_filters(request=request)
         self.add_boolean_filters(request=request)
         self.add_weight_filters(request=request)
+        self.add_queryset_at_time_filters(request=request)
 
         # tags and feed_name should be below others
         # self.add_tags_filters(request=request)

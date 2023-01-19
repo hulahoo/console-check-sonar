@@ -1,4 +1,6 @@
-import json
+"""Views for search app"""
+
+from json import loads
 
 from django.views.decorators.http import require_http_methods
 from django.core import serializers
@@ -21,14 +23,11 @@ from console_api.search.enums import SearchStatus
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
-def by_text(request: Request) -> Response:
-    user, _ = CustomTokenAuthentication().authenticate(request)
+def search_by_text_view(request: Request) -> Response:
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
-    if not user:
-        return Response(
-            {"detail": CREDS_ERROR},
-            status=HTTP_403_FORBIDDEN
-        )
+    user, _ = CustomTokenAuthentication().authenticate(request)
 
     query = request.GET.get('query')
 
@@ -44,7 +43,11 @@ def by_text(request: Request) -> Response:
         'search_type': 'by-text',
         'query_text': query,
         'query_data': None,
-        'results': serializers.serialize("json", indicators, fields=('id', 'value')),
+        'results': serializers.serialize(
+            "json",
+            indicators,
+            fields=('id', 'value'),
+        ),
         'created_by': user.id,
     })
 
@@ -67,7 +70,7 @@ def by_text(request: Request) -> Response:
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
-def history(request: Request) -> Response:
+def search_history_view(request: Request) -> Response:
     if not CustomTokenAuthentication().authenticate(request):
         return Response(
             {"detail": CREDS_ERROR},
@@ -79,7 +82,7 @@ def history(request: Request) -> Response:
     return Response(status=200, data=[
         {
             'id': item.id,
-            'status': SearchStatus.DETECTED if json.loads(item.results) else SearchStatus.NOT_DETECTED,
+            'status': SearchStatus.DETECTED if loads(item.results) else SearchStatus.NOT_DETECTED,
             'created_at': item.created_at,
             'created_by': item.created_by,
             'query': item.query_text

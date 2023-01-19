@@ -130,7 +130,7 @@ class IndicatorListView(generics.ListAPIView):
     def add_queryset_filters(self, request: Request) -> None:
         """Filter the queryset"""
 
-        id_ = get_filter_query_param(request, "id")
+        indicator_id = get_filter_query_param(request, "indicator-id")
         ioc_type = get_filter_query_param(request, "ioc-type")
         value = get_filter_query_param(request, "value")
         context = get_filter_query_param(request, "context")
@@ -146,8 +146,8 @@ class IndicatorListView(generics.ListAPIView):
         updated_at_from = get_filter_query_param(request, "updated-at-from")
         updated_at_to = get_filter_query_param(request, "updated-at-to")
 
-        if id_:
-            self.queryset = self.queryset.filter(id=id_)
+        if indicator_id:
+            self.queryset = self.queryset.filter(id=indicator_id)
         if ioc_type:
             self.queryset = self.queryset.filter(ioc_type=ioc_type)
         if value:

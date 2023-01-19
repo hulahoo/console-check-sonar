@@ -2,15 +2,11 @@
 
 from django.urls import path
 
-from console_api.users.views import (
-    change_user_password_view,
-    users_view,
-    Logout,
-)
+from console_api.users.views import user_detail_view, users_view, Logout
 
 
 urlpatterns = [
     path("", users_view),
-    path("/<int:user_id>", change_user_password_view),
+    path("/<int:user_id>", user_detail_view),
     path('/logout', Logout.as_view()),
 ]

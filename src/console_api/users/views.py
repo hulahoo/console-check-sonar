@@ -1,5 +1,6 @@
 """Views for users app"""
 
+from datetime import datetime
 from uuid import uuid4, UUID
 
 from rest_framework import status
@@ -15,8 +16,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
 )
-from django.views.decorators.http import require_POST, require_http_methods, require_GET
-
+from django.views.decorators.http import require_http_methods
 
 from .serializers import AuthTokenSerializer
 from console_api.services import CustomTokenAuthentication
@@ -25,13 +25,21 @@ from console_api.constants import CREDS_ERROR
 from console_api.services import get_hashed_password
 
 
-@api_view(["POST"])
-@require_POST
-def change_user_password_view(request: Request, user_id: UUID) -> Response:
-    """Change user password"""
+@api_view(["POST", "DELETE"])
+@require_http_methods(["POST", "DELETE"])
+def user_detail_view(request: Request, user_id: UUID) -> Response:
+    """Change user password and delete user"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+
+    if not User.objects.filter(id=user_id).exists():
+        return Response(
+            {"detail": "User does not exist"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    user = User.objects.get(id=user_id)
 
     if request.method == "POST":
         for field in 'prev-pass', 'new-pass':
@@ -40,14 +48,6 @@ def change_user_password_view(request: Request, user_id: UUID) -> Response:
                     {"detail": f"{field} not specified"},
                     status=HTTP_400_BAD_REQUEST,
                 )
-
-        if not User.objects.filter(id=user_id).exists():
-            return Response(
-                {"detail": "User does not exist"},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        user = User.objects.get(id=user_id)
 
         prev_pass = request.data.get("prev-pass")
         new_pass = request.data.get("new-pass")
@@ -61,7 +61,14 @@ def change_user_password_view(request: Request, user_id: UUID) -> Response:
         user.password = get_hashed_password(new_pass)
         user.save()
 
+    elif request.method == "DELETE":
+        user.is_active = False
+        user.deleted_at = datetime.now()
+        user.save()
+
         return Response(status=HTTP_200_OK)
+
+    return Response(status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST", "GET"])

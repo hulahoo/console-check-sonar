@@ -55,13 +55,13 @@ def search_by_text_view(request: Request) -> Response:
         result = search_history.save()
 
         return Response(status=200, data={
-            'created_at': result.created_at,
-            'created_by': result.created_by,
+            'created-at': result.created_at,
+            'created-by': result.created_by,
             'results': [
                 {
                     'id': indicator.id,
-                    'feed_name': feed['name'],
-                    'feed_provider': feed['provider'],
+                    'feed-name': feed['name'],
+                    'feed-provider': feed['provider'],
                     'context': indicator.context
                 } for indicator in indicators for feed in indicator.feeds
             ]
@@ -83,8 +83,8 @@ def search_history_view(request: Request) -> Response:
         {
             'id': item.id,
             'status': SearchStatus.DETECTED if loads(item.results) else SearchStatus.NOT_DETECTED,
-            'created_at': item.created_at,
-            'created_by': item.created_by,
+            'created-at': item.created_at,
+            'created-by': item.created_by,
             'query': item.query_text
         } for item in search_history
     ])

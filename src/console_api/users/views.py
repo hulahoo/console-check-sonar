@@ -25,8 +25,8 @@ from console_api.constants import CREDS_ERROR
 from console_api.services import get_hashed_password
 
 
-@api_view(["POST", "DELETE"])
 @require_http_methods(["POST", "DELETE"])
+@api_view(["POST", "DELETE"])
 def user_detail_view(request: Request, user_id: UUID) -> Response:
     """Change user password and delete user"""
 

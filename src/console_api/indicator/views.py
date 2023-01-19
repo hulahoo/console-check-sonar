@@ -269,6 +269,32 @@ class IndicatorCreateView(viewsets.ModelViewSet):
         return self.list(request, *args, **kwargs)
 
 
+@api_view(("PATCH",))
+@require_http_methods(["PATCH"])
+@renderer_classes((JSONRenderer,))
+def mark_indicator_as_false_positive_view(
+        request: Request, indicator_id: UUID) -> Response:
+    """Mark the indicator as false positive"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+
+    if not Indicator.objects.filter(id=indicator_id).exists():
+        return Response(
+            {"detail": f"Indicator with id {indicator_id} doesn't exists"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    if request.method == "PATCH":
+        indicator = Indicator.objects.get(id=indicator_id)
+        indicator.is_false_positive = True
+        indicator.save()
+
+        return Response(status=HTTP_200_OK)
+
+    return Response(status=HTTP_400_BAD_REQUEST)
+
+
 @api_view(("DELETE", "GET"))
 @require_http_methods(["DELETE", "GET"])
 @renderer_classes((JSONRenderer,))

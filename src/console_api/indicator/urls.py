@@ -7,6 +7,7 @@ from console_api.indicator.views import (
     change_indicator_tags_view,
     indicator_detail_view,
     IndicatorListView,
+    mark_indicator_as_false_positive_view,
 )
 
 
@@ -30,6 +31,12 @@ urlpatterns = [
         "/<uuid:indicator_id>/add-comment",
         add_comment_view,
         name="add_comment",
+    ),
+
+    path(
+        "/<uuid:indicator_id>/as_false_positive",
+        mark_indicator_as_false_positive_view,
+        name="indicator_as_false_positive",
     ),
 
     # Indicator detail or indicator deletion

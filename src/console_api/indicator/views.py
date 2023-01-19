@@ -40,8 +40,8 @@ class IndicatorListView(generics.ListAPIView):
     queryset = Indicator.objects.filter(deleted_at=None)
     serializer_class = IndicatorListSerializer
 
-    # authentication_classes = [CustomTokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def add_counter_queryset_filters(self, request: Request) -> None:
         """Filter the queryset"""
@@ -130,10 +130,34 @@ class IndicatorListView(generics.ListAPIView):
     def add_queryset_filters(self, request: Request) -> None:
         """Filter the queryset"""
 
-        id_ = get_filter_query_param(request, "id")
+        indicator_id = get_filter_query_param(request, "indicator-id")
         ioc_type = get_filter_query_param(request, "ioc-type")
         value = get_filter_query_param(request, "value")
         context = get_filter_query_param(request, "context")
+
+        created_by = get_filter_query_param(request, "created-by")
+
+        comment = get_filter_query_param(request, "comment")
+
+        if indicator_id:
+            self.queryset = self.queryset.filter(id=indicator_id)
+        if ioc_type:
+            self.queryset = self.queryset.filter(ioc_type=ioc_type)
+        if value:
+            self.queryset = self.queryset.filter(value=value)
+        if context:
+            self.queryset = self.queryset.filter(context=context)
+
+        if created_by:
+            self.queryset = self.queryset.filter(created_by=created_by)
+
+        if comment:
+            self.queryset = self.queryset.filter(
+                id__in=IndicatorActivities.objects.values("indicator_id").filter(details__icontains=comment)
+            )
+
+    def add_queryset_at_time_filters(self, request: Request) -> None:
+        """Filter the queryset"""
 
         first_detected_at = get_filter_query_param(request, "first-detected-at")
         last_detected_at = get_filter_query_param(request, "last-detected-at")
@@ -141,21 +165,21 @@ class IndicatorListView(generics.ListAPIView):
         created_at_from = get_filter_query_param(request, "created-at-from")
         created_at_to = get_filter_query_param(request, "created-at-to")
 
-        created_by = get_filter_query_param(request, "created-by")
-
         updated_at_from = get_filter_query_param(request, "updated-at-from")
         updated_at_to = get_filter_query_param(request, "updated-at-to")
 
-        comment = get_filter_query_param(request, "comment")
-
-        if id_:
-            self.queryset = self.queryset.filter(id=id_)
-        if ioc_type:
-            self.queryset = self.queryset.filter(ioc_type=ioc_type)
-        if value:
-            self.queryset = self.queryset.filter(value=value)
-        if context:
-            self.queryset = self.queryset.filter(context=context)
+        if updated_at_from and updated_at_to:
+            self.queryset = self.queryset.filter(
+                updated_at__range=(updated_at_from, updated_at_to),
+            )
+        elif updated_at_from:
+            self.queryset = self.queryset.filter(
+                updated_at__gte=updated_at_from,
+            )
+        elif updated_at_to:
+            self.queryset = self.queryset.filter(
+                updated_at__lte=updated_at_to,
+            )
 
         if first_detected_at:
             self.queryset = self.queryset.filter(first_detected_at=first_detected_at)
@@ -174,28 +198,6 @@ class IndicatorListView(generics.ListAPIView):
             self.queryset = self.queryset.filter(
                 created_at__lte=created_at_to,
             )
-
-        if created_by:
-            self.queryset = self.queryset.filter(created_by=created_by)
-
-        if updated_at_from and updated_at_to:
-            self.queryset = self.queryset.filter(
-                updated_at__range=(updated_at_from, updated_at_to),
-            )
-        elif updated_at_from:
-            self.queryset = self.queryset.filter(
-                updated_at__gte=updated_at_from,
-            )
-        elif updated_at_to:
-            self.queryset = self.queryset.filter(
-                updated_at__lte=updated_at_to,
-            )
-
-        if comment:
-            self.queryset = self.queryset.filter(
-                id__in=IndicatorActivities.objects.values("indicator_id").filter(details__search=comment)
-            )
-
 
     # Потом раскомментить и пофиксить
     def add_tags_filters(self, request: Request) -> None:
@@ -259,8 +261,8 @@ class IndicatorListView(generics.ListAPIView):
 class IndicatorCreateView(viewsets.ModelViewSet):
     """IndicatorCreateView"""
 
-    # authentication_classes = [CustomTokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = IndicatorSerializer
     queryset = Indicator.objects.all()
 

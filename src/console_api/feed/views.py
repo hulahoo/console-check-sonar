@@ -27,8 +27,8 @@ from console_api.services import (
 )
 
 
-@api_view(["POST", "GET"])
 @require_http_methods(["GET", "POST"])
+@api_view(["POST", "GET"])
 def feeds_view(request: Request) -> Response:
     """View for /feeds endpoint"""
 

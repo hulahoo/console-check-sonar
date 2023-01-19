@@ -306,8 +306,8 @@ def mark_indicator_as_false_positive_view(
     return Response(status=HTTP_400_BAD_REQUEST)
 
 
-@api_view(("DELETE", "GET"))
 @require_http_methods(["DELETE", "GET"])
+@api_view(("DELETE", "GET"))
 @renderer_classes((JSONRenderer,))
 def indicator_detail_view(request: Request, indicator_id: UUID) -> Response:
     """Detail for indicator"""

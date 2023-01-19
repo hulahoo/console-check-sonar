@@ -67,11 +67,14 @@ def feed_preview_view(request: Request) -> Response:
 
     url = request.GET.get("url", None)
     if not url:
-        return Response(status=HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": "URL not specified"},
+            status=HTTP_400_BAD_REQUEST,
+        )
 
-    auth_type = request.GET.get("auth_type", None)
-    auth_login = request.GET.get("auth_login", None)
-    auth_pass = request.GET.get("auth_pass", None)
+    auth_type = request.GET.get("auth-type", None)
+    auth_login = request.GET.get("auth-login", None)
+    auth_pass = request.GET.get("auth-pass", None)
 
     payload = {
         "url": url,

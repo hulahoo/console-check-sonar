@@ -4,7 +4,6 @@ from datetime import datetime
 from uuid import UUID
 
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
 from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
@@ -31,6 +30,9 @@ from console_api.indicator.serializers import (
     IndicatorSerializer,
 )
 from console_api.tag.models import IndicatorTagRelationship, Tag
+from console_api.utils.decorators import (
+    require_GET_DELETE, require_PATCH, require_POST
+)
 from console_api.feed.models import IndicatorFeedRelationship, Feed
 
 
@@ -281,7 +283,7 @@ class IndicatorCreateView(viewsets.ModelViewSet):
 
 
 @api_view(("PATCH",))
-@require_http_methods(["PATCH"])
+@require_PATCH
 @renderer_classes((JSONRenderer,))
 def mark_indicator_as_false_positive_view(
         request: Request, indicator_id: UUID) -> Response:
@@ -306,8 +308,8 @@ def mark_indicator_as_false_positive_view(
     return Response(status=HTTP_400_BAD_REQUEST)
 
 
-@require_http_methods(["DELETE", "GET"])
 @api_view(("DELETE", "GET"))
+@require_GET_DELETE
 @renderer_classes((JSONRenderer,))
 def indicator_detail_view(request: Request, indicator_id: UUID) -> Response:
     """Detail for indicator"""
@@ -339,7 +341,7 @@ def indicator_detail_view(request: Request, indicator_id: UUID) -> Response:
 
 
 @api_view(("POST",))
-@require_http_methods(["POST"])
+@require_POST
 @renderer_classes((JSONRenderer,))
 def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response:
     """Change tags list for the indicator"""
@@ -393,7 +395,7 @@ def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response
 
 
 @api_view(("POST",))
-@require_http_methods(["POST"])
+@require_POST
 @renderer_classes((JSONRenderer,))
 def add_comment_view(request: Request, indicator_id: UUID) -> Response:
     """Change tags list for the indicator"""

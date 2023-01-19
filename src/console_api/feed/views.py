@@ -4,7 +4,6 @@ from requests import get
 
 from django.conf import settings
 from django.db.utils import IntegrityError
-from django.views.decorators.http import require_http_methods, require_safe
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -21,13 +20,16 @@ from console_api.feed.serializers import (
     FeedCreateUpdateSerializer,
     FeedsListSerializer,
 )
+from console_api.utils.decorators import (
+    require_GET_POST, require_POST, require_safe
+)
 from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
 
 
-@require_http_methods(["GET", "POST"])
+@require_GET_POST
 @api_view(["POST", "GET"])
 def feeds_view(request: Request) -> Response:
     """View for /feeds endpoint"""
@@ -90,7 +92,7 @@ def feed_preview_view(request: Request) -> Response:
 
 
 @api_view(("POST",))
-@require_http_methods(["POST"])
+@require_POST
 def update_feed_view(request: Request, feed_id: int) -> Response:
     """Update feed's fields"""
 

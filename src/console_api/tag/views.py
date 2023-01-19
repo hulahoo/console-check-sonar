@@ -2,7 +2,6 @@
 
 from datetime import datetime
 
-from django.views.decorators.http import require_http_methods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -21,10 +20,13 @@ from console_api.constants import CREDS_ERROR
 from console_api.tag.models import Tag
 from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 from console_api.tag.services import get_new_tag_id
+from console_api.utils.decorators import (
+    require_GET_POST, require_http_methods
+)
 
 
 @api_view(["POST", "GET"])
-@require_http_methods(["GET", "POST"])
+@require_GET_POST
 def tags_view(request: Request) -> Response:
     """View for /tags endpoint"""
 

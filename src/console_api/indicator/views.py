@@ -302,8 +302,7 @@ class IndicatorDetail(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        indicator = Indicator.objects.get(id=indicator_id)
-        return indicator
+        return Indicator.objects.get(id=indicator_id)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))

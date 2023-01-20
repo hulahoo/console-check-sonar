@@ -83,7 +83,7 @@ class FeedUpdate(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request, *args, **kwargs) -> Response:
+    def post(self, request: Request, *args, **kwargs) -> Response:
         feed_id = kwargs.get("feed_id")
 
         if not Feed.objects.filter(id=feed_id).exists():

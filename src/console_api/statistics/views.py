@@ -15,7 +15,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
 from console_api.constants import CREDS_ERROR
-from console_api.feed.models import Feed
+from console_api.feed.models import Feed, IndicatorFeedRelationship
 from console_api.detections.models import Detection
 from console_api.statistics.serializers import FeedsStatisticSerializer
 from console_api.statistics.models import (
@@ -49,31 +49,38 @@ def indicators_statistic_view(request: Request) -> Response | JsonResponse:
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
-    if request.method == "GET":
-        logger.info("if request.method == 'GET':")
-        types_and_detections_count = defaultdict(int)
+    statistic = defaultdict(dict)
 
-        indicators_and_types = Indicator.objects.values(
-            "id", "ioc_type",
-        ).annotate(tcount=Count("ioc_type")).order_by()
+    indicators = Indicator.objects.values(
+        "id", "ioc_type",
+    ).annotate(tcount=Count("ioc_type")).order_by()
 
-        for indicator in indicators_and_types:
-            indicator_type = indicator["ioc_type"]
-            detections_count = Detection.objects.filter(
-                indicator_id=indicator["id"],
-            ).count()
+    for indicator in indicators:
+        indicator_type = indicator["ioc_type"]
 
-            types_and_detections_count[indicator_type] += detections_count
+        statistic[indicator_type].setdefault('detections_count', 0)
+        statistic[indicator_type].setdefault('checked_count', 0)
 
-        statistic = [
-            {
-                "indicator-type": type_,
-                "detections-count": dcount,
-            }
-            for type_, dcount in types_and_detections_count.items()
-        ]
+        detections_count = Detection.objects.filter(
+            indicator_id=indicator["id"],
+        ).count()
 
-    return JsonResponse(statistic, safe=False)
+        checked_count = StatCheckedObjects.objects.filter(
+            indicator_id=indicator["id"],
+        ).count()
+
+        statistic[indicator_type]['detections_count'] += detections_count
+        statistic[indicator_type]['checked_count'] += checked_count
+
+    result = [
+        {
+            "indicator-type": type_,
+            "detections-count": value['detections_count'],
+            "checked-count": value['checked_count']
+        } for type_, value in statistic.items()
+    ]
+
+    return JsonResponse(result, safe=False)
 
 
 @api_view(("GET",))
@@ -140,3 +147,53 @@ def checked_objects_view(request: Request) -> Union[Response, JsonResponse]:
         )
 
     return JsonResponse(statistics_data)
+
+
+@api_view(("GET",))
+@require_http_methods(["GET"])
+def feeds_intersection_view(request: Request) -> Response:
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+
+    feeds = Feed.objects.filter(is_active=True)
+
+    indicator_ids = {}
+
+    for feed in feeds:
+        indicator_ids[feed.id] = IndicatorFeedRelationship.objects.filter(
+            feed_id=feed.id
+        ).values('indicator_id')
+
+    result = []
+    feed_index = 1
+
+    for feed in feeds:
+        intersections = []
+
+        for intersection_feed in feeds:
+            if not indicator_ids[feed.id]:
+                # empty feed
+                continue
+
+            if intersection_feed.id == feed.id:
+                # intersect with itself
+                intersections.append(100)
+                continue
+
+            intersection_count = len(
+                indicator_ids[feed.id].intersection(indicator_ids[intersection_feed.id])
+            )
+
+            intersections.append(round(
+                intersection_count * 100 / len(indicator_ids[feed.id]), 2
+            ))
+
+        result.append({
+            'feed-index': feed_index,
+            'feed-name': feed.title,
+            'intersections': intersections
+        })
+
+        feed_index += 1
+
+    return Response(status=200, data=result)

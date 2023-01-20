@@ -6,7 +6,7 @@ from console_api.statistics.views import (
     checked_objects_view,
     detected_objects_view,
     detected_indicators_view,
-    # FeedsIntersectionList,
+    feeds_intersection_view,
     FeedsStatisticView,
     indicators_statistic_view,
 )
@@ -38,9 +38,9 @@ urlpatterns = [
         checked_objects_view,
         name="checked_objects",
     ),
-    # path(
-    #     "/feeds-intersections",
-    #     FeedsIntersectionList.as_view(),
-    #     name="feeds_intersections",
-    # ),
+    path(
+        "/feeds-intersections",
+        feeds_intersection_view,
+        name="feeds_intersections",
+    ),
 ]

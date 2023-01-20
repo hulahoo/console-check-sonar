@@ -12,7 +12,7 @@ from console_api.feed.views import (
 urlpatterns = [
     # Feed preview
     path(
-        "/feed-preview/",
+        "/feed-preview",
         FeedPreview.as_view(),
         name="feed_preview",
     ),

@@ -154,7 +154,10 @@ class CustomAuthTokenView(ObtainAuthToken):
                 token = Token.objects.create(key=user_token, user_id=user.pk)
                 token.save()
         except Exception as error:
-            return Response({"detail": error}, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": error.message_dict},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
         return Response({
             'access-token': user_token,

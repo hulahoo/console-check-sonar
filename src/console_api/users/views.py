@@ -155,7 +155,7 @@ class CustomAuthTokenView(ObtainAuthToken):
                 token.save()
         except Exception as error:
             return Response(
-                {"detail": error.message_dict},
+                {"detail": str(error)},
                 status=HTTP_400_BAD_REQUEST,
             )
 

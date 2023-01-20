@@ -16,7 +16,7 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 from console_api.utils.decorators import (
-    require_http_methods, require_POST
+    require_POST
 )
 
 from .serializers import AuthTokenSerializer
@@ -70,7 +70,8 @@ class UserDetail(CommonAPIView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
 
-        self.custom_authenticate(request=request)
+        if auth_result := self.custom_authenticate(request=request) is not None:
+            return auth_result
 
         for field in 'login', 'pass-hash', 'full-name', 'role':
             if not request.data.get(field):
@@ -93,7 +94,8 @@ class UserDetail(CommonAPIView):
 
     def get(self, request: Request, *args, **kwargs) -> Response:
 
-        self.custom_authenticate(request=request)
+        if auth_result := self.custom_authenticate(request=request) is not None:
+            return auth_result
 
         data = [
             {
@@ -114,7 +116,7 @@ class Logout(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None):
+    def get(self, request: Request, *args, **kwargs) -> Response:
         request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
 
@@ -122,7 +124,7 @@ class Logout(APIView):
 class CustomAuthTokenView(ObtainAuthToken):
     """Custom token authorization generator"""
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: Request, *args, **kwargs) -> Response:
         try:
             serializer = AuthTokenSerializer(
                 data=request.data,
@@ -158,20 +160,19 @@ class CustomAuthTokenView(ObtainAuthToken):
         })
 
 
-@api_view(["DELETE"])
-@require_http_methods(["DELETE"])
-def delete_auth_token_view(request: Request, access_token: UUID) -> Response:
-    """Delete token"""
+class DeleteAuthToken(APIView):
+    authentication_classes = [CustomTokenAuthentication]
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+    def delete(self, request: Request, *args, **kwargs) -> Response:
+        """Delete token"""
+        access_token = kwargs.get("access_token")
 
-    if not Token.objects.filter(key=access_token).exists():
-        return Response(
-            {"detail": "Token doesn't exists"},
-            status=HTTP_400_BAD_REQUEST
-        )
+        if not Token.objects.filter(key=access_token).exists():
+            return Response(
+                {"detail": "Token doesn't exists"},
+                status=HTTP_400_BAD_REQUEST
+            )
 
-    Token.objects.get(key=access_token).delete()
+        Token.objects.get(key=access_token).delete()
 
-    return Response(status=HTTP_200_OK)
+        return Response(status=HTTP_200_OK)

@@ -1,28 +1,26 @@
 """Views for detections app"""
 
 from datetime import datetime
-from uuid import UUID
 
 from django.http import JsonResponse
+from rest_framework.views import APIView
 from rest_framework import generics, viewsets
-from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.renderers import JSONRenderer
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-    HTTP_403_FORBIDDEN,
 )
-
-from console_api.constants import CREDS_ERROR
 from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
 )
+from console_api.common.views import CommonAPIView
 from console_api.indicator.models import Indicator, IndicatorActivities
 from console_api.indicator.serializers import (
     IndicatorListSerializer,
@@ -30,9 +28,6 @@ from console_api.indicator.serializers import (
     IndicatorSerializer,
 )
 from console_api.tag.models import IndicatorTagRelationship, Tag
-from console_api.utils.decorators import (
-    require_GET_DELETE, require_PATCH, require_POST
-)
 from console_api.feed.models import IndicatorFeedRelationship, Feed
 
 
@@ -282,94 +277,82 @@ class IndicatorCreateView(viewsets.ModelViewSet):
         return self.list(request, *args, **kwargs)
 
 
-@api_view(("PATCH",))
-@require_PATCH
-@renderer_classes((JSONRenderer,))
-def mark_indicator_as_false_positive_view(
-        request: Request, indicator_id: UUID) -> Response:
-    """Mark the indicator as false positive"""
+class MarkIndicatorFalsePositive(CommonAPIView):
+    renderer_classes = JSONRenderer
+    authentication_classes = [CustomTokenAuthentication]
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+    def patch(self, request: Request, *args, **kwargs) -> Response:
+        indicator_id = kwargs.get("indicator_id")
 
-    if not Indicator.objects.filter(id=indicator_id).exists():
-        return Response(
-            {"detail": f"Indicator with id {indicator_id} doesn't exists"},
-            status=HTTP_400_BAD_REQUEST,
-        )
+        if not Indicator.objects.filter(id=indicator_id).exists():
+            return Response(
+                {"detail": f"Indicator with id {indicator_id} doesn't exists"},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
-    if request.method == "PATCH":
         indicator = Indicator.objects.get(id=indicator_id)
         indicator.is_false_positive = True
         indicator.save()
 
         return Response(status=HTTP_200_OK)
 
-    return Response(status=HTTP_400_BAD_REQUEST)
 
+class IndicatorDetail(APIView):
 
-@api_view(("DELETE", "GET"))
-@require_GET_DELETE
-@renderer_classes((JSONRenderer,))
-def indicator_detail_view(request: Request, indicator_id: UUID) -> Response:
-    """Detail for indicator"""
+    renderer_classes = JSONRenderer
+    authentication_classes = [CustomTokenAuthentication]
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+    def get_indicator_detail(self, *, indicator_id) -> Indicator:
+        if not Indicator.objects.filter(id=indicator_id).exists():
+            return Response(
+                {"detail": f"Indicator with id {indicator_id} doesn't exists"},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
-    if not Indicator.objects.filter(id=indicator_id).exists():
-        return Response(
-            {"detail": f"Indicator with id {indicator_id} doesn't exists"},
-            status=HTTP_400_BAD_REQUEST,
-        )
+        indicator = Indicator.objects.get(id=indicator_id)
+        return indicator
 
-    indicator = Indicator.objects.get(id=indicator_id)
-
-    if request.method == "GET":
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
         return Response(
             IndicatorDetailSerializer(indicator).data,
             status=HTTP_200_OK,
         )
 
-    elif request.method == "DELETE":
+    def delete(self, request: Request, *args, **kwargs) -> Response:
+        indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
         indicator.deleted_at = datetime.now()
         indicator.save()
 
         return Response(status=HTTP_200_OK)
 
-    return Response(status=HTTP_400_BAD_REQUEST)
 
+class ChangeIndicatorTags(APIView):
+    renderer_classes = JSONRenderer
+    authentication_classes = [CustomTokenAuthentication]
 
-@api_view(("POST",))
-@require_POST
-@renderer_classes((JSONRenderer,))
-def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response:
-    """Change tags list for the indicator"""
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        indicator_id = kwargs.get("indicator_id")
+        if not request.data.get("tags"):
+            return Response(
+                {"detail": "Tags not specified"},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+        tags = request.data.get("tags")
+        tags = tags.replace("[", "").replace("]", "").replace(" ", "").split(",")
 
-    if not request.data.get("tags"):
-        return Response(
-            {"detail": "Tags not specified"},
-            status=HTTP_400_BAD_REQUEST,
-        )
+        if tags == ['']:
+            tags = []
 
-    tags = request.data.get("tags")
-    tags = tags.replace("[", "").replace("]", "").replace(" ", "").split(",")
+        if not all(tag.isdigit() for tag in tags):
+            return Response(
+                {"detail": "Tags not valid"},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
-    if tags == ['']:
-        tags = []
+        new_tags = [int(tag) for tag in tags if tag != ""]
 
-    if not all(tag.isdigit() for tag in tags):
-        return Response(
-            {"detail": "Tags not valid"},
-            status=HTTP_400_BAD_REQUEST,
-        )
-
-    new_tags = [int(tag) for tag in tags if tag != ""]
-
-    if request.method == "POST":
         if Indicator.objects.filter(id=indicator_id).exists():
             if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
                 return Response(
@@ -391,19 +374,15 @@ def change_indicator_tags_view(request: Request, indicator_id: UUID) -> Response
 
         request.errors = {"detail": "Indicator not found"}
 
-    return Response(request.errors, status=HTTP_400_BAD_REQUEST)
 
+class IndicatorAddComment(APIView):
+    renderer_classes = JSONRenderer
+    authentication_classes = [CustomTokenAuthentication]
 
-@api_view(("POST",))
-@require_POST
-@renderer_classes((JSONRenderer,))
-def add_comment_view(request: Request, indicator_id: UUID) -> Response:
-    """Change tags list for the indicator"""
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        """Change tags list for the indicator"""
+        indicator_id = kwargs.get("indicator_id")
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
-
-    if request.method == "POST":
         if not Indicator.objects.filter(id=indicator_id).exists():
             return Response(
                 {"error": "Indicator doesn't exists"},
@@ -426,5 +405,3 @@ def add_comment_view(request: Request, indicator_id: UUID) -> Response:
         activity.save()
 
         return Response(status=HTTP_201_CREATED)
-
-    return Response(request.errors, status=HTTP_400_BAD_REQUEST)

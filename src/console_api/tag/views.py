@@ -2,38 +2,28 @@
 
 from datetime import datetime
 
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-    HTTP_403_FORBIDDEN,
 )
 
 from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
-from console_api.constants import CREDS_ERROR
 from console_api.tag.models import Tag
 from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 from console_api.tag.services import get_new_tag_id
-from console_api.utils.decorators import (
-    require_GET_POST, require_http_methods
-)
 
 
-@api_view(["POST", "GET"])
-@require_GET_POST
-def tags_view(request: Request) -> Response:
-    """View for /tags endpoint"""
+class TagsView(APIView):
+    authentication_classes = [CustomTokenAuthentication]
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
-
-    if request.method == "POST":
+    def post(self, request: Request, *args, **kwargs) -> Response:
         for field in "title", "weight":
             if not request.data.get(field):
                 return Response(
@@ -53,26 +43,20 @@ def tags_view(request: Request) -> Response:
 
             return Response(status=HTTP_201_CREATED)
 
-        return Response(tag.errors, status=HTTP_400_BAD_REQUEST)
-    elif request.method == "GET":
+    def get(self, request: Request, *args, **kwargs) -> Response:
         return get_response_with_pagination(
             request=request,
             objects=Tag.objects.filter(deleted_at=None),
             serializer=TagsListSerializer,
         )
 
-    return Response(status=HTTP_400_BAD_REQUEST)
 
+class DeleteTag(APIView):
+    authentication_classes = [CustomTokenAuthentication]
 
-@api_view(["DELETE"])
-@require_http_methods(["DELETE"])
-def delete_tag_view(request: Request, tag_id: int) -> Response:
-    """Mark the tag as deleted"""
-
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
-
-    if request.method == "DELETE":
+    def delete(self, request: Request, *args, **kwargs) -> Response:
+        """Mark the tag as deleted"""
+        tag_id = kwargs.get("tag_id")
         if not Tag.objects.filter(id=tag_id).exists():
             return Response(
                 {"detail": "Token doesn't exists"},

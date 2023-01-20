@@ -3,9 +3,9 @@
 from django.urls import path
 
 from console_api.feed.views import (
-    feed_preview_view,
+    FeedPreview,
     FeedView,
-    update_feed_view,
+    FeedUpdate,
 )
 
 
@@ -13,14 +13,14 @@ urlpatterns = [
     # Feed preview
     path(
         "/feed-preview/",
-        feed_preview_view,
+        FeedPreview.as_view(),
         name="feed_preview",
     ),
 
     # Update feed
     path(
         "/<int:feed_id>",
-        update_feed_view,
+        FeedUpdate.as_view(),
         name="change_properties",
     ),
 

@@ -19,8 +19,8 @@ from console_api.services import get_response_with_pagination
 from console_api.services import CustomTokenAuthentication
 
 
-
 class FeedView(APIView):
+    """View for feed creation or get feeds list"""
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]

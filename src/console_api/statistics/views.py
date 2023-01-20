@@ -26,8 +26,6 @@ from console_api.statistics.services import get_objects_data_for_statistics
 from console_api.services import CustomTokenAuthentication
 from console_api.indicator.models import Indicator
 
-from console_api.config.logger_config import logger
-
 
 class FeedsStatisticView(generics.ListAPIView):
     """Statistics for feeds"""

@@ -366,7 +366,7 @@ class ChangeIndicatorTags(APIView):
             return Response(status=status.HTTP_200_OK)
 
         return Response(
-            data={"detail":"Indicator not found"},
+            data={"detail": "Indicator not found"},
             status=status.HTTP_404_NOT_FOUND,
         )
 

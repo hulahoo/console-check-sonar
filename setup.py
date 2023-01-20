@@ -1,5 +1,5 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 
 install_requires = [
     ('Django', '4.0.4'),

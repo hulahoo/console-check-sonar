@@ -92,4 +92,3 @@ class Indicator(models.Model):
         db_table = "indicators"
 
         unique_together = ("ioc_type", "value")
-

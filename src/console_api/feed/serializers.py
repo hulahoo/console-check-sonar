@@ -5,7 +5,7 @@ from rest_framework import serializers
 from console_api.feed.models import Feed
 
 
-class FeedCreateUpdateSerializer(serializers.ModelSerializer):
+class FeedSerializer(serializers.ModelSerializer):
     """Serializer for create and update feed"""
 
     class Meta:

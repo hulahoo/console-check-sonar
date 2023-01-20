@@ -1,6 +1,5 @@
 """Views for users app"""
 
-from datetime import datetime
 from uuid import uuid4, UUID
 
 from rest_framework import status
@@ -17,20 +16,21 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 from console_api.utils.decorators import (
-    require_GET_POST, require_POST_DELETE, require_http_methods
+    require_http_methods, require_POST
 )
 
 from .serializers import AuthTokenSerializer
-from console_api.services import CustomTokenAuthentication
 from console_api.users.models import Token, User
 from console_api.constants import CREDS_ERROR
+from console_api.common.views import CommonAPIView
 from console_api.services import get_hashed_password
+from console_api.services import CustomTokenAuthentication
 
 
-@require_POST_DELETE
-@api_view(["POST", "DELETE"])
+@require_POST
+@api_view(["POST"])
 def user_detail_view(request: Request, user_id: UUID) -> Response:
-    """Change user password and delete user"""
+    """Change user password"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
@@ -63,25 +63,15 @@ def user_detail_view(request: Request, user_id: UUID) -> Response:
         user.password = get_hashed_password(new_pass)
         user.save()
 
-    elif request.method == "DELETE":
-        user.is_active = False
-        user.deleted_at = datetime.now()
-        user.save()
-
-        return Response(status=HTTP_200_OK)
-
     return Response(status=HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST", "GET"])
-@require_GET_POST
-def users_view(request: Request) -> Response:
-    """Create a new user or return list of users"""
+class UserDetail(CommonAPIView):
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+    def post(self, request: Request, *args, **kwargs) -> Response:
 
-    if request.method == "POST":
+        self.custom_authenticate(request=request)
+
         for field in 'login', 'pass-hash', 'full-name', 'role':
             if not request.data.get(field):
                 return Response(
@@ -101,7 +91,10 @@ def users_view(request: Request) -> Response:
 
         return Response(status=HTTP_201_CREATED)
 
-    elif request.method == "GET":
+    def get(self, request: Request, *args, **kwargs) -> Response:
+
+        self.custom_authenticate(request=request)
+
         data = [
             {
                 "id": user.id,
@@ -115,8 +108,6 @@ def users_view(request: Request) -> Response:
         ]
 
         return Response({"results": data}, status=HTTP_200_OK)
-
-    return Response(status=HTTP_400_BAD_REQUEST)
 
 
 class Logout(APIView):
@@ -146,8 +137,8 @@ class CustomAuthTokenView(ObtainAuthToken):
                 user_token = Token.objects.get(user_id=user.pk).key
             else:
                 user_token = uuid4()
-                t = Token.objects.create(key=user_token, user_id=user.pk)
-                t.save()
+                token = Token.objects.create(key=user_token, user_id=user.pk)
+                token.save()
         except Exception as e:
             return Response(
                 {
@@ -175,13 +166,12 @@ def delete_auth_token_view(request: Request, access_token: UUID) -> Response:
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
-    if request.method == "DELETE":
-        if not Token.objects.filter(key=access_token).exists():
-            return Response(
-                {"detail": "Token doesn't exists"},
-                status=HTTP_400_BAD_REQUEST
-            )
+    if not Token.objects.filter(key=access_token).exists():
+        return Response(
+            {"detail": "Token doesn't exists"},
+            status=HTTP_400_BAD_REQUEST
+        )
 
-        Token.objects.get(key=access_token).delete()
+    Token.objects.get(key=access_token).delete()
 
-        return Response(status=HTTP_200_OK)
+    return Response(status=HTTP_200_OK)

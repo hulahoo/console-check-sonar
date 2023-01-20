@@ -4,7 +4,7 @@ from django.urls import path
 
 from console_api.feed.views import (
     feed_preview_view,
-    feeds_view,
+    FeedView,
     update_feed_view,
 )
 
@@ -27,7 +27,7 @@ urlpatterns = [
     # Create feed and get feeds list
     path(
         "",
-        feeds_view,
+        FeedView.as_view(),
         name="feeds_view",
     ),
 ]

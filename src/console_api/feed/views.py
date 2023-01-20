@@ -17,28 +17,24 @@ from rest_framework.status import (
 from console_api.constants import CREDS_ERROR
 from console_api.feed.models import Feed
 from console_api.feed.serializers import (
-    FeedCreateUpdateSerializer,
+    FeedSerializer,
     FeedsListSerializer,
 )
 from console_api.utils.decorators import (
-    require_GET_POST, require_POST, require_safe
+    require_POST, require_safe
 )
 from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
+from console_api.common.views import CommonAPIView
 
 
-@require_GET_POST
-@api_view(["POST", "GET"])
-def feeds_view(request: Request) -> Response:
-    """View for /feeds endpoint"""
+class FeedView(CommonAPIView):
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
-
-    if request.method == "POST":
-        feed = FeedCreateUpdateSerializer(data=request.data)
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        self.custom_authenticate(request=request)
+        feed = FeedSerializer(data=request.data)
 
         if feed.is_valid():
             try:
@@ -49,14 +45,13 @@ def feeds_view(request: Request) -> Response:
             except IntegrityError as e:
                 return Response({"detail": e}, status=HTTP_406_NOT_ACCEPTABLE)
 
-    elif request.method == "GET":
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        self.custom_authenticate(request=request)
         return get_response_with_pagination(
             request=request,
             objects=Feed.objects.all(),
             serializer=FeedsListSerializer,
         )
-
-    return Response(feed.errors, status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -106,7 +101,7 @@ def update_feed_view(request: Request, feed_id: int) -> Response:
         )
 
     feed = Feed.objects.get(id=feed_id)
-    serializer = FeedCreateUpdateSerializer(
+    serializer = FeedSerializer(
         feed,
         data=request.data,
         partial=True,

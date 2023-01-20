@@ -106,6 +106,7 @@ class IndicatorSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "ioc_type",
+            "feeds",
             "value",
             "created_at",
             "updated_at",

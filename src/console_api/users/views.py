@@ -42,7 +42,7 @@ class UserView(APIView):
             return Response(status=status.HTTP_200_OK)
         return Response(
             status=status.HTTP_404_NOT_FOUND,
-            data="User not found"
+            data={"detail": "User not found"},
         )
 
     def post(self, request: Request, user_id: int) -> Response:
@@ -51,7 +51,7 @@ class UserView(APIView):
         if not user:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
-                data="User not found"
+                data={"detail": "User not found"},
             )
 
         for field in 'prev-pass', 'new-pass':

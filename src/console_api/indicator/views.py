@@ -20,7 +20,6 @@ from console_api.services import (
     get_filter_query_param,
     get_response_with_pagination,
 )
-from console_api.common.views import CommonAPIView
 from console_api.indicator.models import Indicator, IndicatorActivities
 from console_api.indicator.serializers import (
     IndicatorListSerializer,
@@ -277,7 +276,7 @@ class IndicatorCreateView(viewsets.ModelViewSet):
         return self.list(request, *args, **kwargs)
 
 
-class MarkIndicatorFalsePositive(CommonAPIView):
+class MarkIndicatorFalsePositive(APIView):
     renderer_classes = JSONRenderer
     authentication_classes = [CustomTokenAuthentication]
 

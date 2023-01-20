@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.request import Request
 from django.db.utils import IntegrityError
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from console_api.feed.models import Feed
 from console_api.feed.serializers import (
@@ -14,11 +15,10 @@ from console_api.feed.serializers import (
     FeedsListSerializer,
 )
 from console_api.services import get_response_with_pagination
-from console_api.common.views import CommonAPIView
 from console_api.services import CustomTokenAuthentication
 
 
-class FeedView(CommonAPIView):
+class FeedView(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
 
@@ -45,7 +45,7 @@ class FeedView(CommonAPIView):
         )
 
 
-class FeedPreview(CommonAPIView):
+class FeedPreview(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
 
@@ -75,7 +75,7 @@ class FeedPreview(CommonAPIView):
         return Response(response.content, status=response.status_code)
 
 
-class FeedUpdate(CommonAPIView):
+class FeedUpdate(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
 

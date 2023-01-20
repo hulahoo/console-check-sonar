@@ -15,7 +15,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 
 from console_api.constants import CREDS_ERROR
-from console_api.feed.models import Feed
+from console_api.feed.models import Feed, IndicatorFeedRelationship
 from console_api.detections.models import Detection
 from console_api.statistics.serializers import FeedsStatisticSerializer
 from console_api.statistics.models import (
@@ -140,3 +140,53 @@ def checked_objects_view(request: Request) -> Union[Response, JsonResponse]:
         )
 
     return JsonResponse(statistics_data)
+
+
+@api_view(("GET",))
+@require_http_methods(["GET"])
+def feeds_intersection_view(request: Request) -> Response:
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+
+    feeds = Feed.objects.filter(is_active=True)
+
+    indicator_ids = {}
+
+    for feed in feeds:
+        indicator_ids[feed.id] = IndicatorFeedRelationship.objects.filter(
+            feed_id=feed.id
+        ).values('indicator_id')
+
+    result = []
+    feed_index = 1
+
+    for feed in feeds:
+        intersections = []
+
+        for intersection_feed in feeds:
+            if not indicator_ids[feed.id]:
+                # empty feed
+                continue
+
+            if intersection_feed.id == feed.id:
+                # intersect with itself
+                intersections.append(100)
+                continue
+
+            intersection_count = len(
+                indicator_ids[feed.id].intersection(indicator_ids[intersection_feed.id])
+            )
+
+            intersections.append(round(
+                intersection_count * 100 / len(indicator_ids[feed.id]), 2
+            ))
+
+        result.append({
+            'feed-index': feed_index,
+            'feed-name': feed.title,
+            'intersections': intersections
+        })
+
+        feed_index += 1
+
+    return Response(status=200, data=result)

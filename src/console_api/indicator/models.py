@@ -190,6 +190,8 @@ class Indicator(models.Model):
 
         db_table = "indicators"
 
+        ordering = ["-created_at"]
+
         unique_together = ("ioc_type", "value")
 
 

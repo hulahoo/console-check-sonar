@@ -10,11 +10,7 @@ from rest_framework.request import Request
 from rest_framework.renderers import JSONRenderer
 
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
-)
+from rest_framework import status
 from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
@@ -286,14 +282,14 @@ class MarkIndicatorFalsePositive(APIView):
         if not Indicator.objects.filter(id=indicator_id).exists():
             return Response(
                 {"detail": f"Indicator with id {indicator_id} doesn't exists"},
-                status=HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         indicator = Indicator.objects.get(id=indicator_id)
         indicator.is_false_positive = True
         indicator.save()
 
-        return Response(status=HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
 
 class IndicatorDetail(APIView):
@@ -305,7 +301,7 @@ class IndicatorDetail(APIView):
         if not Indicator.objects.filter(id=indicator_id).exists():
             return Response(
                 {"detail": f"Indicator with id {indicator_id} doesn't exists"},
-                status=HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         indicator = Indicator.objects.get(id=indicator_id)
@@ -315,7 +311,7 @@ class IndicatorDetail(APIView):
         indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
         return Response(
             IndicatorDetailSerializer(indicator).data,
-            status=HTTP_200_OK,
+            status=status.HTTP_200_OK,
         )
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
@@ -323,7 +319,7 @@ class IndicatorDetail(APIView):
         indicator.deleted_at = datetime.now()
         indicator.save()
 
-        return Response(status=HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
 
 class ChangeIndicatorTags(APIView):
@@ -335,7 +331,7 @@ class ChangeIndicatorTags(APIView):
         if not request.data.get("tags"):
             return Response(
                 {"detail": "Tags not specified"},
-                status=HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         tags = request.data.get("tags")
@@ -347,7 +343,7 @@ class ChangeIndicatorTags(APIView):
         if not all(tag.isdigit() for tag in tags):
             return Response(
                 {"detail": "Tags not valid"},
-                status=HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         new_tags = [int(tag) for tag in tags if tag != ""]
@@ -356,7 +352,7 @@ class ChangeIndicatorTags(APIView):
             if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
                 return Response(
                     {"detail": "Tags wrong"},
-                    status=HTTP_400_BAD_REQUEST,
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             IndicatorTagRelationship.objects.filter(
@@ -369,9 +365,9 @@ class ChangeIndicatorTags(APIView):
                     tag_id=tag,
                 )
 
-            return Response(status=HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
 
-        request.errors = {"detail": "Indicator not found"}
+        return Response(status=status.HTTP_404_NOT_FOUND, data="Indicator not found")
 
 
 class IndicatorAddComment(APIView):
@@ -385,13 +381,13 @@ class IndicatorAddComment(APIView):
         if not Indicator.objects.filter(id=indicator_id).exists():
             return Response(
                 {"error": "Indicator doesn't exists"},
-                status=HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if not request.data.get("details"):
             return Response(
                 {"error": "Details not specified"},
-                status=HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         activity = IndicatorActivities(
@@ -403,4 +399,4 @@ class IndicatorAddComment(APIView):
         )
         activity.save()
 
-        return Response(status=HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)

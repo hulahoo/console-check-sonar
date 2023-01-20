@@ -49,31 +49,38 @@ def indicators_statistic_view(request: Request) -> Response | JsonResponse:
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
-    if request.method == "GET":
-        logger.info("if request.method == 'GET':")
-        types_and_detections_count = defaultdict(int)
+    statistic = defaultdict(dict)
 
-        indicators_and_types = Indicator.objects.values(
-            "id", "ioc_type",
-        ).annotate(tcount=Count("ioc_type")).order_by()
+    indicators = Indicator.objects.values(
+        "id", "ioc_type",
+    ).annotate(tcount=Count("ioc_type")).order_by()
 
-        for indicator in indicators_and_types:
-            indicator_type = indicator["ioc_type"]
-            detections_count = Detection.objects.filter(
-                indicator_id=indicator["id"],
-            ).count()
+    for indicator in indicators:
+        indicator_type = indicator["ioc_type"]
 
-            types_and_detections_count[indicator_type] += detections_count
+        statistic[indicator_type].setdefault('detections_count', 0)
+        statistic[indicator_type].setdefault('checked_count', 0)
 
-        statistic = [
-            {
-                "indicator-type": type_,
-                "detections-count": dcount,
-            }
-            for type_, dcount in types_and_detections_count.items()
-        ]
+        detections_count = Detection.objects.filter(
+            indicator_id=indicator["id"],
+        ).count()
 
-    return JsonResponse(statistic, safe=False)
+        checked_count = StatCheckedObjects.objects.filter(
+            indicator_id=indicator["id"],
+        ).count()
+
+        statistic[indicator_type]['detections_count'] += detections_count
+        statistic[indicator_type]['checked_count'] += checked_count
+
+    result = [
+        {
+            "indicator-type": type_,
+            "detections-count": value['detections_count'],
+            "checked-count": value['checked_count']
+        } for type_, value in statistic.items()
+    ]
+
+    return JsonResponse(result, safe=False)
 
 
 @api_view(("GET",))

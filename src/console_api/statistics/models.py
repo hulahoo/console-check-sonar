@@ -23,6 +23,8 @@ class StatMatchedObjects(models.Model):
 class StatCheckedObjects(models.Model):
     """stat_checked_objects table"""
 
+    indicator_id = models.UUIDField()
+
     created_at = models.DateTimeField(
         "Дата и время создания",
         auto_now_add=True,

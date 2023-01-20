@@ -37,7 +37,6 @@ class FeedView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
-        self.custom_authenticate(request=request)
         return get_response_with_pagination(
             request=request,
             objects=Feed.objects.all(),

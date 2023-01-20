@@ -17,6 +17,7 @@ class StatMatchedObjects(models.Model):
         """Metainformation about the model"""
 
         db_table = "stat_matched_objects"
+        ordering = ["-created_at"]
 
 
 class StatCheckedObjects(models.Model):
@@ -31,3 +32,4 @@ class StatCheckedObjects(models.Model):
         """Metainformation about the model"""
 
         db_table = "stat_checked_objects"
+        ordering = ["-created_at"]

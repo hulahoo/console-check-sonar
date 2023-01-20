@@ -49,7 +49,7 @@ class Tag(models.Model):
 
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
-
+        ordering = ["-created_at"]
         db_table = "tags"
 
 

@@ -9,6 +9,7 @@ from console_api.feed.models import Feed, IndicatorFeedRelationship
 
 CREATED_AT = "Дата и время создания"
 
+
 class DetectionTagRelationship(models.Model):
     """Custom ManyToMany relationship table for Detection and Tag"""
 
@@ -115,7 +116,7 @@ class Detection(models.Model):
 
         verbose_name = "Обнаружение"
         verbose_name_plural = "Обнаружения"
-
+        ordering = ["-created_at"]
         db_table = "detections"
 
 

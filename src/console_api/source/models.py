@@ -110,5 +110,5 @@ class Source(models.Model):
 
         verbose_name = "Источник"
         verbose_name_plural = "Источники"
-
+        ordering = ["-created_at"]
         db_table = "sources"

@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.renderers import JSONRenderer
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -19,7 +18,6 @@ from console_api.services import (
 from console_api.indicator.models import Indicator, IndicatorActivities
 from console_api.indicator.serializers import (
     IndicatorListSerializer,
-    IndicatorDetailSerializer,
     IndicatorSerializer,
 )
 from console_api.tag.models import IndicatorTagRelationship, Tag
@@ -273,7 +271,6 @@ class IndicatorCreateView(viewsets.ModelViewSet):
 
 
 class MarkIndicatorFalsePositive(APIView):
-    renderer_classes = JSONRenderer
     authentication_classes = [CustomTokenAuthentication]
 
     def patch(self, request: Request, *args, **kwargs) -> Response:
@@ -294,7 +291,6 @@ class MarkIndicatorFalsePositive(APIView):
 
 class IndicatorDetail(APIView):
 
-    renderer_classes = JSONRenderer
     authentication_classes = [CustomTokenAuthentication]
 
     def get_indicator_detail(self, *, indicator_id) -> Indicator:
@@ -309,8 +305,9 @@ class IndicatorDetail(APIView):
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
+        serialized_data = IndicatorSerializer(instance=indicator).data
         return Response(
-            IndicatorDetailSerializer(indicator).data,
+            data=serialized_data,
             status=status.HTTP_200_OK,
         )
 
@@ -323,7 +320,6 @@ class IndicatorDetail(APIView):
 
 
 class ChangeIndicatorTags(APIView):
-    renderer_classes = JSONRenderer
     authentication_classes = [CustomTokenAuthentication]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
@@ -371,7 +367,6 @@ class ChangeIndicatorTags(APIView):
 
 
 class IndicatorAddComment(APIView):
-    renderer_classes = JSONRenderer
     authentication_classes = [CustomTokenAuthentication]
 
     def post(self, request: Request, *args, **kwargs) -> Response:

@@ -110,7 +110,7 @@ class IndicatorSerializer(serializers.ModelSerializer):
             "value",
             "created_at",
             "updated_at",
-            "ioc_weight",
+            "weight",
             "tags",
             "tags_weight",
         ]

@@ -153,18 +153,8 @@ class CustomAuthTokenView(ObtainAuthToken):
                 user_token = uuid4()
                 token = Token.objects.create(key=user_token, user_id=user.pk)
                 token.save()
-        except Exception as e:
-            return Response(
-                {
-                    'errors': [
-                        {
-                            key: value[0]
-                            for key, value in e.args[0]
-                        }
-                    ]
-                },
-                status=HTTP_400_BAD_REQUEST,
-            )
+        except Exception as error:
+            return Response({"detail": error}, status=HTTP_400_BAD_REQUEST)
 
         return Response({
             'access-token': user_token,

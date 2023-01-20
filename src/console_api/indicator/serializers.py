@@ -17,7 +17,7 @@ class TagSerializer(serializers.ModelSerializer):
 class FeedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed
-        fields = ["name"]
+        fields = ["title"]
         exclude = []
 
 

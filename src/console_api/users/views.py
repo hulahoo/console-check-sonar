@@ -26,6 +26,7 @@ from console_api.services import CustomTokenAuthentication
 class UserView(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, user_id: int) -> Optional[User]:
         try:
@@ -84,6 +85,7 @@ class UserView(APIView):
 class UserDetail(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
 
@@ -172,6 +174,7 @@ class CustomAuthTokenView(ObtainAuthToken):
 
 class DeleteAuthToken(APIView):
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
         """Delete token"""

@@ -8,6 +8,7 @@ from rest_framework.request import Request
 from django.db.utils import IntegrityError
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from console_api.feed.models import Feed
 from console_api.feed.serializers import (
@@ -18,9 +19,11 @@ from console_api.services import get_response_with_pagination
 from console_api.services import CustomTokenAuthentication
 
 
+
 class FeedView(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
 
@@ -47,6 +50,7 @@ class FeedView(APIView):
 class FeedPreview(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, *args, **kwargs) -> Response:
 
@@ -77,6 +81,7 @@ class FeedPreview(APIView):
 class FeedUpdate(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         feed_id = kwargs.get("feed_id")

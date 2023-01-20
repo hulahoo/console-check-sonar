@@ -272,6 +272,7 @@ class IndicatorCreateView(viewsets.ModelViewSet):
 
 class MarkIndicatorFalsePositive(APIView):
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
@@ -292,6 +293,7 @@ class MarkIndicatorFalsePositive(APIView):
 class IndicatorDetail(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_indicator_detail(self, *, indicator_id) -> Indicator:
         if not Indicator.objects.filter(id=indicator_id).exists():
@@ -321,6 +323,7 @@ class IndicatorDetail(APIView):
 
 class ChangeIndicatorTags(APIView):
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
@@ -368,6 +371,7 @@ class ChangeIndicatorTags(APIView):
 
 class IndicatorAddComment(APIView):
     authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         """Change tags list for the indicator"""

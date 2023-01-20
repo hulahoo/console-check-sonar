@@ -97,20 +97,55 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
         }
 
 
-class IndicatorSerializer(serializers.ModelSerializer):
-    tags = TagSerializer()
-    feeds = FeedSerializer()
+class IndicatorCreateSerializer(serializers.ModelSerializer):
+    """Serializer for indicator creation"""
 
     class Meta:
+        """Metainformation about the serializer"""
+
         model = Indicator
+
+        fields = [
+            "ioc-type",
+            "value",
+            "context",
+            "tags",
+        ]
+
+        extra_kwargs = {
+            "ioc-type": {"source": "ioc_type"},
+        }
+
+
+class IndicatorDetailSerializer(serializers.ModelSerializer):
+    """Serializer for detail indiactor"""
+
+    class Meta:
+        """Metainformation about the serializer"""
+
+        model = Indicator
+
         fields = [
             "id",
-            "ioc_type",
-            "feeds",
+            "ioc-type",
             "value",
-            "created_at",
-            "updated_at",
-            "weight",
+            "context",
+            "created-at",
+            "updated-at",
+            "ioc-weight",
             "tags",
-            "tags_weight",
+            "tags-weight",
+            "external-source-link",
+            "feeds",
+            "activities",
         ]
+
+        extra_kwargs = {
+            "ioc-type": {"source": "ioc_type"},
+            "created-at": {"source": "created_at"},
+            "updated-at": {"source": "updated_at"},
+            "tags": {"source": "tags_ids"},
+            "ioc-weight": {"source": "weight"},
+            "tags-weight": {"source": "tags_weight"},
+            "external-source-link": {"source": "external_source_link"},
+        }

@@ -17,8 +17,9 @@ from console_api.services import (
 )
 from console_api.indicator.models import Indicator, IndicatorActivities
 from console_api.indicator.serializers import (
+    IndicatorCreateSerializer,
+    IndicatorDetailSerializer,
     IndicatorListSerializer,
-    IndicatorSerializer,
 )
 from console_api.tag.models import IndicatorTagRelationship, Tag
 from console_api.feed.models import IndicatorFeedRelationship, Feed
@@ -254,7 +255,7 @@ class IndicatorCreateView(viewsets.ModelViewSet):
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = IndicatorSerializer
+    serializer_class = IndicatorCreateSerializer
     queryset = Indicator.objects.all()
 
     def create(self, request, *args, **kwargs):
@@ -270,7 +271,9 @@ class IndicatorCreateView(viewsets.ModelViewSet):
         return self.list(request, *args, **kwargs)
 
 
-class MarkIndicatorFalsePositive(APIView):
+class MarkIndicatorAsFalsePositiveView(APIView):
+    """Mark the indicator as false positive"""
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -306,7 +309,7 @@ class IndicatorDetail(APIView):
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
-        serialized_data = IndicatorSerializer(instance=indicator).data
+        serialized_data = IndicatorDetailSerializer(instance=indicator).data
         return Response(
             data=serialized_data,
             status=status.HTTP_200_OK,

@@ -7,7 +7,7 @@ from console_api.indicator.views import (
     ChangeIndicatorTags,
     IndicatorDetail,
     IndicatorListView,
-    MarkIndicatorFalsePositive,
+    MarkIndicatorAsFalsePositiveView,
 )
 
 
@@ -34,7 +34,7 @@ urlpatterns = [
 
     path(
         "/<uuid:indicator_id>/as_false_positive",
-        MarkIndicatorFalsePositive.as_view(),
+        MarkIndicatorAsFalsePositiveView.as_view(),
         name="indicator_as_false_positive",
     ),
 

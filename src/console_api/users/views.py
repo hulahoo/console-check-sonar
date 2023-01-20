@@ -1,55 +1,71 @@
 """Views for users app"""
 
-from uuid import uuid4, UUID
+from datetime import datetime
+from typing import Optional
+from uuid import uuid4
 
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
+
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-    HTTP_403_FORBIDDEN,
-)
-from console_api.utils.decorators import (
-    require_POST
 )
 
 from .serializers import AuthTokenSerializer
 from console_api.users.models import Token, User
-from console_api.constants import CREDS_ERROR
 from console_api.common.views import CommonAPIView
 from console_api.services import get_hashed_password
 from console_api.services import CustomTokenAuthentication
 
 
-@require_POST
-@api_view(["POST"])
-def user_detail_view(request: Request, user_id: UUID) -> Response:
-    """Change user password"""
+class UserView(APIView):
 
-    if not CustomTokenAuthentication().authenticate(request):
-        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+    authentication_classes = [CustomTokenAuthentication]
 
-    if not User.objects.filter(id=user_id).exists():
+    def get_object(self, user_id: int) -> Optional[User]:
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None
+
+    def delete(self, request: Request, *args, **kwargs) -> Response:
+        user = self.get_object(user_id=kwargs.pop("user_id"))
+        if user:
+            user.deleted_at = datetime.now()
+            user.save()
+            return Response(status=status.HTTP_200_OK)
         return Response(
-            {"detail": "User does not exist"},
-            status=HTTP_400_BAD_REQUEST,
+            status=status.HTTP_404_NOT_FOUND,
+            data="User not found"
         )
 
-    user = User.objects.get(id=user_id)
+    def post(self, request: Request, user_id: int) -> Response:
+        user = self.get_object(user_id=user_id)
 
-    if request.method == "POST":
+        if not user:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data="User not found"
+            )
+
         for field in 'prev-pass', 'new-pass':
             if not request.data.get(field):
                 return Response(
                     {"detail": f"{field} not specified"},
                     status=HTTP_400_BAD_REQUEST,
                 )
+
+        if not User.objects.filter(id=user_id).exists():
+            return Response(
+                {"detail": "User does not exist"},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
         prev_pass = request.data.get("prev-pass")
         new_pass = request.data.get("new-pass")
@@ -63,15 +79,14 @@ def user_detail_view(request: Request, user_id: UUID) -> Response:
         user.password = get_hashed_password(new_pass)
         user.save()
 
-    return Response(status=HTTP_400_BAD_REQUEST)
+        return Response(status=HTTP_200_OK)
 
 
 class UserDetail(CommonAPIView):
 
-    def post(self, request: Request, *args, **kwargs) -> Response:
+    authentication_classes = [CustomTokenAuthentication]
 
-        if auth_result := self.custom_authenticate(request=request) is not None:
-            return auth_result
+    def post(self, request: Request, *args, **kwargs) -> Response:
 
         for field in 'login', 'pass-hash', 'full-name', 'role':
             if not request.data.get(field):
@@ -93,10 +108,6 @@ class UserDetail(CommonAPIView):
         return Response(status=HTTP_201_CREATED)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
-
-        if auth_result := self.custom_authenticate(request=request) is not None:
-            return auth_result
-
         data = [
             {
                 "id": user.id,
@@ -147,7 +158,7 @@ class CustomAuthTokenView(ObtainAuthToken):
                     'errors': [
                         {
                             key: value[0]
-                            for key, value in e.detail.items()
+                            for key, value in e.args[0]
                         }
                     ]
                 },

@@ -18,7 +18,6 @@ urlpatterns = [
         IndicatorListView.as_view(),
         name="indicator_list",
     ),
-
     # Change tags for the indicator
     path(
         "/<uuid:indicator_id>/change/tags",

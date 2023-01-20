@@ -19,7 +19,6 @@ from rest_framework.status import (
 
 from .serializers import AuthTokenSerializer
 from console_api.users.models import Token, User
-from console_api.common.views import CommonAPIView
 from console_api.services import get_hashed_password
 from console_api.services import CustomTokenAuthentication
 
@@ -82,7 +81,7 @@ class UserView(APIView):
         return Response(status=HTTP_200_OK)
 
 
-class UserDetail(CommonAPIView):
+class UserDetail(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
 

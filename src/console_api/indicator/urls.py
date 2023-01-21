@@ -1,23 +1,21 @@
 """Urls for indicator app"""
 
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
 from console_api.indicator.views import (
     IndicatorAddComment,
     ChangeIndicatorTags,
     IndicatorDetail,
-    IndicatorListView,
+    IndicatorView,
     MarkIndicatorAsFalsePositiveView,
 )
 
+router = DefaultRouter()
+router.register("", IndicatorView)
+
 
 urlpatterns = [
-    # Indicators list
-    path(
-        "",
-        IndicatorListView.as_view(),
-        name="indicator_list",
-    ),
     # Change tags for the indicator
     path(
         "/<uuid:indicator_id>/change/tags",
@@ -45,3 +43,5 @@ urlpatterns = [
         name="indicator_detail",
     ),
 ]
+
+urlpatterns += router.urls

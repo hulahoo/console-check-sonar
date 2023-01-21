@@ -1,0 +1,1 @@
+from console_api.mixins.query import IndicatorQueryMixin # noqa

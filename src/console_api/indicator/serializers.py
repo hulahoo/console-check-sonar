@@ -1,10 +1,14 @@
 """Serializers for indicator app"""
 
+from typing import List
+
+from rest_framework import status
 from rest_framework import serializers
 
-from console_api.feed.models import Feed, IndicatorFeedRelationship
-from console_api.tag.models import Tag
 from console_api.indicator.models import Indicator
+from console_api.config.logger_config import logger
+from console_api.tag.models import Tag, IndicatorTagRelationship
+from console_api.feed.models import Feed, IndicatorFeedRelationship
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -97,55 +101,29 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
         }
 
 
-class IndicatorCreateSerializer(serializers.ModelSerializer):
+class IndicatorCreateSerializer(serializers.Serializer):
     """Serializer for indicator creation"""
+    tags = serializers.ListField(
+        child=serializers.IntegerField(min_value=0, required=True)
+    )
+    ioc_type = serializers.CharField(max_length=32, required=True)
+    value = serializers.CharField(max_length=1024, required=True)
+    context = serializers.JSONField(required=True)
 
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = Indicator
-
-        fields = [
-            "ioc-type",
-            "value",
-            "context",
-            "tags",
-        ]
-
-        extra_kwargs = {
-            "ioc-type": {"source": "ioc_type"},
-        }
-
-
-class IndicatorDetailSerializer(serializers.ModelSerializer):
-    """Serializer for detail indiactor"""
-
-    class Meta:
-        """Metainformation about the serializer"""
-
-        model = Indicator
-
-        fields = [
-            "id",
-            "ioc-type",
-            "value",
-            "context",
-            "created-at",
-            "updated-at",
-            "ioc-weight",
-            "tags",
-            "tags-weight",
-            "external-source-link",
-            "feeds",
-            "activities",
-        ]
-
-        extra_kwargs = {
-            "ioc-type": {"source": "ioc_type"},
-            "created-at": {"source": "created_at"},
-            "updated-at": {"source": "updated_at"},
-            "tags": {"source": "tags_ids"},
-            "ioc-weight": {"source": "weight"},
-            "tags-weight": {"source": "tags_weight"},
-            "external-source-link": {"source": "external_source_link"},
-        }
+    def create(self, validated_data):
+        tags_id_list = validated_data.pop("tags")
+        tags: List[Tag] = Tag.objects.filter(pk__in=tags_id_list)
+        logger.info(f"Retrieved tags: {tags}")
+        if len(tags) != len(tags_id_list):
+            raise serializers.ValidationError(
+                detail={"data": "No tags found with provided ids"},
+                code=status.HTTP_400_BAD_REQUEST
+            )
+        indicator = Indicator.objects.create(**validated_data)
+        logger.info(f"Created indicator: {indicator.id}")
+        for tag in tags:
+            IndicatorTagRelationship.objects.create(
+                indicator_id=indicator.id,
+                tag_id=tag.id
+            )
+        return indicator

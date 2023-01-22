@@ -8,6 +8,7 @@ from console_api.indicator.views import (
     ChangeIndicatorTags,
     IndicatorDetail,
     IndicatorView,
+    IndicatorIsSendToDections,
     MarkIndicatorAsFalsePositiveView,
 )
 
@@ -41,6 +42,11 @@ urlpatterns = [
         "/<uuid:indicator_id>",
         IndicatorDetail.as_view(),
         name="indicator_detail",
+    ),
+    path(
+        "/<uuid:indicator_id>/is_sending_to_detections",
+        IndicatorIsSendToDections.as_view(),
+        name="indicator_is_send_to_detecions",
     ),
 ]
 

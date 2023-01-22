@@ -1,5 +1,6 @@
 """Views for detections app"""
 
+from uuid import UUID
 from datetime import datetime
 
 from rest_framework import viewsets
@@ -12,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from console_api.mixins import IndicatorQueryMixin
+from console_api.config.logger_config import logger
 from console_api.services import CustomTokenAuthentication
 from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.indicator.models import Indicator, IndicatorActivities
@@ -223,3 +225,43 @@ class IndicatorAddComment(APIView):
         activity.save()
 
         return Response(status=status.HTTP_201_CREATED)
+
+
+class IndicatorIsSendToDections(APIView):
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def create_indicator_activity(*, indicator_id: UUID, activity_type: str, user_id: int) -> IndicatorActivities:
+        activity = IndicatorActivities(
+            indicator_id=indicator_id,
+            activity_type=activity_type,
+            created_by=user_id
+        )
+        activity.save()
+        return activity
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        indicator_id = kwargs.get("indicator_id")
+        if not Indicator.objects.filter(id=indicator_id).exists():
+            return Response(
+                {"error": "Indicator doesn't exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        indicator = Indicator.objects.get(id=indicator_id)
+        cuurent_value = indicator.is_sending_to_detections
+        if cuurent_value:
+            indicator.is_sending_to_detections = False
+        else:
+            indicator.is_sending_to_detections = True
+        indicator.save()
+        activity = self.create_indicator_activity(
+            indicator_id=indicator.id,
+            activity_type="Change is_sending_to_detections field",
+            user_id=request.user.id
+        )
+        logger.info(f"Created indicator activity: {activity.id}")
+        return Response(
+            data={"data": "is_sending_to_detections changed"},
+            status=status.HTTP_200_OK,
+        )

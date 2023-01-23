@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 
 from console_api.indicator.views import (
     IndicatorAddComment,
-    ChangeIndicatorTags,
+    ChangeIndicatorTagsView,
     IndicatorDetail,
     IndicatorView,
     IndicatorIsSendingToDetectionsView,
@@ -20,7 +20,7 @@ urlpatterns = [
     # Change tags for the indicator
     path(
         "/<uuid:indicator_id>/change/tags",
-        ChangeIndicatorTags.as_view(),
+        ChangeIndicatorTagsView.as_view(),
         name="indicator_change_tags",
     ),
 

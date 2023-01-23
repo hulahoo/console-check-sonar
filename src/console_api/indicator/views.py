@@ -144,7 +144,22 @@ class IndicatorDetail(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class ChangeIndicatorTags(APIView):
+def create_indicator_activity(data: dict) -> None:
+    """Create IndicatorActivities object"""
+
+    activity = IndicatorActivities(
+        indicator_id=data.get("indicator_id"),
+        activity_type=data.get("activity_type"),
+        created_by=data.get("created_by"),
+    )
+    activity.save()
+
+    logger.info(f"Created indicator activity: {activity.id}")
+
+
+class ChangeIndicatorTagsView(APIView):
+    """Change tags for the indicator"""
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -186,6 +201,12 @@ class ChangeIndicatorTags(APIView):
                     indicator_id=indicator_id,
                     tag_id=tag,
                 )
+
+            create_indicator_activity({
+                "indicator_id": indicator_id,
+                "activity_type": "update-tags",
+                "created_by": request.user.id,
+            })
 
             return Response(status=status.HTTP_200_OK)
 
@@ -231,16 +252,6 @@ class IndicatorIsSendingToDetectionsView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def create_indicator_activity(*, indicator_id: UUID, activity_type: str, user_id: int) -> IndicatorActivities:
-        activity = IndicatorActivities(
-            indicator_id=indicator_id,
-            activity_type=activity_type,
-            created_by=user_id
-        )
-        activity.save()
-        return activity
-
     def post(self, request: Request, *args, **kwargs) -> Response:
         value: bool = request.data.get("value")
         if not value:
@@ -257,12 +268,13 @@ class IndicatorIsSendingToDetectionsView(APIView):
         indicator = Indicator.objects.get(id=indicator_id)
         indicator.is_sending_to_detections = value
         indicator.save()
-        activity = self.create_indicator_activity(
-            indicator_id=indicator.id,
-            activity_type="Change is_sending_to_detections field",
-            user_id=request.user.id
-        )
-        logger.info(f"Created indicator activity: {activity.id}")
+
+        create_indicator_activity({
+            "indicator_id": indicator.id,
+            "activity_type": "Change is_sending_to_detections field",
+            "created_by": request.user.id,
+        })
+
         return Response(
             data={"data": "is_sending_to_detections changed"},
             status=status.HTTP_200_OK,

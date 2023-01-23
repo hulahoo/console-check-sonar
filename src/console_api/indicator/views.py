@@ -1,6 +1,5 @@
 """Views for detections app"""
 
-from uuid import UUID
 from datetime import datetime
 
 from rest_framework import viewsets
@@ -22,6 +21,19 @@ from console_api.indicator.serializers import (
     IndicatorDetailSerializer,
     IndicatorListSerializer,
 )
+
+
+def create_indicator_activity(data: dict) -> None:
+    """Create IndicatorActivities object"""
+
+    activity = IndicatorActivities(
+        indicator_id=data.get("indicator_id"),
+        activity_type=data.get("activity_type"),
+        created_by=data.get("created_by"),
+    )
+    activity.save()
+
+    logger.info(f"Created indicator activity: {activity.id}")
 
 
 class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
@@ -111,6 +123,12 @@ class MarkIndicatorAsFalsePositiveView(APIView):
         indicator.is_false_positive = True
         indicator.save()
 
+        create_indicator_activity({
+            "indicator_id": indicator_id,
+            "activity_type": "mark-as-false-positive",
+            "created_by": request.user.id,
+        })
+
         return Response(status=status.HTTP_200_OK)
 
 
@@ -142,19 +160,6 @@ class IndicatorDetail(APIView):
         indicator.save()
 
         return Response(status=status.HTTP_200_OK)
-
-
-def create_indicator_activity(data: dict) -> None:
-    """Create IndicatorActivities object"""
-
-    activity = IndicatorActivities(
-        indicator_id=data.get("indicator_id"),
-        activity_type=data.get("activity_type"),
-        created_by=data.get("created_by"),
-    )
-    activity.save()
-
-    logger.info(f"Created indicator activity: {activity.id}")
 
 
 class ChangeIndicatorTagsView(APIView):

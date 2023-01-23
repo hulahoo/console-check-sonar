@@ -83,6 +83,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "created-at",
             "updated-at",
             "ioc-weight",
+            "is-sending-to-detections",
             "tags",
             "tags-weight",
             "external-source-link",
@@ -92,6 +93,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             "ioc-type": {"source": "ioc_type"},
+            "is-sending-to-detections": {"source": "is_sending_to_detections"},
             "created-at": {"source": "created_at"},
             "updated-at": {"source": "updated_at"},
             "ioc-weight": {"source": "weight"},

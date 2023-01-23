@@ -242,6 +242,12 @@ class IndicatorIsSendToDections(APIView):
         return activity
 
     def post(self, request: Request, *args, **kwargs) -> Response:
+        value: bool = request.data.get("value")
+        if not value:
+            return Response(
+                {"error": "No value provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         indicator_id = kwargs.get("indicator_id")
         if not Indicator.objects.filter(id=indicator_id).exists():
             return Response(
@@ -249,11 +255,7 @@ class IndicatorIsSendToDections(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         indicator = Indicator.objects.get(id=indicator_id)
-        cuurent_value = indicator.is_sending_to_detections
-        if cuurent_value:
-            indicator.is_sending_to_detections = False
-        else:
-            indicator.is_sending_to_detections = True
+        indicator.is_sending_to_detections = value
         indicator.save()
         activity = self.create_indicator_activity(
             indicator_id=indicator.id,

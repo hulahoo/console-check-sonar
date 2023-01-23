@@ -54,6 +54,7 @@ class IndicatorListSerializer(serializers.ModelSerializer):
             "tags",
             "tags-weight",
             "feed-names",
+            "is-false-positive"
         ]
 
         extra_kwargs = {
@@ -62,6 +63,7 @@ class IndicatorListSerializer(serializers.ModelSerializer):
             "updated-at": {"source": "updated_at"},
             "ioc-weight": {"source": "weight"},
             "tags": {"source": "tags_ids"},
+            "is-false-positive": {"source": "is_false_positive"},
             "tags-weight": {"source": "tags_weight"},
             "feed-names": {"source": "feeds_names"},
         }

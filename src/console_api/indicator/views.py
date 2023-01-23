@@ -227,7 +227,7 @@ class IndicatorAddComment(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class IndicatorIsSendToDections(APIView):
+class IndicatorIsSendingToDetectionsView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 

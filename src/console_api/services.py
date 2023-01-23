@@ -24,7 +24,11 @@ class CustomTokenAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
         if token := request.META.get('HTTP_AUTHORIZATION'):
-            token = token.split()[1]
+            token = token.split()
+            if len(token) > 1:
+                token = token[1]
+            else:
+                return None
 
             if not Token.objects.filter(key=token).exists():
                 return None

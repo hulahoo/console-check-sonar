@@ -27,9 +27,11 @@ def create_indicator_activity(data: dict) -> None:
     """Create IndicatorActivities object"""
 
     activity = IndicatorActivities(
+        id=IndicatorActivities.objects.order_by("id").last().id + 1,
         indicator_id=data.get("indicator_id"),
         activity_type=data.get("activity_type"),
         created_by=data.get("created_by"),
+        details=data.get("details"),
     )
     activity.save()
 
@@ -127,6 +129,7 @@ class MarkIndicatorAsFalsePositiveView(APIView):
             "indicator_id": indicator_id,
             "activity_type": "mark-as-false-positive",
             "created_by": request.user.id,
+            "details": request.data.get("details"),
         })
 
         return Response(status=status.HTTP_200_OK)
@@ -211,6 +214,7 @@ class ChangeIndicatorTagsView(APIView):
                 "indicator_id": indicator_id,
                 "activity_type": "update-tags",
                 "created_by": request.user.id,
+                "details": request.data.get("details"),
             })
 
             return Response(status=status.HTTP_200_OK)
@@ -241,14 +245,12 @@ class IndicatorAddComment(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        activity = IndicatorActivities(
-            id=IndicatorActivities.objects.order_by("id").last().id + 1,
-            indicator_id=indicator_id,
-            activity_type="add-comment",
-            details=request.data.get("details"),
-            created_by=request.data.get("created-by"),
-        )
-        activity.save()
+        create_indicator_activity({
+            "indicator_id": indicator_id,
+            "activity_type": "Change is_sending_to_detections field",
+            "created_by": request.user.id,
+            "details": request.data.get("details"),
+        })
 
         return Response(status=status.HTTP_201_CREATED)
 
@@ -278,6 +280,7 @@ class IndicatorIsSendingToDetectionsView(APIView):
             "indicator_id": indicator.id,
             "activity_type": "Change is_sending_to_detections field",
             "created_by": request.user.id,
+            "details": request.data.get("details"),
         })
 
         return Response(

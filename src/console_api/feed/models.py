@@ -18,6 +18,8 @@ FEED_FORMAT = (
     ("csv", "csv"),
     ("txt", "txt"),
     ("xml", "xml"),
+    ("txt", "txt"),
+    ("csv", "csv")
 )
 
 

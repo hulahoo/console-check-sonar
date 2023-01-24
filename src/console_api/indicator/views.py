@@ -55,9 +55,6 @@ class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
 
         self.queryset = self.get_queryset()
 
-        if not self.queryset:
-            return JsonResponse({"data": []})
-
         self.add_queryset_filters(request=request)
         self.add_counter_queryset_filters(request=request)
         self.add_boolean_filters(request=request)

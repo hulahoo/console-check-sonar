@@ -2,18 +2,18 @@
 
 from datetime import datetime
 
+from rest_framework import status
 from rest_framework import viewsets
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from console_api.services import get_response_with_pagination
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
 
 from console_api.mixins import IndicatorQueryMixin
 from console_api.config.logger_config import logger
 from console_api.services import CustomTokenAuthentication
+from console_api.services import get_response_with_pagination
 from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.indicator.models import Indicator, IndicatorActivities
 from console_api.indicator.serializers import (

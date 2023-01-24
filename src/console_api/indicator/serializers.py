@@ -125,6 +125,7 @@ class IndicatorCreateSerializer(serializers.Serializer):
                 detail={"data": "No tags found with provided ids"},
                 code=status.HTTP_400_BAD_REQUEST
             )
+        validated_data["tags_weight"] = sum([tag.weight for tag in tags])
         indicator = Indicator.objects.create(**validated_data)
         logger.info(f"Created indicator: {indicator.id}")
         for tag in tags:

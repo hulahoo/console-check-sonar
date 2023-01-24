@@ -30,7 +30,7 @@ urlpatterns = [
         IndicatorAddComment.as_view(),
         name="add_comment",
     ),
-
+    # Mark as_false_positive
     path(
         "/<uuid:indicator_id>/as_false_positive",
         MarkIndicatorAsFalsePositiveView.as_view(),
@@ -43,6 +43,7 @@ urlpatterns = [
         IndicatorDetail.as_view(),
         name="indicator_detail",
     ),
+    # Indicator is_sending_to_detections
     path(
         "/<uuid:indicator_id>/is_sending_to_detections",
         IndicatorIsSendingToDetectionsView.as_view(),

@@ -18,6 +18,16 @@ from console_api.users.models import User, Token
 def get_indicator_logging_data(indicator) -> dict:
     """Return indicator data for logging"""
 
+    if indicator.first_detected_at:
+        first_detected_at = str(indicator.first_detected_at)
+    else:
+        first_detected_at = indicator.first_detected_at
+
+    if indicator.last_detected_at:
+        last_detected_at = str(indicator.last_detected_at)
+    else:
+        last_detected_at = indicator.last_detected_at
+
     return {
         "ioc_type": indicator.ioc_type,
         "value": indicator.value,
@@ -32,8 +42,8 @@ def get_indicator_logging_data(indicator) -> dict:
         "false_detected_counter": indicator.false_detected_counter,
         "positive_detected_counter": indicator.positive_detected_counter,
         "total_detected_counter": indicator.total_detected_counter,
-        "first_detected_at": str(indicator.first_detected_at) if indicator.first_detected_at else indicator.first_detected_at,
-        "first_detected_at": str(indicator.first_detected_at) if indicator.first_detected_at else indicator.first_detected_at,
+        "first_detected_at": first_detected_at,
+        "last_detected_at": last_detected_at,
         "created_by": indicator.created_by,
         "external_source_link": indicator.external_source_link,
         "created_at": str(indicator.created_at) if indicator.created_at else indicator.created_at,

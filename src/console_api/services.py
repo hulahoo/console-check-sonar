@@ -10,7 +10,41 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import SerializerMetaclass
 
+from console_api.audit_logs.models import AuditLogs
 from console_api.users.models import User, Token
+
+
+def create_audit_log_entry(request: Request, data: dict) -> None:
+    """Create an entry to audit_logs table for user's action"""
+
+    if User.objects.filter(id=request.user.id):
+        user_name = User.objects.get(id=request.user.id)
+    else:
+        user_name = None
+
+    if AuditLogs.objects.count() == 0:
+        new_id = 1
+    else:
+        new_id = AuditLogs.objects.order_by("id").last().id + 1
+
+    AuditLogs.objects.create(
+        id=new_id,
+        service_name=f"Console API {data.get('table', '')}",
+        user_id=request.user.id,
+        user_name=user_name,
+        event_type=data.get("event_type"),
+        object_type=data.get("object_type"),
+        object_name=data.get("object_name"),
+        description=data.get("description"),
+        prev_value=data.get("prev_value"),
+        new_value=data.get("new_value"),
+        context={
+            "User Agent": request.META.get("HTTP_USER_AGENT"),
+            "URL": request.META.get("RAW_URI"),
+            "IP": request.META.get("REMOTE_ADDR"),
+            "Protocol": request.META.get("SERVER_PROTOCOL"),
+        },
+    )
 
 
 def get_hashed_password(password: str):
@@ -23,7 +57,7 @@ class CustomTokenAuthentication(BaseAuthentication):
     """Custom token authentication class"""
 
     def authenticate(self, request):
-        if token := request.META.get('HTTP_AUTHORIZATION'):
+        if token := request.META.get("HTTP_AUTHORIZATION"):
             token = token.split()
             if len(token) > 1:
                 token = token[1]
@@ -66,10 +100,10 @@ def get_response_with_pagination(
 def _get_page_size(request: Request) -> int:
     """Return page size for pagination"""
 
-    page_size = request.GET.get('page-size')
+    page_size = request.GET.get("page-size")
 
     if not page_size or int(page_size) <= 0:
-        page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+        page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
 
     return int(page_size)
 
@@ -77,4 +111,4 @@ def _get_page_size(request: Request) -> int:
 def get_filter_query_param(request, field: str) -> str:
     """Return filter query parameter for the field"""
 
-    return request.GET.get(f'filter[{field}]')
+    return request.GET.get(f"filter[{field}]")

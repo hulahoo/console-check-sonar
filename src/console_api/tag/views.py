@@ -16,23 +16,23 @@ from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
-from console_api.services import create_audit_log_entry
+from console_api.services import create_audit_log_entry, get_not_fields_error
 from console_api.tag.models import Tag
 from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 from console_api.tag.services import get_new_tag_id
 
 
 class TagsView(APIView):
+    """Create a new tag or return list of tags"""
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
-        for field in "title", "weight":
-            if not request.data.get(field):
-                return Response(
-                    {"detail": f"{field} not specified"},
-                    status=HTTP_400_BAD_REQUEST,
-                )
+        """Create a new tag"""
+
+        if error_400 := get_not_fields_error(request, ("title", "weight")):
+            return error_400
 
         tag_data = {
             "id": get_new_tag_id(),
@@ -58,6 +58,8 @@ class TagsView(APIView):
         return Response(tag.errors, status=HTTP_400_BAD_REQUEST)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
+        """Return a list of tags"""
+
         return get_response_with_pagination(
             request=request,
             objects=Tag.objects.filter(deleted_at=None),
@@ -65,13 +67,17 @@ class TagsView(APIView):
         )
 
 
-class DeleteTag(APIView):
+class DeleteTagView(APIView):
+    """Delete the tag"""
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
         """Mark the tag as deleted"""
+
         tag_id = kwargs.get("tag_id")
+
         if not Tag.objects.filter(id=tag_id).exists():
             return Response(
                 {"detail": "Token doesn't exists"},

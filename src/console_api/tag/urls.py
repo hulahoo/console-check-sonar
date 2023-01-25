@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from console_api.tag.views import TagsView, DeleteTag
+from console_api.tag.views import TagsView, DeleteTagView
 
 
 urlpatterns = [
@@ -10,13 +10,13 @@ urlpatterns = [
     path(
         "",
         TagsView.as_view(),
-        name="tag_list",
+        name="tag_view",
     ),
 
     # Delete tag
     path(
         "/<int:tag_id>",
-        DeleteTag.as_view(),
+        DeleteTagView.as_view(),
         name="delete_tag",
     ),
 ]

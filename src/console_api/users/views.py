@@ -19,8 +19,11 @@ from rest_framework.status import (
 
 from .serializers import AuthTokenSerializer
 from console_api.users.models import Token, User
-from console_api.services import get_hashed_password
-from console_api.services import CustomTokenAuthentication
+from console_api.services import (
+    CustomTokenAuthentication,
+    get_hashed_password,
+    get_not_fields_error,
+)
 
 
 class UserView(APIView):
@@ -54,12 +57,8 @@ class UserView(APIView):
                 data={"detail": "User not found"},
             )
 
-        for field in 'prev-pass', 'new-pass':
-            if not request.data.get(field):
-                return Response(
-                    {"detail": f"{field} not specified"},
-                    status=HTTP_400_BAD_REQUEST,
-                )
+        if error_400 := get_not_fields_error(request, ('prev-pass', 'new-pass')):
+            return error_400
 
         if not User.objects.filter(id=user_id).exists():
             return Response(
@@ -88,13 +87,12 @@ class UserDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
+        error_400 = get_not_fields_error(
+            request, ('login', 'pass-hash', 'full-name', 'role'),
+        )
 
-        for field in 'login', 'pass-hash', 'full-name', 'role':
-            if not request.data.get(field):
-                return Response(
-                    {"detail": f"{field} not specified"},
-                    status=HTTP_400_BAD_REQUEST,
-                )
+        if error_400:
+            return error_400
 
         user_login = request.data.get('login')
 

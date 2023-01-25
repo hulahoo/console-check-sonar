@@ -9,9 +9,24 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import SerializerMetaclass
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from console_api.audit_logs.models import AuditLogs
 from console_api.users.models import User, Token
+
+
+def get_not_fields_error(
+        request: Request, expected_fields: tuple) -> None | Response:
+    """Check if fields exists and return response with 400 erorr if not"""
+
+    for field in expected_fields:
+        if not request.data.get(field):
+            return Response(
+                {"detail": f"{field} not specified"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+    return None
 
 
 def create_audit_log_entry(request: Request, data: dict) -> None:

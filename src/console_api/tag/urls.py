@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from console_api.tag.views import TagsView, DeleteTagView
+from console_api.tag.views import DeleteTagView, TagsView
 
 
 urlpatterns = [

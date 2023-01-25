@@ -15,6 +15,21 @@ from console_api.audit_logs.models import AuditLogs
 from console_api.users.models import User, Token
 
 
+def get_feed_logging_data(feed) -> dict:
+    """Return feed data for logging"""
+
+    return {
+        "id": feed.id,
+        "title": feed.title,
+        "provider": feed.provider,
+        "description": feed.description,
+        "format": feed.format,
+        "weight": str(feed.weight),
+        "status": feed.status,
+        "created_at": str(feed.created_at),
+    }
+
+
 def get_not_fields_error(
         request: Request, expected_fields: tuple) -> None | Response:
     """Check if fields exists and return response with 400 erorr if not"""

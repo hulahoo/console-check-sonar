@@ -5,7 +5,6 @@ from requests import get
 from django.conf import settings
 from rest_framework import status
 from rest_framework.request import Request
-from django.db.utils import IntegrityError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -15,8 +14,12 @@ from console_api.feed.serializers import (
     FeedSerializer,
     FeedsListSerializer,
 )
-from console_api.services import get_response_with_pagination
-from console_api.services import CustomTokenAuthentication
+from console_api.services import (
+    CustomTokenAuthentication,
+    create_audit_log_entry,
+    get_feed_logging_data,
+    get_response_with_pagination,
+)
 
 
 class FeedView(APIView):
@@ -30,14 +33,21 @@ class FeedView(APIView):
         feed = FeedSerializer(data=request.data)
 
         if feed.is_valid():
-            try:
-                feed.save()
-                feed_id = Feed.objects.get(title=request.data["feed-name"]).id
+            feed.save()
+            feed = Feed.objects.get(title=request.data["feed-name"])
 
-                return Response({"id": feed_id}, status=status.HTTP_201_CREATED)
-            except IntegrityError as e:
-                return Response({"detail": e}, status=status.HTTP_406_NOT_ACCEPTABLE)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+            create_audit_log_entry(request, {
+                "table": "feeds",
+                "event_type": "create-feed",
+                "object_type": "feed",
+                "object_name": "Feed",
+                "description": "Create a new feed",
+                "new_value": get_feed_logging_data(feed),
+            })
+
+            return Response({"id": feed.id}, status=status.HTTP_201_CREATED)
+
+        return Response(feed.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         return get_response_with_pagination(
@@ -93,6 +103,9 @@ class FeedUpdate(APIView):
             )
 
         feed = Feed.objects.get(id=feed_id)
+
+        prev_feed_value = get_feed_logging_data(feed)
+
         serializer = FeedSerializer(
             feed,
             data=request.data,
@@ -103,5 +116,15 @@ class FeedUpdate(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
+
+        create_audit_log_entry(request, {
+            "table": "feeds",
+            "event_type": "update-feed",
+            "object_type": "feed",
+            "object_name": "Feed",
+            "description": "Update feed",
+            "prev_value": prev_feed_value,
+            "new_value": get_feed_logging_data(feed),
+        })
 
         return Response(status=status.HTTP_201_CREATED)

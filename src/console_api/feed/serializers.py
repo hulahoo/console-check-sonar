@@ -14,6 +14,7 @@ class FeedSerializer(serializers.ModelSerializer):
         model = Feed
 
         fields = [
+            "id",
             "source-url",
             "format",
             "is-use-taxii",
@@ -32,7 +33,6 @@ class FeedSerializer(serializers.ModelSerializer):
             "is-truncating",
             "max-records-count",
             "weight",
-            "importing-fields",
             "available-fields",
         ]
 
@@ -49,7 +49,6 @@ class FeedSerializer(serializers.ModelSerializer):
             "is-enabled": {"source": "is_active"},
             "is-truncating": {"source": "is_truncating"},
             "max-records-count": {"source": "max_records_count"},
-            "importing-fields": {"source": "importing_fields"},
             "available-fields": {"source": "available_fields"},
         }
 
@@ -83,7 +82,6 @@ class FeedsListSerializer(serializers.ModelSerializer):
             "is-use-taxii",
             "polling-frequency",
             "status",
-            "importing-fields",
             "created-at",
         ]
 
@@ -101,6 +99,5 @@ class FeedsListSerializer(serializers.ModelSerializer):
             "max-records-count": {"source": "max_records_count"},
             "available-fields": {"source": "available_fields"},
             "is-use-taxii": {"source": "is_use_taxii"},
-            "importing-fields": {"source": "importing_fields"},
             "created-at": {"source": "created_at"},
         }

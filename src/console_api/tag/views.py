@@ -78,14 +78,42 @@ class DeleteTagView(APIView):
 
         tag_id = kwargs.get("tag_id")
 
-        if not Tag.objects.filter(id=tag_id).exists():
+        if not Tag.objects.filter(id=tag_id, deleted_at=None).exists():
             return Response(
-                {"detail": "Token doesn't exists"},
+                {"detail": "Tag doesn't exists"},
                 status=HTTP_400_BAD_REQUEST
             )
 
         tag = Tag.objects.get(id=tag_id)
+        prev_tag_value = {
+            "id": tag.id,
+            "title": tag.title,
+            "weight": str(tag.weight),
+            "created_by": tag.created_by,
+            "created_at": str(tag.created_at) if tag.created_at else tag.created_at,
+            "updated_at": str(tag.updated_at) if tag.updated_at else tag.updated_at,
+            "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
+        }
+
         tag.deleted_at = datetime.now()
         tag.save()
+
+        create_audit_log_entry(request, {
+            "table": "tags",
+            "event_type": "delete-tag",
+            "object_type": "tag",
+            "object_name": "Tag",
+            "description": "Delete a tag",
+            "prev_value": prev_tag_value,
+            "new_value": {
+                "id": tag.id,
+                "title": tag.title,
+                "weight": str(tag.weight),
+                "created_by": tag.created_by,
+                "created_at": str(tag.created_at) if tag.created_at else tag.created_at,
+                "updated_at": str(tag.updated_at) if tag.updated_at else tag.updated_at,
+                "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
+            },
+        })
 
         return Response(status=HTTP_200_OK)

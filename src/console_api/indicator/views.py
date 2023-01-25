@@ -26,6 +26,15 @@ from console_api.services import (
 )
 
 
+def get_indicator_doesnt_exists_error() -> Response:
+    """Return response with error when indicator does not exist"""
+
+    return Response(
+        {"detail": "Indicator doesn't exists"},
+        status=status.HTTP_400_BAD_REQUEST,
+    )
+
+
 def create_indicator_activity(data: dict) -> None:
     """Create IndicatorActivities object"""
 
@@ -207,6 +216,10 @@ class ChangeIndicatorTagsView(APIView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
+
+        if not Indicator.objects.filter(id=indicator_id).exists():
+            return get_indicator_doesnt_exists_error()
+
         indicator = Indicator.objects.get(id=indicator_id)
         prev_indicator_value = get_indicator_logging_data(indicator)
 
@@ -282,10 +295,7 @@ class IndicatorAddComment(APIView):
         indicator_id = kwargs.get("indicator_id")
 
         if not Indicator.objects.filter(id=indicator_id).exists():
-            return Response(
-                {"error": "Indicator doesn't exists"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return get_indicator_doesnt_exists_error()
 
         if not request.data.get("details"):
             return Response(
@@ -324,10 +334,8 @@ class IndicatorIsSendingToDetectionsView(APIView):
             )
         indicator_id = kwargs.get("indicator_id")
         if not Indicator.objects.filter(id=indicator_id).exists():
-            return Response(
-                {"error": "Indicator doesn't exists"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return get_indicator_doesnt_exists_error()
+
         indicator = Indicator.objects.get(id=indicator_id)
         prev_indicator_value = get_indicator_logging_data(indicator)
         indicator.is_sending_to_detections = value

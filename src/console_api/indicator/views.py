@@ -4,7 +4,6 @@ from datetime import datetime
 
 from rest_framework import status
 from rest_framework import viewsets
-from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -12,14 +11,18 @@ from rest_framework.permissions import IsAuthenticated
 
 from console_api.mixins import IndicatorQueryMixin
 from console_api.config.logger_config import logger
-from console_api.services import CustomTokenAuthentication
-from console_api.services import get_response_with_pagination
 from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.indicator.models import Indicator, IndicatorActivities
 from console_api.indicator.serializers import (
     IndicatorCreateSerializer,
     IndicatorDetailSerializer,
     IndicatorListSerializer,
+)
+from console_api.services import (
+    CustomTokenAuthentication,
+    create_audit_log_entry,
+    get_response_with_pagination,
+    get_indicator_logging_data,
 )
 
 
@@ -91,6 +94,16 @@ class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+
+        create_audit_log_entry(request, {
+            "table": "indicators",
+            "event_type": "create-indicator",
+            "object_type": "indicator",
+            "object_name": "Indicator",
+            "description": "Create a new indicator",
+            "new_value": request.data,
+        })
+
         return Response(
             status=status.HTTP_201_CREATED,
             data={"data": "Indicator created successfully"}
@@ -119,6 +132,8 @@ class MarkIndicatorAsFalsePositiveView(APIView):
             )
 
         indicator = Indicator.objects.get(id=indicator_id)
+        prev_indicator_value = get_indicator_logging_data(indicator)
+
         indicator.is_false_positive = True
         indicator.save()
 
@@ -127,6 +142,16 @@ class MarkIndicatorAsFalsePositiveView(APIView):
             "activity_type": "mark-as-false-positive",
             "created_by": request.user.id,
             "details": request.data.get("details"),
+        })
+
+        create_audit_log_entry(request, {
+            "table": "indicators",
+            "event_type": "mark-indicator-as-false-positive",
+            "object_type": "indicator",
+            "object_name": "Indicator",
+            "description": "Mark indicator as false positive",
+            "prev_value": prev_indicator_value,
+            "new_value": get_indicator_logging_data(indicator),
         })
 
         return Response(status=status.HTTP_200_OK)
@@ -170,6 +195,9 @@ class ChangeIndicatorTagsView(APIView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
+        indicator = Indicator.objects.get(id=indicator_id)
+        prev_indicator_value = get_indicator_logging_data(indicator)
+
         if not request.data.get("tags"):
             return Response(
                 {"detail": "Tags not specified"},
@@ -214,6 +242,18 @@ class ChangeIndicatorTagsView(APIView):
                 "details": request.data.get("details"),
             })
 
+            create_audit_log_entry(request, {
+                "table": "indicators",
+                "event_type": "change-indicator-tags",
+                "object_type": "indicator",
+                "object_name": "Indicator",
+                "description": "Change tags for indicator",
+                "prev_value": prev_indicator_value,
+                "new_value": get_indicator_logging_data(
+                    Indicator.objects.get(id=indicator_id),
+                ),
+            })
+
             return Response(status=status.HTTP_200_OK)
 
         return Response(
@@ -227,7 +267,6 @@ class IndicatorAddComment(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
-        """Change tags list for the indicator"""
         indicator_id = kwargs.get("indicator_id")
 
         if not Indicator.objects.filter(id=indicator_id).exists():
@@ -244,9 +283,17 @@ class IndicatorAddComment(APIView):
 
         create_indicator_activity({
             "indicator_id": indicator_id,
-            "activity_type": "Change is_sending_to_detections field",
+            "activity_type": "add-comment",
             "created_by": request.user.id,
             "details": request.data.get("details"),
+        })
+
+        create_audit_log_entry(request, {
+            "table": "indicator_activities",
+            "event_type": "add-comment",
+            "object_type": "IndicatorActivities",
+            "object_name": "Comment",
+            "description": "Add comment",
         })
 
         return Response(status=status.HTTP_201_CREATED)
@@ -270,6 +317,7 @@ class IndicatorIsSendingToDetectionsView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         indicator = Indicator.objects.get(id=indicator_id)
+        prev_indicator_value = get_indicator_logging_data(indicator)
         indicator.is_sending_to_detections = value
         indicator.save()
 
@@ -278,6 +326,16 @@ class IndicatorIsSendingToDetectionsView(APIView):
             "activity_type": "Change is_sending_to_detections field",
             "created_by": request.user.id,
             "details": request.data.get("details"),
+        })
+
+        create_audit_log_entry(request, {
+            "table": "indicators",
+            "event_type": "change-indicator-is-sending-to-detections",
+            "object_type": "indicator",
+            "object_name": "Indicator",
+            "description": "Change is_sending_to_detections field",
+            "prev_value": prev_indicator_value,
+            "new_value": get_indicator_logging_data(indicator),
         })
 
         return Response(

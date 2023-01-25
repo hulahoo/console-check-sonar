@@ -15,6 +15,33 @@ from console_api.audit_logs.models import AuditLogs
 from console_api.users.models import User, Token
 
 
+def get_indicator_logging_data(indicator) -> dict:
+    """Return indicator data for logging"""
+
+    return {
+        "ioc_type": indicator.ioc_type,
+        "value": indicator.value,
+        "context": indicator.context,
+        "is_sending_to_detections": indicator.is_sending_to_detections,
+        "is_false_positive": indicator.is_false_positive,
+        "weight": str(indicator.weight),
+        "feeds_weight": str(indicator.feeds_weight),
+        "time_weight": str(indicator.time_weight),
+        "tags_weight": str(indicator.tags_weight),
+        "is_archived": indicator.is_archived,
+        "false_detected_counter": indicator.false_detected_counter,
+        "positive_detected_counter": indicator.positive_detected_counter,
+        "total_detected_counter": indicator.total_detected_counter,
+        "first_detected_at": str(indicator.first_detected_at) if indicator.first_detected_at else indicator.first_detected_at,
+        "first_detected_at": str(indicator.first_detected_at) if indicator.first_detected_at else indicator.first_detected_at,
+        "created_by": indicator.created_by,
+        "external_source_link": indicator.external_source_link,
+        "created_at": str(indicator.created_at) if indicator.created_at else indicator.created_at,
+        "updated_at": str(indicator.updated_at) if indicator.updated_at else indicator.updated_at,
+        "deleted_at": str(indicator.deleted_at) if indicator.deleted_at else indicator.deleted_at,
+    }
+
+
 def get_feed_logging_data(feed) -> dict:
     """Return feed data for logging"""
 

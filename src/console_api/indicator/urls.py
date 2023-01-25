@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from console_api.indicator.views import (
     IndicatorAddComment,
     ChangeIndicatorTagsView,
-    IndicatorDetail,
+    IndicatorDetailView,
     IndicatorView,
     IndicatorIsSendingToDetectionsView,
     MarkIndicatorAsFalsePositiveView,
@@ -40,7 +40,7 @@ urlpatterns = [
     # Indicator detail or indicator deletion
     path(
         "/<uuid:indicator_id>",
-        IndicatorDetail.as_view(),
+        IndicatorDetailView.as_view(),
         name="indicator_detail",
     ),
     # Indicator is_sending_to_detections

@@ -166,12 +166,17 @@ class MarkIndicatorAsFalsePositiveView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class IndicatorDetail(APIView):
+class IndicatorDetailView(APIView):
+    """View for detail of the indicator"""
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get_indicator_detail(self, *, indicator_id) -> Indicator:
+    @staticmethod
+    def get_indicator_or_error_response(
+            indicator_id: int) -> Indicator | Response:
+        """Return indicator or response with 400 error if not exists"""
+
         if not Indicator.objects.filter(id=indicator_id).exists():
             return Response(
                 {"detail": f"Indicator with id {indicator_id} doesn't exists"},
@@ -181,15 +186,20 @@ class IndicatorDetail(APIView):
         return Indicator.objects.get(id=indicator_id)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
-        indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
+        indicator_id = kwargs.get("indicator_id")
+        indicator = self.get_indicator_or_error_response(indicator_id)
+
+        if isinstance(indicator, Response):
+            return indicator
+
         serialized_data = IndicatorDetailSerializer(instance=indicator).data
-        return Response(
-            data=serialized_data,
-            status=status.HTTP_200_OK,
-        )
+
+        return Response(data=serialized_data, status=status.HTTP_200_OK)
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
-        indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
+        indicator_id = kwargs.get("indicator_id")
+        indicator = self.get_indicator_or_error_response(indicator_id)
+
         prev_indicator_value = get_indicator_logging_data(indicator)
 
         indicator.deleted_at = datetime.now()

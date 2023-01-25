@@ -181,8 +181,20 @@ class IndicatorDetail(APIView):
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
         indicator = self.get_indicator_detail(indicator_id=kwargs.get("indicator_id"))
+        prev_indicator_value = get_indicator_logging_data(indicator)
+
         indicator.deleted_at = datetime.now()
         indicator.save()
+
+        create_audit_log_entry(request, {
+            "table": "indicators",
+            "event_type": "delete-indicator",
+            "object_type": "indicator",
+            "object_name": "Indicator",
+            "description": "Delete indicator",
+            "prev_value": prev_indicator_value,
+            "new_value": get_indicator_logging_data(indicator),
+        })
 
         return Response(status=status.HTTP_200_OK)
 

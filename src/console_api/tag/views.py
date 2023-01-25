@@ -16,6 +16,7 @@ from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
+from console_api.services import create_audit_log_entry
 from console_api.tag.models import Tag
 from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 from console_api.tag.services import get_new_tag_id
@@ -43,7 +44,18 @@ class TagsView(APIView):
         if tag.is_valid():
             tag.save()
 
+            create_audit_log_entry(request, {
+                "table": "tags",
+                "event_type": "create-tag",
+                "object_type": "tag",
+                "object_name": "Tag",
+                "description": "Create a new tag",
+                "new_value": tag_data,
+            })
+
             return Response(status=HTTP_201_CREATED)
+
+        return Response(tag.errors, status=HTTP_400_BAD_REQUEST)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         return get_response_with_pagination(

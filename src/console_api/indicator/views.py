@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from rest_framework import status
-from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -29,13 +29,14 @@ from console_api.services import (
 )
 
 
-class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
-    """List of indicators"""
+class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
+    """/indicators endpoint view"""
 
     queryset = Indicator.objects.filter(deleted_at=None)
+
     serializer_classes = {
         "list": IndicatorListSerializer,
-        "create": IndicatorCreateSerializer
+        "create": IndicatorCreateSerializer,
     }
 
     authentication_classes = [CustomTokenAuthentication]
@@ -55,14 +56,7 @@ class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
         # tags and feed_name should be below others
         # self.add_tags_filters(request=request)
         self.add_feed_name_filters(request=request)
-
-        if sort_by_param := request.GET.get("sort-by"):
-            sort_by_param = sort_by_param[0] + sort_by_param[1:].replace("-", "_")
-
-            if sort_by_param in ["ioc_weight", "-ioc_weight"]:
-                sort_by_param = "weight"
-
-            self.queryset = self.queryset.order_by(sort_by_param)
+        self.__sort_queryset_by_param(request)
 
         return get_response_with_pagination(
             request,
@@ -70,10 +64,26 @@ class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
             self.get_serializer,
         )
 
+    def __sort_queryset_by_param(self, request: Request) -> None:
+        """Sort the queryset by the given parameter"""
+
+        if sort_by_param := request.GET.get("sort-by"):
+            sort_by_param = \
+                sort_by_param[0] + sort_by_param[1:].replace("-", "_")
+
+            if sort_by_param in ["ioc_weight", "-ioc_weight"]:
+                sort_by_param = "weight"
+
+            self.queryset = self.queryset.order_by(sort_by_param)
+
     def get_serializer_class(self):
+        """Return serializer class for the method"""
+
         return self.serializer_classes.get(self.action)
 
-    def create(self, request: Request, *args, **kwargs):
+    def create(self, request: Request, *args, **kwargs) -> Response:
+        """Create an indicator"""
+
         if not request.data:
             return Response(
                 {"detail": "Missing fields"},
@@ -101,13 +111,17 @@ class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
 
         return Response(
             status=status.HTTP_201_CREATED,
-            data={"data": "Indicator created successfully"}
+            data={"data": "Indicator created successfully"},
         )
 
-    def get(self, request, *args, **kwargs):
-        start_period = request.GET.get("start-period-at")
-        finish_period = request.GET.get("finish-period-at")
-        self.param_dict = {"start_period": start_period, "finish_period": finish_period}
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        """Return response with list of indicators"""
+
+        self.param_dict = {
+            "start_period": request.GET.get("start-period-at"),
+            "finish_period": request.GET.get("finish-period-at"),
+        }
+
         return self.list(request, *args, **kwargs)
 
 

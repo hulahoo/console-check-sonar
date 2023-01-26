@@ -7,13 +7,13 @@ from console_api.indicator.views import (
     IndicatorAddComment,
     ChangeIndicatorTagsView,
     IndicatorDetailView,
-    IndicatorView,
+    IndicatorsView,
     IndicatorIsSendingToDetectionsView,
     MarkIndicatorAsFalsePositiveView,
 )
 
 router = DefaultRouter()
-router.register("", IndicatorView)
+router.register("", IndicatorsView)
 
 
 urlpatterns = [

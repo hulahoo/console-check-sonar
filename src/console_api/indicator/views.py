@@ -198,6 +198,8 @@ class IndicatorDetailView(APIView):
         indicator_id = kwargs.get("indicator_id")
         indicator = self.get_indicator_or_error_response(indicator_id)
 
+        prev_indicator_value = get_indicator_logging_data(indicator)
+
         if isinstance(indicator, Response):
             return indicator
 
@@ -210,6 +212,16 @@ class IndicatorDetailView(APIView):
             )
 
         serializer.save()
+
+        create_audit_log_entry(request, {
+            "table": "indicators",
+            "event_type": "change-indicator",
+            "object_type": "indicator",
+            "object_name": "Indicator",
+            "description": "Change indicator",
+            "prev_value": prev_indicator_value,
+            "new_value": get_indicator_logging_data(indicator),
+        })
 
         return Response(status=status.HTTP_200_OK)
 

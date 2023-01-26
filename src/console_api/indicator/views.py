@@ -112,14 +112,15 @@ class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
 
 
 class MarkIndicatorAsFalsePositiveView(APIView):
-    """Mark the indicator as false positive"""
+    """Change is_false_positive field to True for the indicator"""
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        indicator_id = kwargs.get("indicator_id")
+        """Change is_false_positive field"""
 
+        indicator_id = kwargs.get("indicator_id")
         indicator = get_indicator_or_error_response(indicator_id)
 
         if isinstance(indicator, Response):
@@ -132,7 +133,7 @@ class MarkIndicatorAsFalsePositiveView(APIView):
 
         create_indicator_activity({
             "indicator_id": indicator_id,
-            "activity_type": "mark-as-false-positive",
+            "activity_type": "mark-indicator-as-false-positive",
             "created_by": request.user.id,
             "details": request.data.get("details"),
         })

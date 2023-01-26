@@ -192,6 +192,27 @@ class IndicatorDetailView(APIView):
 
         return Indicator.objects.get(id=indicator_id)
 
+    def put(self, request: Request, *args, **kwargs) -> Response:
+        """Change data of the indicator"""
+
+        indicator_id = kwargs.get("indicator_id")
+        indicator = self.get_indicator_or_error_response(indicator_id)
+
+        if isinstance(indicator, Response):
+            return indicator
+
+        serializer = IndicatorDetailSerializer(indicator, data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.save()
+
+        return Response(status=status.HTTP_200_OK)
+
     def get(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
         indicator = self.get_indicator_or_error_response(indicator_id)

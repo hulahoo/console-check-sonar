@@ -10,13 +10,16 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from console_api.mixins import IndicatorQueryMixin
-from console_api.config.logger_config import logger
 from console_api.tag.models import Tag, IndicatorTagRelationship
-from console_api.indicator.models import Indicator, IndicatorActivities
+from console_api.indicator.models import Indicator
 from console_api.indicator.serializers import (
     IndicatorCreateSerializer,
     IndicatorDetailSerializer,
     IndicatorListSerializer,
+)
+from console_api.indicator.services import (
+    create_indicator_activity,
+    get_indicator_or_error_response,
 )
 from console_api.services import (
     CustomTokenAuthentication,
@@ -24,30 +27,6 @@ from console_api.services import (
     get_response_with_pagination,
     get_indicator_logging_data,
 )
-
-
-def get_indicator_doesnt_exists_error() -> Response:
-    """Return response with error when indicator does not exist"""
-
-    return Response(
-        {"detail": "Indicator doesn't exists"},
-        status=status.HTTP_400_BAD_REQUEST,
-    )
-
-
-def create_indicator_activity(data: dict) -> None:
-    """Create IndicatorActivities object"""
-
-    activity = IndicatorActivities(
-        id=IndicatorActivities.objects.order_by("id").last().id + 1,
-        indicator_id=data.get("indicator_id"),
-        activity_type=data.get("activity_type"),
-        created_by=data.get("created_by"),
-        details=data.get("details"),
-    )
-    activity.save()
-
-    logger.info(f"Created indicator activity: {activity.id}")
 
 
 class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
@@ -141,13 +120,11 @@ class MarkIndicatorAsFalsePositiveView(APIView):
     def patch(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
 
-        if not Indicator.objects.filter(id=indicator_id).exists():
-            return Response(
-                {"detail": f"Indicator with id {indicator_id} doesn't exists"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        indicator = get_indicator_or_error_response(indicator_id)
 
-        indicator = Indicator.objects.get(id=indicator_id)
+        if isinstance(indicator, Response):
+            return indicator
+
         prev_indicator_value = get_indicator_logging_data(indicator)
 
         indicator.is_false_positive = True
@@ -179,29 +156,16 @@ class IndicatorDetailView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def get_indicator_or_error_response(
-            indicator_id: int) -> Indicator | Response:
-        """Return indicator or response with 400 error if not exists"""
-
-        if not Indicator.objects.filter(id=indicator_id).exists():
-            return Response(
-                {"detail": f"Indicator with id {indicator_id} doesn't exists"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        return Indicator.objects.get(id=indicator_id)
-
     def put(self, request: Request, *args, **kwargs) -> Response:
         """Change data of the indicator"""
 
         indicator_id = kwargs.get("indicator_id")
-        indicator = self.get_indicator_or_error_response(indicator_id)
-
-        prev_indicator_value = get_indicator_logging_data(indicator)
+        indicator = get_indicator_or_error_response(indicator_id)
 
         if isinstance(indicator, Response):
             return indicator
+
+        prev_indicator_value = get_indicator_logging_data(indicator)
 
         serializer = IndicatorDetailSerializer(indicator, data=request.data)
 
@@ -226,19 +190,27 @@ class IndicatorDetailView(APIView):
         return Response(status=status.HTTP_200_OK)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
+        """Return info about the indicator"""
+
         indicator_id = kwargs.get("indicator_id")
-        indicator = self.get_indicator_or_error_response(indicator_id)
+        indicator = get_indicator_or_error_response(indicator_id)
 
         if isinstance(indicator, Response):
             return indicator
 
-        serialized_data = IndicatorDetailSerializer(instance=indicator).data
-
-        return Response(data=serialized_data, status=status.HTTP_200_OK)
+        return Response(
+            data=IndicatorDetailSerializer(indicator).data,
+            status=status.HTTP_200_OK,
+        )
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
+        """Delete the indicator"""
+
         indicator_id = kwargs.get("indicator_id")
-        indicator = self.get_indicator_or_error_response(indicator_id)
+        indicator = get_indicator_or_error_response(indicator_id)
+
+        if isinstance(indicator, Response):
+            return indicator
 
         prev_indicator_value = get_indicator_logging_data(indicator)
 
@@ -266,11 +238,11 @@ class ChangeIndicatorTagsView(APIView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
+        indicator = get_indicator_or_error_response(indicator_id)
 
-        if not Indicator.objects.filter(id=indicator_id).exists():
-            return get_indicator_doesnt_exists_error()
+        if isinstance(indicator, Response):
+            return indicator
 
-        indicator = Indicator.objects.get(id=indicator_id)
         prev_indicator_value = get_indicator_logging_data(indicator)
 
         if not request.data.get("tags"):
@@ -343,9 +315,10 @@ class IndicatorAddComment(APIView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
+        indicator = get_indicator_or_error_response(indicator_id)
 
-        if not Indicator.objects.filter(id=indicator_id).exists():
-            return get_indicator_doesnt_exists_error()
+        if isinstance(indicator, Response):
+            return indicator
 
         if not request.data.get("details"):
             return Response(
@@ -383,10 +356,10 @@ class IndicatorIsSendingToDetectionsView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         indicator_id = kwargs.get("indicator_id")
-        if not Indicator.objects.filter(id=indicator_id).exists():
-            return get_indicator_doesnt_exists_error()
+        indicator = get_indicator_or_error_response(indicator_id)
 
-        indicator = Indicator.objects.get(id=indicator_id)
+        if isinstance(indicator, Response):
+            return indicator
         prev_indicator_value = get_indicator_logging_data(indicator)
         indicator.is_sending_to_detections = value
         indicator.save()

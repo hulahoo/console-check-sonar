@@ -6,11 +6,11 @@ from console_api.tag.views import DeleteTagView, TagsView
 
 
 urlpatterns = [
-    # Tags list
+    # Tags list and create
     path(
         "",
         TagsView.as_view(),
-        name="tag_view",
+        name="tag_list_create",
     ),
 
     # Delete tag

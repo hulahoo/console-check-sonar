@@ -2,24 +2,25 @@
 
 from datetime import datetime
 
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
-from rest_framework.views import APIView
 
+from console_api.tag.models import Tag
+from console_api.tag.services import get_new_tag_id
+from console_api.services import create_audit_log_entry, get_not_fields_error
+from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
-from console_api.services import create_audit_log_entry, get_not_fields_error
-from console_api.tag.models import Tag
-from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
-from console_api.tag.services import get_new_tag_id
 
 
 class TagsView(APIView):
@@ -117,3 +118,17 @@ class DeleteTagView(APIView):
         })
 
         return Response(status=HTTP_200_OK)
+    
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        tag_id = kwargs.get("tag_id")
+        title = request.data.get("title")
+
+        if not Tag.objects.filter(id=tag_id).exists():
+            return Response(
+                {"detail": f"Indicator with id {tag_id} doesn't exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        tag = Tag.objects.get(id=tag_id)
+        tag.title = title
+        tag.save()
+        return Response(TagCreateSerializer(instance=tag).data, status=status.HTTP_200_OK)

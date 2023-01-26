@@ -131,9 +131,7 @@ class MarkIndicatorAsFalsePositiveView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def patch(self, request: Request, *args, **kwargs) -> Response:
-        """Change is_false_positive field"""
-
+    def post(self, request: Request, *args, **kwargs) -> Response:
         indicator_id = kwargs.get("indicator_id")
         indicator = get_indicator_or_error_response(indicator_id)
 

@@ -9,8 +9,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from console_api.mixins import IndicatorQueryMixin
-from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.indicator.models import Indicator
 from console_api.indicator.serializers import (
     IndicatorCreateSerializer,
@@ -21,12 +19,14 @@ from console_api.indicator.services import (
     create_indicator_activity,
     get_indicator_or_error_response,
 )
+from console_api.mixins import IndicatorQueryMixin
 from console_api.services import (
     CustomTokenAuthentication,
     create_audit_log_entry,
     get_response_with_pagination,
     get_indicator_logging_data,
 )
+from console_api.tag.models import Tag, IndicatorTagRelationship
 
 
 class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
@@ -252,6 +252,8 @@ class ChangeIndicatorTagsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
+        """Change tags for the indicator"""
+
         indicator_id = kwargs.get("indicator_id")
         indicator = get_indicator_or_error_response(indicator_id)
 
@@ -325,10 +327,14 @@ class ChangeIndicatorTagsView(APIView):
 
 
 class IndicatorAddComment(APIView):
+    """Add comment for the indicator"""
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
+        """Add comment"""
+
         indicator_id = kwargs.get("indicator_id")
         indicator = get_indicator_or_error_response(indicator_id)
 
@@ -360,23 +366,33 @@ class IndicatorAddComment(APIView):
 
 
 class IndicatorIsSendingToDetectionsView(APIView):
+    """Change is_sending_to_detections field for the indicator"""
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
-        value: bool = request.data.get("value")
-        if not value:
+        """Change is_sending_to_detections field"""
+
+        is_sending_to_detections: bool | None = request.data.get(
+            "is-sending-to-detections",
+        )
+
+        if not is_sending_to_detections:
             return Response(
-                {"error": "No value provided"},
+                {"detail": "No value provided"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
         indicator_id = kwargs.get("indicator_id")
         indicator = get_indicator_or_error_response(indicator_id)
 
         if isinstance(indicator, Response):
             return indicator
+
         prev_indicator_value = get_indicator_logging_data(indicator)
-        indicator.is_sending_to_detections = value
+
+        indicator.is_sending_to_detections = is_sending_to_detections
         indicator.save()
 
         create_indicator_activity({

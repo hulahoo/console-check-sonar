@@ -4,8 +4,8 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from console_api.indicator.views import (
-    IndicatorAddComment,
     ChangeIndicatorTagsView,
+    IndicatorAddComment,
     IndicatorDetailView,
     IndicatorsView,
     IndicatorIsSendingToDetectionsView,

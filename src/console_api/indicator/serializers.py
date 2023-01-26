@@ -2,6 +2,7 @@
 
 from typing import List
 
+from django.db.utils import IntegrityError
 from rest_framework import status
 from rest_framework import serializers
 
@@ -109,6 +110,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
 
 class IndicatorCreateSerializer(serializers.Serializer):
     """Serializer for indicator creation"""
+
     tags = serializers.ListField(
         child=serializers.IntegerField(min_value=0, required=True)
     )
@@ -120,17 +122,27 @@ class IndicatorCreateSerializer(serializers.Serializer):
         tags_id_list = validated_data.pop("tags")
         tags: List[Tag] = Tag.objects.filter(pk__in=tags_id_list)
         logger.info(f"Retrieved tags: {tags}")
+
         if len(tags) != len(tags_id_list):
             raise serializers.ValidationError(
                 detail={"data": "No tags found with provided ids"},
                 code=status.HTTP_400_BAD_REQUEST
             )
-        validated_data["tags_weight"] = sum([tag.weight for tag in tags])
-        indicator = Indicator.objects.create(**validated_data)
-        logger.info(f"Created indicator: {indicator.id}")
+
+        validated_data["tags_weight"] = sum(tag.weight for tag in tags)
+
+        try:
+            indicator = Indicator.objects.create(**validated_data)
+            logger.info(f"Created indicator: {indicator.id}")
+        except IntegrityError as error:
+            raise serializers.ValidationError(
+                detail=error, code=status.HTTP_400_BAD_REQUEST
+            )
+
         for tag in tags:
             IndicatorTagRelationship.objects.create(
                 indicator_id=indicator.id,
                 tag_id=tag.id
             )
+
         return indicator

@@ -100,8 +100,15 @@ class IndicatorView(viewsets.ModelViewSet, IndicatorQueryMixin):
                 {"detail": "Missing fields"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+
+        if not serializer.is_valid(raise_exception=True):
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         self.perform_create(serializer)
 
         create_audit_log_entry(request, {

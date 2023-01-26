@@ -11,21 +11,25 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.http import require_http_methods
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
 )
 
 from console_api.tag.models import Tag
 from console_api.search.enums import SearchStatus
-from console_api.search.models import History, Indicator
+from console_api.search.models import History
 from console_api.services import CustomTokenAuthentication
 from console_api.search.serializers import SearchHistorySerializer
+from console_api.indicator.models import Indicator
 from console_api.constants import CREDS_ERROR, SEARCH_QUERY_ERROR
 
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def search_by_text_view(request: Request) -> Response:
+    """Search feeds by text"""
+
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
@@ -39,7 +43,10 @@ def search_by_text_view(request: Request) -> Response:
             status=HTTP_400_BAD_REQUEST
         )
 
-    indicators = Indicator.objects.filter(value__contains=query)
+    indicators = Indicator.objects.filter(
+        value__contains=query,
+        deleted_at=None,
+    )
 
     search_history = SearchHistorySerializer(data={
         'search_type': 'by-text',
@@ -56,15 +63,15 @@ def search_by_text_view(request: Request) -> Response:
     if search_history.is_valid():
         result = search_history.save()
 
-        return Response(status=200, data={
+        return Response(status=HTTP_200_OK, data={
             'created-at': result.created_at,
             'created-by': result.created_by,
             'results': [
                 {
                     'id': indicator.id,
-                    'feed-name': feed['name'],
-                    'feed-provider': feed['provider'],
-                    'context': indicator.context
+                    'feed-name': feed.get('name'),
+                    'feed-provider': feed.get('provider'),
+                    'context': indicator.context,
                 } for indicator in indicators for feed in indicator.feeds
             ]
         })
@@ -96,7 +103,7 @@ class SearchTagsView(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request: Request, *args, **kwargs) -> Response:
         query = request.GET.get('query')
 
@@ -119,7 +126,6 @@ class SearchTagsView(APIView):
             ),
             'created_by': request.user.id,
         })
-        
 
         if search_history.is_valid():
             result = search_history.save()

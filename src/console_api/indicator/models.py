@@ -130,17 +130,25 @@ class Indicator(models.Model):
     def feeds(self) -> tuple:
         """Return tuple of feeds that linked with the indicator"""
 
-        feeds_ids = [
-            relationship.feed_id
-            for relationship in IndicatorFeedRelationship.objects.filter(
-                indicator_id=self.id,
-            )
-        ]
-
-        return (
-            {"id": feed_id, "name": Feed.objects.get(id=feed_id).title}
-            for feed_id in feeds_ids
+        indicators_feeds = IndicatorFeedRelationship.objects.filter(
+            indicator_id=self.id,
+            deleted_at=None,
         )
+
+        data = []
+
+        for relationship in indicators_feeds:
+            feed = Feed.objects.values("title", "provider").get(
+                id=relationship.feed_id,
+            )
+
+            data.append({
+                "id": relationship.feed_id,
+                "name": feed.get("title"),
+                "provider": feed.get("provider"),
+            })
+
+        return tuple(data)
 
     @property
     def activities(self) -> tuple:

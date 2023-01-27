@@ -92,12 +92,14 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "tags",
             "tags-weight",
             "external-source-link",
+            "is-false-positive",
             "feeds",
             "activities",
         ]
 
         extra_kwargs = {
             "ioc-type": {"source": "ioc_type"},
+            "is-false-positive": {"source": "is_false_positive"},
             "is-sending-to-detections": {"source": "is_sending_to_detections"},
             "created-at": {"source": "created_at"},
             "updated-at": {"source": "updated_at"},

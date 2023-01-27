@@ -16,6 +16,9 @@ class AuditLogsListView(generics.ListAPIView):
     """View for audit logs list"""
 
     def list(self, request, *args, **kwargs):
+        if event_id := get_filter_query_param(request, "id"):
+            self.queryset = self.queryset.filter(id=event_id)
+
         if service_name := get_filter_query_param(request, "service-name"):
             self.queryset = self.queryset.filter(service_name=service_name)
 

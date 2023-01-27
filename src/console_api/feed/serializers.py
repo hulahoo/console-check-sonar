@@ -1,11 +1,11 @@
 """Serializers for feed app"""
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from console_api.feed.models import Feed
 
 
-class FeedSerializer(serializers.ModelSerializer):
+class FeedSerializer(ModelSerializer):
     """Serializer for create and update feed"""
 
     class Meta:
@@ -53,7 +53,7 @@ class FeedSerializer(serializers.ModelSerializer):
         }
 
 
-class FeedsListSerializer(serializers.ModelSerializer):
+class FeedsListSerializer(ModelSerializer):
     """Serializer for list of feeds"""
 
     class Meta:

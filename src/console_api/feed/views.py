@@ -8,6 +8,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_200_OK
+from rest_framework.generics import ListAPIView
 
 from console_api.feed.models import Feed
 from console_api.feed.serializers import (
@@ -20,6 +22,20 @@ from console_api.services import (
     get_feed_logging_data,
     get_response_with_pagination,
 )
+
+
+class ProvidersListView(ListAPIView):
+    """List with feeds providers"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        """Return list with providers"""
+
+        feeds = Feed.objects.all().order_by("provider").distinct("provider")
+
+        return Response([feed.provider for feed in feeds], status=HTTP_200_OK)
 
 
 class FeedView(APIView):

@@ -6,6 +6,7 @@ from console_api.feed.views import (
     FeedPreview,
     FeedView,
     FeedUpdate,
+    ProvidersListView,
 )
 
 
@@ -22,6 +23,13 @@ urlpatterns = [
         "/<int:feed_id>",
         FeedUpdate.as_view(),
         name="change_properties",
+    ),
+
+    # Providers list
+    path(
+        "/providers",
+        ProvidersListView.as_view(),
+        name="providers_list_view",
     ),
 
     # Create feed and get feeds list

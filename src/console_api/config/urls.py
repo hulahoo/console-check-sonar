@@ -56,6 +56,7 @@ urlpatterns = [
     path("metrics", metrics_view, name="metrics"),
     path("host/api", api_res, name="api"),
     path("api/search", include("console_api.search.urls")),
+    path("api/platform-settings", include("console_api.platform_settings.urls")),
 ]
 
 if settings.DEBUG:

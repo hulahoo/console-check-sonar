@@ -16,14 +16,14 @@ class AuditLogsListView(generics.ListAPIView):
     """View for audit logs list"""
 
     def list(self, request, *args, **kwargs):
+        if created_at := get_filter_query_param(request, "created-at"):
+            self.queryset = self.queryset.filter(created_at=created_at)
+
         if event_id := get_filter_query_param(request, "id"):
             self.queryset = self.queryset.filter(id=event_id)
 
         if service_name := get_filter_query_param(request, "service-name"):
             self.queryset = self.queryset.filter(service_name=service_name)
-
-        if user_id := get_filter_query_param(request, "user-id"):
-            self.queryset = self.queryset.filter(user_id=user_id)
 
         if user_name := get_filter_query_param(request, "user-name"):
             self.queryset = self.queryset.filter(user_name=user_name)
@@ -39,9 +39,6 @@ class AuditLogsListView(generics.ListAPIView):
 
         if description := get_filter_query_param(request, "description"):
             self.queryset = self.queryset.filter(description=description)
-
-        if created_at := get_filter_query_param(request, "created-at"):
-            self.queryset = self.queryset.filter(created_at=created_at)
 
         if sort_by := request.GET.get("sort-by"):
             sort_by = sort_by[0] + sort_by[1:].replace("-", "_")

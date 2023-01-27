@@ -38,6 +38,9 @@ class UserView(APIView):
             return None
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Delete user
+        """
         user = self.get_object(user_id=kwargs.pop("user_id"))
         if user:
             user.deleted_at = datetime.now()
@@ -49,6 +52,9 @@ class UserView(APIView):
         )
 
     def post(self, request: Request, user_id: int) -> Response:
+        """
+        Change user data
+        """
         user = self.get_object(user_id=user_id)
 
         if not user:
@@ -57,7 +63,7 @@ class UserView(APIView):
                 data={"detail": "User not found"},
             )
 
-        if error_400 := get_not_fields_error(request, ('prev-pass', 'new-pass')):
+        if error_400 := get_not_fields_error(request, ('role', 'new-pass', 'full-name')):
             return error_400
 
         if not User.objects.filter(id=user_id).exists():
@@ -66,15 +72,12 @@ class UserView(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        prev_pass = request.data.get("prev-pass")
         new_pass = request.data.get("new-pass")
+        new_role = request.data.get("role")
+        new_full_name = request.data.get("full-name")
 
-        if get_hashed_password(prev_pass) != user.password:
-            return Response(
-                {"detail": "Password is invalid"},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
+        user.full_name = new_full_name
+        user.role = new_role
         user.password = get_hashed_password(new_pass)
         user.save()
 

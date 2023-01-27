@@ -169,7 +169,7 @@ class IndicatorDetailView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def put(self, request: Request, *args, **kwargs) -> Response:
+    def post(self, request: Request, *args, **kwargs) -> Response:
         """Change data of the indicator"""
 
         indicator_id = kwargs.get("indicator_id")

@@ -2,7 +2,12 @@
 
 from django.urls import path
 
-from console_api.search.views import search_by_text_view, search_history_view, SearchTagsView
+from console_api.search.views import (
+    search_indicators_by_text_view,
+    search_detections_by_text_view,
+    search_history_view,
+    SearchTagsView,
+)
 
 
 urlpatterns = [
@@ -13,8 +18,13 @@ urlpatterns = [
     ),
     path(
         "/by-text",
-        search_by_text_view,
+        search_indicators_by_text_view,
         name="by_text",
+    ),
+    path(
+        "/detections/by-text",
+        search_detections_by_text_view,
+        name="detections_by_text",
     ),
     path(
         "/tags/by-title",

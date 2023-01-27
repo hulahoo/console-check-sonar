@@ -4,6 +4,7 @@ from json import loads
 from typing import List
 
 from django.core import serializers
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -16,19 +17,80 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 
-from console_api.tag.models import Tag
+from console_api.constants import CREDS_ERROR, SEARCH_QUERY_ERROR
+from console_api.detections.models import Detection
+from console_api.indicator.models import Indicator
 from console_api.search.enums import SearchStatus
 from console_api.search.models import History
 from console_api.services import CustomTokenAuthentication
 from console_api.search.serializers import SearchHistorySerializer
-from console_api.indicator.models import Indicator
-from console_api.constants import CREDS_ERROR, SEARCH_QUERY_ERROR
+from console_api.tag.models import Tag
 
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
-def search_by_text_view(request: Request) -> Response:
-    """Search feeds by text"""
+def search_detections_by_text_view(request: Request) -> Response:
+    """Search detections by text"""
+
+    if not CustomTokenAuthentication().authenticate(request):
+        return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
+
+    user, _ = CustomTokenAuthentication().authenticate(request)
+
+    query = request.GET.get('query')
+
+    if not query:
+        return Response(
+            {"detail": SEARCH_QUERY_ERROR},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
+    detections = Detection.objects.filter(
+        Q(source__contains=query)
+        | Q(source_message__contains=query)
+        | Q(detection_message__contains=query)
+    )
+
+    search_history = SearchHistorySerializer(data={
+        'search_type': 'by-text',
+        'query_text': query,
+        'query_data': None,
+        'results': serializers.serialize(
+            "json",
+            detections,
+            fields=('id', "source", 'source_message', "detection_message"),
+        ),
+        'created_by': user.id,
+    })
+
+    if search_history.is_valid():
+        result = search_history.save()
+
+        return Response(status=HTTP_200_OK, data={
+            'created-at': result.created_at,
+            'created-by': result.created_by,
+            'results': [
+                {
+                    'id': detect.id,
+                    'source': detect.source,
+                    'source-message': detect.source_message,
+                    'source-event': detect.source_event,
+                    'details': detect.details,
+                    'indicator-id': detect.indicator_id,
+                    'detection-event': detect.detection_event,
+                    'detection-message': detect.detection_message,
+                    'tags-weight': detect.tags_weight,
+                    'indicator-weight': detect.indicator_weight,
+                    'created-at': detect.created_at,
+                } for detect in detections
+            ]
+        })
+
+
+@api_view(["GET"])
+@require_http_methods(["GET"])
+def search_indicators_by_text_view(request: Request) -> Response:
+    """Search indicators by text"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)

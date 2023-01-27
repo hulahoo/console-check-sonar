@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from console_api.audit_logs.models import AuditLogs
-from console_api.audit_logs.serializers import AuditLogsSerializer
+from console_api.audit_logs.serializers import AuditLogsListSerializer
 from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
@@ -18,7 +18,7 @@ from console_api.services import (
 class AuditLogsListView(generics.ListAPIView):
     """Audit logs list"""
 
-    serializer_class = AuditLogsSerializer
+    serializer_class = AuditLogsListSerializer
     queryset = AuditLogs.objects.all()
 
     authentication_classes = [CustomTokenAuthentication]

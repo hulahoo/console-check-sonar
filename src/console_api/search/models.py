@@ -1,8 +1,10 @@
+"""Models for search app"""
+
 from django.db import models
 
 
 class History(models.Model):
-    """SearchHistory - data source"""
+    """History of search"""
 
     id = models.BigAutoField(
         primary_key=True,
@@ -10,20 +12,20 @@ class History(models.Model):
 
     search_type = models.CharField(
         "Тип поиска",
-        max_length=64
+        max_length=64,
     )
 
     query_text = models.CharField(
         "Содержимое текстового запроса",
-        max_length=255
+        max_length=255,
     )
 
     query_data = models.BinaryField(
-        "Содержимое файлового запроса"
+        "Содержимое файлового запроса",
     )
 
     results = models.JSONField(
-        "Результаты поиска"
+        "Результаты поиска",
     )
 
     created_at = models.DateTimeField(
@@ -32,5 +34,5 @@ class History(models.Model):
     )
 
     created_by = models.BigIntegerField(
-        "Кто запросил поиск"
+        "Кто запросил поиск",
     )

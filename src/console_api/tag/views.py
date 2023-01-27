@@ -29,6 +29,18 @@ class TagsView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def __create_post_log_entry(self, request: Request, tag_data: dict) -> None:
+        """Create a log entry for POST method"""
+
+        create_audit_log_entry(request, {
+            "table": "tags",
+            "event_type": "create-tag",
+            "object_type": "tag",
+            "object_name": "Tag",
+            "description": "Create a new tag",
+            "new_value": tag_data,
+        })
+
     def post(self, request: Request, *args, **kwargs) -> Response:
         """Create a new tag"""
 
@@ -45,14 +57,15 @@ class TagsView(APIView):
         if tag.is_valid():
             tag.save()
 
-            create_audit_log_entry(request, {
-                "table": "tags",
-                "event_type": "create-tag",
-                "object_type": "tag",
-                "object_name": "Tag",
-                "description": "Create a new tag",
-                "new_value": tag_data,
-            })
+            self.__create_post_log_entry(request, tag_data)
+
+            return Response(status=HTTP_201_CREATED)
+        elif Tag.objects.filter(title=tag_data["title"]):
+            tag = Tag.objects.get(title=tag_data["title"])
+            tag.deleted_at = None
+            tag.save()
+
+            self.__create_post_log_entry(request, tag_data)
 
             return Response(status=HTTP_201_CREATED)
 
@@ -118,7 +131,7 @@ class DeleteTagView(APIView):
         })
 
         return Response(status=HTTP_200_OK)
-    
+
     def post(self, request: Request, *args, **kwargs) -> Response:
         tag_id = kwargs.get("tag_id")
         title = request.data.get("title")

@@ -2,6 +2,8 @@
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
 
 from console_api.audit_logs.models import AuditLogs
 from console_api.audit_logs.serializers import AuditLogsSerializer
@@ -9,13 +11,22 @@ from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
+    get_sort_by_param,
 )
 
 
 class AuditLogsListView(generics.ListAPIView):
-    """View for audit logs list"""
+    """Audit logs list"""
 
-    def list(self, request, *args, **kwargs):
+    serializer_class = AuditLogsSerializer
+    queryset = AuditLogs.objects.all()
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def __filter_queryset(self, request: Request) -> None:
+        """Filter the queryset"""
+
         if created_at := get_filter_query_param(request, "created-at"):
             self.queryset = self.queryset.filter(created_at=created_at)
 
@@ -40,17 +51,20 @@ class AuditLogsListView(generics.ListAPIView):
         if description := get_filter_query_param(request, "description"):
             self.queryset = self.queryset.filter(description=description)
 
-        if sort_by := request.GET.get("sort-by"):
-            sort_by = sort_by[0] + sort_by[1:].replace("-", "_")
+    def __sort_queryset(self, request: Request) -> None:
+        """Sort the queryset"""
+
+        if sort_by := get_sort_by_param(request):
             self.queryset = self.queryset.order_by(sort_by)
+
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        """Return response with list of logs"""
+
+        self.__filter_queryset(request)
+        self.__sort_queryset(request)
 
         return get_response_with_pagination(
             request,
             self.queryset,
             self.get_serializer,
         )
-
-    serializer_class = AuditLogsSerializer
-    queryset = AuditLogs.objects.all()
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]

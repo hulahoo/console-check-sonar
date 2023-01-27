@@ -25,7 +25,9 @@ from console_api.services import (
     create_audit_log_entry,
     get_response_with_pagination,
     get_indicator_logging_data,
+    get_sort_by_param,
 )
+
 from console_api.tag.models import Tag, IndicatorTagRelationship
 
 
@@ -67,14 +69,11 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
     def __sort_queryset_by_param(self, request: Request) -> None:
         """Sort the queryset by the given parameter"""
 
-        if sort_by_param := request.GET.get("sort-by"):
-            sort_by_param = \
-                sort_by_param[0] + sort_by_param[1:].replace("-", "_")
+        if sort_by := get_sort_by_param(request):
+            if sort_by in ["ioc_weight", "-ioc_weight"]:
+                sort_by = "weight"
 
-            if sort_by_param in ["ioc_weight", "-ioc_weight"]:
-                sort_by_param = "weight"
-
-            self.queryset = self.queryset.order_by(sort_by_param)
+            self.queryset = self.queryset.order_by(sort_by)
 
     def get_serializer_class(self):
         """Return serializer class for the method"""

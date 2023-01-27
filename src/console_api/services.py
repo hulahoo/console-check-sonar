@@ -15,6 +15,17 @@ from console_api.audit_logs.models import AuditLogs
 from console_api.users.models import User, Token
 
 
+def get_sort_by_param(request: Request) -> str | None:
+    """Return value for query parameter sort_by"""
+
+    sort_by = request.GET.get("sort-by")
+
+    if sort_by:
+        sort_by = sort_by[0] + sort_by[1:].replace("-", "_")
+
+    return sort_by
+
+
 def get_indicator_logging_data(indicator) -> dict:
     """Return indicator data for logging"""
 

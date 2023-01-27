@@ -129,7 +129,7 @@ class Token(models.Model):
 
     user = models.OneToOneField(
         "User",
-        related_name='auth_token',
+        related_name='token',
         on_delete=models.CASCADE,
         verbose_name="User",
     )

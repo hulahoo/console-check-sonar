@@ -187,6 +187,12 @@ def get_response_with_pagination(
 
     paginator = PageNumberPagination()
 
+    if not request.GET.get("page-size", "0").isdigit():
+        return Response(
+            {"detail": "page-size parameter is wrong"},
+            status=HTTP_400_BAD_REQUEST,
+        )
+
     paginator.page_size = _get_page_size(request)
     paginator.page_query_param = "page-number"
 

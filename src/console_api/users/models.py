@@ -88,6 +88,14 @@ class User(AbstractBaseUser):
         editable=False,
     )
 
+    admin = models.BooleanField(
+        default=False,
+    )
+
+    staff = models.BooleanField(
+        default=False,
+    )
+
     USERNAME_FIELD = 'login'
 
     # Login & Password are required by default

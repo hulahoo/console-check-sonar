@@ -33,7 +33,6 @@ links:
     targetServiceId: console-api
     endpointMapping:
     - endpointAlias: /api
-    - endpointOrigin: /host/api
 
   - targetProtocol: HTTP
     targetInformationSystemId: threat-intelligence

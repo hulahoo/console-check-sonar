@@ -1,5 +1,7 @@
 """Services for indicator app"""
 
+from uuid import UUID
+
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.response import Response
 
@@ -7,7 +9,8 @@ from console_api.config.logger_config import logger
 from console_api.indicator.models import Indicator, IndicatorActivities
 
 
-def get_indicator_or_error_response(indicator_id: int) -> Indicator | Response:
+def get_indicator_or_error_response(
+        indicator_id: UUID) -> Indicator | Response:
     """Return indicator or response with 400 error if not exists"""
 
     return (
@@ -23,8 +26,13 @@ def get_indicator_or_error_response(indicator_id: int) -> Indicator | Response:
 def create_indicator_activity(data: dict) -> None:
     """Create IndicatorActivities object"""
 
+    if IndicatorActivities.objects.count() == 0:
+        new_id = 1
+    else:
+        new_id = IndicatorActivities.objects.order_by("id").last().id + 1
+
     activity = IndicatorActivities(
-        id=IndicatorActivities.objects.order_by("id").last().id + 1,
+        id=new_id,
         indicator_id=data.get("indicator_id"),
         activity_type=data.get("activity_type"),
         created_by=data.get("created_by"),

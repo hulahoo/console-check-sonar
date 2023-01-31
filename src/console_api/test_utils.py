@@ -6,6 +6,30 @@ from console_api.users.models import User
 from console_api.constants import ADMIN_PASS_HASH, ADMIN_LOGIN, ADMIN_PASSWORD
 
 
+def get_authorization_token(client) -> str:
+    """Return authorization token"""
+
+    User.objects.create(
+        login=ADMIN_LOGIN,
+        password=ADMIN_PASS_HASH,
+        full_name="admin",
+        role="admin",
+        is_active=True,
+        staff=True,
+        admin=True,
+    )
+
+    response = client.post(
+        "/api/sessions",
+        {
+            "login": ADMIN_LOGIN,
+            "password": ADMIN_PASSWORD,
+        },
+    )
+
+    return f"Bearer {response.data.get('access-token')}"
+
+
 class TestURLMixin(TestCase):
     """Mixin for testing status code"""
 
@@ -14,7 +38,7 @@ class TestURLMixin(TestCase):
             is_authorized=True, data=None) -> None:
         """Test status code if user is authorized"""
 
-        token = self.__get_token() if is_authorized else ""
+        token = get_authorization_token(self.client) if is_authorized else ""
 
         if data:
             response = self.client.post(path, data, HTTP_AUTHORIZATION=token)
@@ -23,25 +47,5 @@ class TestURLMixin(TestCase):
 
         self.assertEqual(response.status_code, expected_status_code)
 
-    def __get_token(self) -> str:
-        """Return authorization token"""
-
-        User.objects.create(
-            login=ADMIN_LOGIN,
-            password=ADMIN_PASS_HASH,
-            full_name="admin",
-            role="admin",
-            is_active=True,
-            staff=True,
-            admin=True,
-        )
-
-        response = self.client.post(
-            "/api/sessions",
-            {
-                "login": ADMIN_LOGIN,
-                "password": ADMIN_PASSWORD,
-            },
-        )
-
-        return f"Bearer {response.data.get('access-token')}"
+        if data:
+            self.assertEqual(response.data, data)

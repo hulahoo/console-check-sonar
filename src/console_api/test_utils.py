@@ -3,7 +3,7 @@
 from django.test import TestCase
 
 from console_api.users.models import User
-from console_api.constants import ADMIN_PASS_HASH, ADMIN_LOGIN, ADMIN_PASSWORD
+from console_api.constants import ADMIN_PASS_HASH, ADMIN_LOGIN
 
 
 def get_authorization_token(client) -> str:
@@ -23,7 +23,7 @@ def get_authorization_token(client) -> str:
         "/api/sessions",
         {
             "login": ADMIN_LOGIN,
-            "password": ADMIN_PASSWORD,
+            "password": ADMIN_LOGIN,
         },
     )
 

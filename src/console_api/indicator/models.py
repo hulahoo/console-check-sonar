@@ -7,7 +7,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 from console_api.feed.models import IndicatorFeedRelationship, Feed
-from console_api.tag.models import IndicatorTagRelationship
+from console_api.tag.models import IndicatorTagRelationship, Tag
 
 
 RELATE_TO = "users.User"
@@ -182,11 +182,18 @@ class Indicator(models.Model):
     def tags_ids(self) -> tuple:
         """Return tuple of tags ids that linked with the indicator"""
 
-        return (
-            relationship.tag_id
+        tags = (
+            Tag.objects.get(id=relationship.tag_id)
             for relationship in IndicatorTagRelationship.objects.filter(
                 indicator_id=self.id,
             )
+        )
+
+        return (
+            {
+                "title": tag.title,
+                "weight": tag.weight,
+            } for tag in tags
         )
 
     def __str__(self) -> str:

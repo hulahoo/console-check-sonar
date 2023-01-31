@@ -121,11 +121,11 @@ class FeedUpdate(APIView):
         feed = Feed.objects.get(id=feed_id)
 
         prev_feed_value = get_feed_logging_data(feed)
-
         serializer = FeedSerializer(
             feed,
             data=request.data,
             partial=True,
+            fields=request.data.keys()
         )
 
         if not serializer.is_valid():
@@ -144,3 +144,4 @@ class FeedUpdate(APIView):
         })
 
         return Response(status=status.HTTP_201_CREATED)
+

@@ -191,6 +191,7 @@ class Indicator(models.Model):
 
         return (
             {
+                "id": tag.id,
                 "title": tag.title,
                 "weight": tag.weight,
             } for tag in tags

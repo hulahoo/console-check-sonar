@@ -10,6 +10,7 @@ from console_api.indicator.views import (
     IndicatorsView,
     IndicatorIsSendingToDetectionsView,
     MarkIndicatorAsFalsePositiveView,
+    MarkListAsNotFalsePositiveView,
 )
 
 router = DefaultRouter()
@@ -30,6 +31,7 @@ urlpatterns = [
         IndicatorAddComment.as_view(),
         name="add_comment",
     ),
+
     # Mark as_false_positive
     path(
         "/<uuid:indicator_id>/as_false_positive",
@@ -43,11 +45,19 @@ urlpatterns = [
         IndicatorDetailView.as_view(),
         name="indicator_detail",
     ),
+
     # Indicator is_sending_to_detections
     path(
         "/<uuid:indicator_id>/is_sending_to_detections",
         IndicatorIsSendingToDetectionsView.as_view(),
         name="indicator_is_send_to_detecions",
+    ),
+
+    # Mark list of indicators as false positive
+    path(
+        "/list_as_not_false_positive",
+        MarkListAsNotFalsePositiveView.as_view(),
+        name="list_as_not_false_positive",
     ),
 ]
 

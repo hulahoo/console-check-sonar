@@ -124,6 +124,39 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
         return self.list(request, *args, **kwargs)
 
 
+class MarkListAsNotFalsePositiveView(APIView):
+    """Change is_false_positive field to False for list of indicators"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        indicators_ids = request.data.get("indicators", [])
+        all_indicators = []
+
+        for id_ in indicators_ids:
+            indicator = get_indicator_or_error_response(id_)
+
+            if isinstance(indicator, Response):
+                return indicator
+
+            all_indicators.append(indicator)
+
+        for indicator in all_indicators:
+            indicator.is_false_positive = False
+            indicator.save()
+
+        create_audit_log_entry(request, {
+            "table": "indicators",
+            "event_type": "mark-indicators-list-as-not-false-positive",
+            "object_type": "indicator",
+            "object_name": "Indicator",
+            "description": "Mark indicators list as not false positive",
+        })
+
+        return Response(status=status.HTTP_200_OK)
+
+
 class MarkIndicatorAsFalsePositiveView(APIView):
     """Change is_false_positive field to True for the indicator"""
 

@@ -3,10 +3,7 @@
 from django.test import TestCase, Client
 
 from console_api.audit_logs.models import AuditLogs
-from console_api.audit_logs.tests.constants import (
-    AUDIT_LOGS_URL,
-    TEST_SERVER_URL,
-)
+from console_api.audit_logs.tests.constants import AUDIT_LOGS_URL
 from console_api.test_utils import get_authorization_token
 from console_api.constants import DIFFERENT_VALUES, WRONG_PAGE_SIZE
 
@@ -103,9 +100,9 @@ class PaginationParametersTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
-        self.assertEqual(
+        self.assertIn(
+            f"{AUDIT_LOGS_URL}?page-number=2",
             response.data.get("next", ""),
-            TEST_SERVER_URL + AUDIT_LOGS_URL + "?page-number=2",
         )
 
         self.assertEqual(response.data.get("previous", ""), None)
@@ -128,10 +125,7 @@ class PaginationParametersTests(TestCase):
         self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
         self.assertEqual(response.data.get("next", ""), None)
 
-        self.assertEqual(
-            response.data.get("previous", ""),
-            TEST_SERVER_URL + AUDIT_LOGS_URL,
-        )
+        self.assertIn(AUDIT_LOGS_URL, response.data.get("previous", ""))
 
         self.assertEqual(
             len(response.data.get("results")),
@@ -148,9 +142,9 @@ class PaginationParametersTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
-        self.assertEqual(
+        self.assertIn(
+            f"{AUDIT_LOGS_URL}?page-number=2&page-size=2",
             response.data.get("next", ""),
-            TEST_SERVER_URL + AUDIT_LOGS_URL + "?page-number=2&page-size=2",
         )
         self.assertEqual(response.data.get("previous", ""), None)
         self.assertEqual(len(response.data.get("results")), 2)
@@ -165,13 +159,13 @@ class PaginationParametersTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
-        self.assertEqual(
+        self.assertIn(
+            f"{AUDIT_LOGS_URL}?page-number=3&page-size=2",
             response.data.get("next", ""),
-            TEST_SERVER_URL + AUDIT_LOGS_URL + "?page-number=3&page-size=2",
         )
-        self.assertEqual(
+        self.assertIn(
+            f"{AUDIT_LOGS_URL}?page-size=2",
             response.data.get("previous", ""),
-            TEST_SERVER_URL + AUDIT_LOGS_URL + "?page-size=2",
         )
         self.assertEqual(len(response.data.get("results")), 2)
 

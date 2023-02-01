@@ -34,7 +34,10 @@ from console_api.tag.models import Tag, IndicatorTagRelationship
 class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
     """/indicators endpoint view"""
 
-    queryset = Indicator.objects.filter(deleted_at=None)
+    queryset = Indicator.objects.filter(
+        deleted_at=None,
+        is_false_positive=False,
+    )
 
     serializer_classes = {
         "list": IndicatorListSerializer,

@@ -79,6 +79,17 @@ class AuditLogsTests(TestCase):
 
         cls.field_and_primary_key = {
             "id": True,
+            "service_name": False,
+            "user_id": False,
+            "user_name": False,
+            "event_type": False,
+            "object_type": False,
+            "object_name": False,
+            "description": False,
+            "prev_value": False,
+            "new_value": False,
+            "context": False,
+            "created_at": False,
         }
 
     def test_verbose_name(self) -> None:
@@ -154,3 +165,8 @@ class AuditLogsTests(TestCase):
         """Test AuditLogs ordering"""
 
         self.assertEqual(AuditLogs._meta.ordering, ["service_name"])
+
+    def test_db_table(self) -> None:
+        """Test AuditLogs db_table"""
+
+        self.assertEqual(AuditLogs._meta.db_table, "audit_logs")

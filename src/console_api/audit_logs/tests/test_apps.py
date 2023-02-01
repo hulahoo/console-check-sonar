@@ -4,6 +4,7 @@ from django.apps import AppConfig
 from django.test import TestCase
 
 from console_api.audit_logs.apps import AuditLogsConfig
+from console_api.constants import DEFAULT_AUTO_FIELD
 
 
 class AuditLogsConfigTests(TestCase):
@@ -14,7 +15,7 @@ class AuditLogsConfigTests(TestCase):
 
         self.assertEqual(
             AuditLogsConfig.default_auto_field,
-            "django.db.models.BigAutoField",
+            DEFAULT_AUTO_FIELD,
         )
 
     def test_name(self) -> None:

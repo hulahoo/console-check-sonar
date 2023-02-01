@@ -11,6 +11,7 @@ ADMIN_PASS_HASH = \
 
 ADMIN_LOGIN = "admin"
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 class TestClass:
     """Empty class for testing"""

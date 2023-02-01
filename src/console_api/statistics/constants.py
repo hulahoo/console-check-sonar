@@ -8,6 +8,8 @@ DAY_PERIOD_FORMAT = "%Y-%m-%d"
 
 MONTH_PERIOD_FORMAT = "%Y-%m"
 
+ISO_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+
 GROUP_BY_AND_FREQUENCY = {
     "minute": "T",
     "hour": "H",
@@ -18,7 +20,6 @@ GROUP_BY_AND_FREQUENCY = {
 FREQUENCY_AND_FORMAT = {
     "T": MINUTE_PERIOD_FORMAT,
     "H": HOUR_PERIOD_FORMAT,
-    "12H": HOUR_PERIOD_FORMAT,
     "D": DAY_PERIOD_FORMAT,
     "MS": MONTH_PERIOD_FORMAT,
 }

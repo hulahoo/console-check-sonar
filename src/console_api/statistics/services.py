@@ -8,17 +8,18 @@ from pandas import date_range
 from console_api.statistics.constants import (
     FREQUENCY_AND_FORMAT,
     GROUP_BY_AND_FREQUENCY,
+    ISO_DATE_FORMAT,
 )
 
 
 def get_datetime_from_iso(iso_date: str) -> datetime:
     """Return datetime from data in iso format"""
 
-    dt, _, us = iso_date.partition(".")
-    dt = datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S")
-    us = int(us.rstrip("Z"), 10)
+    date, _, timezone = iso_date.partition(".")
+    date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S")
+    microseconds = int(timezone.rstrip("Z"), 10)
 
-    return dt + timedelta(microseconds=us)
+    return date + timedelta(microseconds=microseconds)
 
 
 def get_period_query_params(request: Request) -> tuple:
@@ -53,15 +54,12 @@ def get_objects_data_for_statistics(request: Request, model) -> dict:
     if not period_format:
         return {"error": "Invalid group-by"}
 
-    for obj in model.objects.all():
-        print(obj.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
-
     objects = model.objects.filter(
         created_at__range=(start_period_at, finish_period_at),
     )
 
     date_and_objects_amount = {
-        date.to_pydatetime().strftime("%Y-%m-%dT%H:%M:%S.%fZ"): 0
+        date.to_pydatetime().strftime(ISO_DATE_FORMAT): 0
         for date in date_range(
             start_period_at.strftime(period_format),
             finish_period_at.strftime(period_format),
@@ -72,9 +70,9 @@ def get_objects_data_for_statistics(request: Request, model) -> dict:
     for obj in objects:
         date = obj.created_at.strftime(period_format)
         date = datetime.strptime(date, period_format)
-        date = date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
-        date_and_objects_amount[date] += 1
+        date_in_iso = date.strftime(ISO_DATE_FORMAT)
+        date_and_objects_amount[date_in_iso] += 1
 
     return {
         "labels": list(date_and_objects_amount.keys()),

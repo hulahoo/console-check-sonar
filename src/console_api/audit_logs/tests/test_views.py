@@ -380,3 +380,77 @@ class AuditLogsListViewFiltersTests(AuditLogsViewTestsMixin):
                 )
 
                 self.assertEqual(response.status_code, 400)
+
+
+class AuditLogsListViewDoubleFiltersTests(AuditLogsViewTestsMixin):
+    """Test double filters parameters for AuditLogsListView"""
+
+    _AUDIT_LOGS_COUNT = 0
+
+    def test_double_filters(self) -> None:
+        """Filter logs by double params"""
+
+        for i in range(3):
+            AuditLogs.objects.create(
+                service_name="Service name",
+                user_id=1,
+                user_name="User name",
+                event_type="Event type",
+                object_type="Object type",
+                object_name="Object name",
+                description="Description",
+                prev_value={"test": i},
+                new_value={"test": i},
+                context={"info": f"INFO {i}"},
+            )
+
+        for i in range(3, 8):
+            AuditLogs.objects.create(
+                service_name="Service name",
+                user_id=i,
+                user_name=f"User name {i}",
+                event_type=f"Event type {i}",
+                object_type="Object type",
+                object_name=f"Object name {i}",
+                description=f"Description {i}",
+                prev_value={"test": i},
+                new_value={"test": i},
+                context={"info": f"INFO {i}"},
+            )
+
+            filter_service_name = "filter[service-name]=Service name"
+            filter_object_type = "filter[object-type]=Object type"
+
+            filter_user_id = "filter[user-id]=1"
+            filter_user_name = "filter[user-name]=User name"
+            filter_event_type = "filter[event-type]=Event type"
+            filter_object_name = "filter[object-name]=Object name"
+            filter_description = "filter[description]=Description"
+
+            filters = (
+                filter_service_name + "&" + filter_user_id,
+                filter_service_name + "&" + filter_user_name,
+                filter_service_name + "&" + filter_event_type,
+                filter_service_name + "&" + filter_object_name,
+                filter_service_name + "&" + filter_description,
+
+                filter_object_type + "&" + filter_user_id,
+                filter_object_type + "&" + filter_user_name,
+                filter_object_type + "&" + filter_event_type,
+                filter_object_type + "&" + filter_object_name,
+                filter_object_type + "&" + filter_description,
+            )
+
+            for filter_ in filters:
+                with self.subTest(f"{filter_=}"):
+                    response = self.get_auth_get_response(
+                        f"{AUDIT_LOGS_URL}?{filter_}",
+                    )
+
+                    results = response.data.get("results")
+
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(response.data.get("count"), 3)
+                    self.assertEqual(response.data.get("next", ""), None)
+                    self.assertEqual(response.data.get("previous", ""), None)
+                    self.assertEqual(len(results), 3)

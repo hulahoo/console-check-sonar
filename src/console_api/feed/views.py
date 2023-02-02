@@ -9,7 +9,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+)
 from rest_framework.generics import ListAPIView
 
 from console_api.feed.models import Feed
@@ -44,7 +48,7 @@ class UpdateFeedsNowView(APIView):
         except Exception as error:
             return Response({"detail": str(error)}, status=HTTP_400_BAD_REQUEST)
 
-        return Response("Updated", status=HTTP_200_OK)
+        return Response("Updated", status=HTTP_201_CREATED)
 
 
 class ProvidersListView(ListAPIView):

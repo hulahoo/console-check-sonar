@@ -39,7 +39,9 @@ class Feed(models.Model):
 
     description = models.CharField(
         "Описание Фида",
-        max_length=255
+        max_length=255,
+        null=True,
+        blank=True,
     )
 
     format = models.CharField(
@@ -92,6 +94,8 @@ class Feed(models.Model):
         "Частота обновления",
         max_length=32,
         help_text="Формат CronTab",
+        null=True,
+        blank=True,
     )
 
     weight = models.DecimalField(
@@ -115,6 +119,7 @@ class Feed(models.Model):
         "Статус фида",
         max_length=32,
         choices=FEED_STATUSES,
+        default="normal",
     )
 
     is_active = models.BooleanField(

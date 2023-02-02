@@ -7,7 +7,7 @@ from console_api.feed.views import (
     FeedView,
     FeedUpdate,
     ProvidersListView,
-    UpdateNowView,
+    UpdateFeedsNowView,
 )
 
 
@@ -15,7 +15,7 @@ urlpatterns = [
     # Update now
     path(
         "/update-now",
-        UpdateNowView.as_view(),
+        UpdateFeedsNowView.as_view(),
         name="update_now",
     ),
 

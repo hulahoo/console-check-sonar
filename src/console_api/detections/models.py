@@ -34,39 +34,49 @@ class DetectionTagRelationship(models.Model):
 class Detection(models.Model):
     """Event detection"""
 
-    source = models.TextField()
+    source = models.TextField(
+        "Источник",
+    )
 
-    source_message = models.TextField()
+    source_message = models.TextField(
+        "Текст входящего сообщения от SIEM",
+    )
 
     source_event = models.JSONField(
-        "Информация о событии",
-        help_text="Информация о Событии (Объект из Kafka)",
+        "Результат парсинга входящего сообщения от SIEM",
     )
 
-    details = models.JSONField()
+    details = models.JSONField(
+        "Дополнительная информация",
+    )
 
-    indicator_id = models.UUIDField()
+    indicator_id = models.UUIDField(
+        "Обнаруженный Индикатор для данного события",
+    )
 
     detection_event = models.JSONField(
-        "Информация о событии, которая отправляется во внешнюю ИС (SIEM)",
+        "Объект с информацией об обнаружении",
     )
 
-    detection_message = models.TextField()
+    detection_message = models.TextField(
+        "Текст исходящего сообщения во внешнюю ИС (SIEM)",
+    )
 
     tags_weight = models.DecimalField(
-        "Вес тегов",
-        validators=[MaxValueValidator(100), MinValueValidator(1)],
+        "Вес тэгов Индикатора на момент обнаружения",
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
         decimal_places=5,
-        max_digits=20,
+        max_digits=8,
     )
 
     indicator_weight = models.DecimalField(
+        "Вес Индикатора на момент обнаружения",
         decimal_places=5,
-        max_digits=20,
+        max_digits=8,
     )
 
     created_at = models.DateTimeField(
-        CREATED_AT,
+        "Дата создания обнаружения",
         auto_now_add=True,
     )
 

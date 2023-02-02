@@ -170,3 +170,11 @@ class AuditLogsTests(TestCase):
         """Test AuditLogs db_table"""
 
         self.assertEqual(AuditLogs._meta.db_table, "audit_logs")
+
+    def test_str(self) -> None:
+        """Test __str__ method"""
+
+        self.assertEqual(
+            str(AuditLogs.objects.last()),
+            str(AuditLogs.objects.last().id),
+        )

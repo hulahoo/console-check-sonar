@@ -63,6 +63,9 @@ class AuditLogs(Model):
         auto_now_add=True,
     )
 
+    def __str__(self) -> str:
+        return str(self.id)
+
     class Meta:
         """Metainformation about the model"""
 

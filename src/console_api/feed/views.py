@@ -24,6 +24,16 @@ from console_api.services import (
 )
 
 
+class UpdateNowView(APIView):
+    """Update feeds now"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        return Response("Updated", status=status.HTTP_201_CREATED)
+
+
 class ProvidersListView(ListAPIView):
     """List with feeds providers"""
 

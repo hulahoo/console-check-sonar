@@ -11,12 +11,12 @@ class AuditLogsListSerializerTests(TestCase):
     """Test AuditLogsListSerializer serializer"""
 
     def test_model(self) -> None:
-        """Test model"""
+        """Test model field of meta"""
 
         self.assertEqual(AuditLogsListSerializer.Meta.model, AuditLogs)
 
     def test_fields(self) -> None:
-        """Test fields"""
+        """Test fields field of meta"""
 
         expected_fields = [
             "id",
@@ -36,7 +36,7 @@ class AuditLogsListSerializerTests(TestCase):
         self.assertEqual(AuditLogsListSerializer.Meta.fields, expected_fields)
 
     def test_extra_kwargs(self) -> None:
-        """Test extra_kwargs"""
+        """Test extra_kwargs field of meta"""
 
         expected_extra_kwargs = {
             "service-name": {"source": "service_name"},

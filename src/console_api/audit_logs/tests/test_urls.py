@@ -9,8 +9,8 @@ from rest_framework.exceptions import ErrorDetail
 class UrlsTests(TestURLMixin):
     """Test urls"""
 
-    def test_index(self) -> None:
-        """Test /api/audit-logs path"""
+    def test_audit_logs_endpoint(self) -> None:
+        """Test /api/audit-logs endpoint"""
 
         self._test_url(AUDIT_LOGS_URL, 200, is_authorized=True)
 
@@ -19,9 +19,9 @@ class UrlsTests(TestURLMixin):
             expected_status_code=403,
             is_authorized=False,
             data={
-                'detail': ErrorDetail(
-                    string='Authentication credentials were not provided.',
-                    code='not_authenticated'
-                )
-            }
+                "detail": ErrorDetail(
+                    string="Authentication credentials were not provided.",
+                    code="not_authenticated",
+                ),
+            },
         )

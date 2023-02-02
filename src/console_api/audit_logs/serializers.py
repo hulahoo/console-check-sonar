@@ -1,12 +1,12 @@
 """Serializers for audit_logs app"""
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from console_api.audit_logs.models import AuditLogs
 
 
-class AuditLogsListSerializer(serializers.ModelSerializer):
-    """Serializer for AuditLogsListView view"""
+class AuditLogsListSerializer(ModelSerializer):
+    """Serializer for audit logs list"""
 
     class Meta:
         """Metainformation about the serializer"""

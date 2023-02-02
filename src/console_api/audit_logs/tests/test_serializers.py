@@ -1,6 +1,7 @@
 """Test serializers.py file"""
 
 from django.test import TestCase
+from rest_framework.serializers import ModelSerializer
 
 from console_api.audit_logs.models import AuditLogs
 from console_api.audit_logs.serializers import AuditLogsListSerializer
@@ -53,3 +54,8 @@ class AuditLogsListSerializerTests(TestCase):
             AuditLogsListSerializer.Meta.extra_kwargs,
             expected_extra_kwargs,
         )
+
+    def test_mro(self) -> None:
+        """Test MRO"""
+
+        self.assertIn(ModelSerializer, AuditLogsListSerializer.mro())

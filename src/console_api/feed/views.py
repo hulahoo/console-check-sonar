@@ -48,6 +48,14 @@ class UpdateFeedsNowView(APIView):
         except Exception as error:
             return Response({"detail": str(error)}, status=HTTP_400_BAD_REQUEST)
 
+        create_audit_log_entry(request, {
+            "table": "Feeds-importing-worker",
+            "event_type": "update-feeds",
+            "object_type": "feed",
+            "object_name": "Feed",
+            "description": "Update feeds",
+        })
+
         return Response("Updated", status=HTTP_201_CREATED)
 
 
@@ -171,4 +179,3 @@ class FeedUpdate(APIView):
         })
 
         return Response(status=status.HTTP_201_CREATED)
-

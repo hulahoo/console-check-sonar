@@ -91,7 +91,10 @@ class AuditLogsListView(ListAPIView):
 
                 self.queryset = self.queryset.order_by(sort_by)
         except Exception as error:
-            return Response({"detail": str(error)}, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": str(error)},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
         return get_response_with_pagination(
             request,

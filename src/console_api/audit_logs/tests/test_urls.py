@@ -1,9 +1,9 @@
 """Test urls.py file"""
 
+from rest_framework.exceptions import ErrorDetail
+
 from console_api.audit_logs.tests.constants import AUDIT_LOGS_URL
 from console_api.test_utils import TestURLMixin
-
-from rest_framework.exceptions import ErrorDetail
 
 
 class UrlsTests(TestURLMixin):

@@ -2,22 +2,22 @@
 
 from random import randint
 
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from console_api.audit_logs.models import AuditLogs
-from console_api.audit_logs.tests.constants import AUDIT_LOGS_URL
 from console_api.audit_logs.serializers import AuditLogsListSerializer
+from console_api.audit_logs.tests.constants import AUDIT_LOGS_URL
+from console_api.audit_logs.tests.mixins import AuditLogsViewTestsMixin
 from console_api.audit_logs.views import AuditLogsListView
 from console_api.constants import (
     DIFFERENT_VALUES,
-    WRONG_PAGE_SIZE,
     PAGE_NUMBER,
     PAGE_SIZE,
     SORT_BY,
+    WRONG_PAGE_SIZE,
 )
 from console_api.services import CustomTokenAuthentication
-from console_api.audit_logs.tests.mixins import AuditLogsViewTestsMixin
 
 
 class AuditLogsListViewFieldsTests(AuditLogsViewTestsMixin):
@@ -371,7 +371,7 @@ class AuditLogsListViewFiltersTests(AuditLogsViewTestsMixin):
                 self.assertEqual(len(results), 1)
 
     def test_wrong_fields_values(self) -> None:
-        """Filter logs by wrong fieleds values should return 400 error"""
+        """Filter logs by wrong fields values should return 400 error"""
 
         for field in "id", "user-id", "created-at":
             with self.subTest(f"{field=}"):
@@ -418,39 +418,39 @@ class AuditLogsListViewDoubleFiltersTests(AuditLogsViewTestsMixin):
                 context={"info": f"INFO {i}"},
             )
 
-            filter_service_name = "filter[service-name]=Service name"
-            filter_object_type = "filter[object-type]=Object type"
+        filter_service_name = "filter[service-name]=Service name"
+        filter_object_type = "filter[object-type]=Object type"
 
-            filter_user_id = "filter[user-id]=1"
-            filter_user_name = "filter[user-name]=User name"
-            filter_event_type = "filter[event-type]=Event type"
-            filter_object_name = "filter[object-name]=Object name"
-            filter_description = "filter[description]=Description"
+        filter_user_id = "filter[user-id]=1"
+        filter_user_name = "filter[user-name]=User name"
+        filter_event_type = "filter[event-type]=Event type"
+        filter_object_name = "filter[object-name]=Object name"
+        filter_description = "filter[description]=Description"
 
-            filters = (
-                filter_service_name + "&" + filter_user_id,
-                filter_service_name + "&" + filter_user_name,
-                filter_service_name + "&" + filter_event_type,
-                filter_service_name + "&" + filter_object_name,
-                filter_service_name + "&" + filter_description,
+        filters = (
+            filter_service_name + "&" + filter_user_id,
+            filter_service_name + "&" + filter_user_name,
+            filter_service_name + "&" + filter_event_type,
+            filter_service_name + "&" + filter_object_name,
+            filter_service_name + "&" + filter_description,
 
-                filter_object_type + "&" + filter_user_id,
-                filter_object_type + "&" + filter_user_name,
-                filter_object_type + "&" + filter_event_type,
-                filter_object_type + "&" + filter_object_name,
-                filter_object_type + "&" + filter_description,
-            )
+            filter_object_type + "&" + filter_user_id,
+            filter_object_type + "&" + filter_user_name,
+            filter_object_type + "&" + filter_event_type,
+            filter_object_type + "&" + filter_object_name,
+            filter_object_type + "&" + filter_description,
+        )
 
-            for filter_ in filters:
-                with self.subTest(f"{filter_=}"):
-                    response = self.get_auth_get_response(
-                        f"{AUDIT_LOGS_URL}?{filter_}",
-                    )
+        for filter_ in filters:
+            with self.subTest(f"{filter_=}"):
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?{filter_}",
+                )
 
-                    results = response.data.get("results")
+                results = response.data.get("results")
 
-                    self.assertEqual(response.status_code, 200)
-                    self.assertEqual(response.data.get("count"), 3)
-                    self.assertEqual(response.data.get("next", ""), None)
-                    self.assertEqual(response.data.get("previous", ""), None)
-                    self.assertEqual(len(results), 3)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data.get("count"), 3)
+                self.assertEqual(response.data.get("next", ""), None)
+                self.assertEqual(response.data.get("previous", ""), None)
+                self.assertEqual(len(results), 3)

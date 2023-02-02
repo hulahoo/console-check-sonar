@@ -116,3 +116,9 @@ services:
             ├── swagger/                         ## Модуль отвечающий за swagger api
 ... ... ... ...
 ```
+
+## Тесты
+### Запуск тестов приложения audit_logs
+```bash
+docker-compose exec console python src/console_api/manage.py test audit_logs.tests
+```

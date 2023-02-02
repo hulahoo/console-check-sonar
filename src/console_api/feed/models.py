@@ -61,17 +61,23 @@ class Feed(models.Model):
 
     auth_api_token = models.CharField(
         "API токен",
-        max_length=255
+        max_length=255,
+        null=True,
+        blank=True,
     )
 
     auth_login = models.CharField(
         "Логин HTTP Basic Auth",
-        max_length=32
+        max_length=32,
+        null=True,
+        blank=True,
     )
 
     auth_pass = models.CharField(
         "Пароль HTTP Basic Auth",
-        max_length=32
+        max_length=32,
+        null=True,
+        blank=True,
     )
 
     certificate = models.BinaryField(

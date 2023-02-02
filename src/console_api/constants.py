@@ -3,6 +3,12 @@
 from keyword import kwlist
 
 
+PAGE_NUMBER = "page-number"
+
+PAGE_SIZE = "page-size"
+
+SORT_BY = "sort-by"
+
 CREDS_ERROR = "Authentication credentials were not provided."
 SEARCH_QUERY_ERROR = "Missing or empty 'query' param"
 
@@ -42,6 +48,13 @@ NOT_STRING_VALUES = (
     None, complex(1, 2), bin(20), hex(100), range(100),
 )
 
+DIFFERENT_STRINGS = (
+    'value   value', '!@@#Q@$Q', 'test'.encode(), 'a', 'b', 'A', 'B', 'def',
+    "2023-02-02 11:17:25.748471+00:00",
+)
+
+DIFFERENT_VALUES = DIFFERENT_STRINGS + NOT_STRING_VALUES
+
 WRONG_PAGE_SIZE = (
     # int, float and bool
     -100, 122.12323, True, False,
@@ -60,9 +73,3 @@ WRONG_PAGE_SIZE = (
 
     'value   value', '!@@#Q@$Q', 'test'.encode(), 'a', 'b', 'A', 'B', 'def',
 )
-
-DIFFERENT_STRINGS = (
-    'value   value', '!@@#Q@$Q', 'test'.encode(), 'a', 'b', 'A', 'B', 'def'
-)
-
-DIFFERENT_VALUES = DIFFERENT_STRINGS + NOT_STRING_VALUES

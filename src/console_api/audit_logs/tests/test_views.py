@@ -1,52 +1,114 @@
 """Test views.py file"""
 
-from django.test import TestCase, Client
+from random import randint
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
 
 from console_api.audit_logs.models import AuditLogs
 from console_api.audit_logs.tests.constants import AUDIT_LOGS_URL
-from console_api.test_utils import get_authorization_token
-from console_api.constants import DIFFERENT_VALUES, WRONG_PAGE_SIZE
+from console_api.audit_logs.serializers import AuditLogsListSerializer
+from console_api.audit_logs.views import AuditLogsListView
+from console_api.constants import (
+    DIFFERENT_VALUES,
+    WRONG_PAGE_SIZE,
+    PAGE_NUMBER,
+    PAGE_SIZE,
+    SORT_BY,
+)
+from console_api.services import CustomTokenAuthentication
+from console_api.audit_logs.tests.mixins import AuditLogsViewTestsMixin
 
 
-class ListWithoutParamsTests(TestCase):
-    """Test list of logs without parameters"""
+class AuditLogsListViewFieldsTests(AuditLogsViewTestsMixin):
+    """Test fields for AuditLogsListView"""
 
-    __OBJECTS_COUNT = 3
+    _AUDIT_LOGS_COUNT = 3
 
-    @classmethod
-    def setUpTestData(cls) -> None:
-        for i in range(cls.__OBJECTS_COUNT):
-            AuditLogs.objects.create(
-                service_name=f"Service name {i}",
-                user_id=i,
-                user_name=f"User name {i}",
-                event_type=f"Event type {i}",
-                object_type=f"Object type {i}",
-                object_name=f"Object name {i}",
-                description=f"Description {i}",
-                prev_value={"test": i},
-                new_value={"test": i},
-                context={"info": f"INFO {i}"},
-            )
+    def test_authentication_classes(self) -> None:
+        """Test authentication_classes field"""
 
-        cls.client = Client()
-        cls.token = get_authorization_token(cls.client)
+        self.assertEqual(
+            AuditLogsListView.authentication_classes,
+            [CustomTokenAuthentication],
+        )
+
+    def test_permission_classes(self) -> None:
+        """Test permission_classes field"""
+
+        self.assertEqual(
+            AuditLogsListView.permission_classes,
+            [IsAuthenticated],
+        )
+
+    def test_queryset(self) -> None:
+        """Test queryset field"""
+
+        self.assertEqual(
+            [log.id for log in AuditLogsListView().get_queryset()],
+            [log.id for log in AuditLogs.objects.all()],
+        )
+
+    def test_serializer_class(self) -> None:
+        """Test serializer_class field"""
+
+        self.assertEqual(
+            AuditLogsListView.serializer_class,
+            AuditLogsListSerializer,
+        )
+
+    def test_mro(self) -> None:
+        """Test MRO"""
+
+        self.assertIn(ListAPIView, AuditLogsListView.mro())
+
+    def test_sort_by_params(self) -> None:
+        """Test __SORT_BY_PARAMS field"""
+
+        expected_sort_by_params = (
+            "id",
+            "-id",
+            "service_name",
+            "-service_name",
+            "user_id",
+            "-user_id",
+            "user_name",
+            "-user_name",
+            "event_type",
+            "-event_type",
+            "object_type",
+            "-object_type",
+            "object_name",
+            "-object_name",
+            "description",
+            "-description",
+            "created_at",
+            "-created_at",
+        )
+
+        self.assertEqual(
+            AuditLogsListView()._AuditLogsListView__SORT_BY_PARAMS,
+            expected_sort_by_params,
+        )
+
+
+class AuditLogsListViewWithoutParamsTests(AuditLogsViewTestsMixin):
+    """Test AuditLogsListView without parameters"""
+
+    _AUDIT_LOGS_COUNT = 3
 
     def test_list(self) -> None:
         """Test list of logs"""
 
-        response = self.client.get(
-            AUDIT_LOGS_URL,
-            HTTP_AUTHORIZATION=self.token,
-        )
+        response = self.get_auth_get_response(AUDIT_LOGS_URL)
 
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
+        self.assertEqual(response.data.get("count"), self._AUDIT_LOGS_COUNT)
         self.assertEqual(response.data.get("next", ""), None)
         self.assertEqual(response.data.get("previous", ""), None)
 
-        for i in range(self.__OBJECTS_COUNT):
+        for i in range(self._AUDIT_LOGS_COUNT):
             results = response.data.get("results")[i]
 
             self.assertEqual(results.get("service-name"), f"Service name {i}")
@@ -63,49 +125,26 @@ class ListWithoutParamsTests(TestCase):
             self.assertNotEqual(results.get("created-at"), None)
 
 
-class PaginationParametersTests(TestCase):
-    """Test page-number and page-size parameters for logs list"""
+class AuditLogsListViewPaginationParametersTests(AuditLogsViewTestsMixin):
+    """Test page-number and page-size parameters for AuditLogsListView"""
 
-    __OBJECTS_COUNT = 50
+    _AUDIT_LOGS_COUNT = 50
 
     __DEFAULT_PAGE_SIZE = 25
 
-    @classmethod
-    def setUpTestData(cls) -> None:
-        for i in range(cls.__OBJECTS_COUNT):
-            AuditLogs.objects.create(
-                service_name=f"Service name {i}",
-                user_id=i,
-                user_name=f"User name {i}",
-                event_type=f"Event type {i}",
-                object_type=f"Object type {i}",
-                object_name=f"Object name {i}",
-                description=f"Description {i}",
-                prev_value={"test": i},
-                new_value={"test": i},
-                context={"info": f"INFO {i}"},
-            )
-
-        cls.client = Client()
-        cls.token = get_authorization_token(cls.client)
-
     def test_page_number_1(self) -> None:
-        """Test page-number=1 parameter"""
+        """Test for page-number = 1"""
 
-        response = self.client.get(
-            AUDIT_LOGS_URL,
-            HTTP_AUTHORIZATION=self.token,
-        )
+        response = self.get_auth_get_response(AUDIT_LOGS_URL)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get("count"), self._AUDIT_LOGS_COUNT)
+        self.assertEqual(response.data.get("previous", ""), None)
 
-        self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
         self.assertIn(
-            f"{AUDIT_LOGS_URL}?page-number=2",
+            f"{AUDIT_LOGS_URL}?{PAGE_NUMBER}=2",
             response.data.get("next", ""),
         )
-
-        self.assertEqual(response.data.get("previous", ""), None)
 
         self.assertEqual(
             len(response.data.get("results")),
@@ -113,58 +152,53 @@ class PaginationParametersTests(TestCase):
         )
 
     def test_page_number_2(self) -> None:
-        """Test page-number=2 parameter"""
+        """Test for page-number = 2"""
 
-        response = self.client.get(
-            f"{AUDIT_LOGS_URL}?page-number=2",
-            HTTP_AUTHORIZATION=self.token,
+        response = self.get_auth_get_response(
+            f"{AUDIT_LOGS_URL}?{PAGE_NUMBER}=2",
         )
 
         self.assertEqual(response.status_code, 200)
-
-        self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
         self.assertEqual(response.data.get("next", ""), None)
-
         self.assertIn(AUDIT_LOGS_URL, response.data.get("previous", ""))
+        self.assertEqual(response.data.get("count"), self._AUDIT_LOGS_COUNT)
 
         self.assertEqual(
             len(response.data.get("results")),
             self.__DEFAULT_PAGE_SIZE,
         )
 
-    def test_page_size(self) -> None:
-        """Test page-size parameter"""
+    def test_page_size_2(self) -> None:
+        """Test for page-size = 2"""
 
-        response = self.client.get(
-            f"{AUDIT_LOGS_URL}?page-size=2",
-            HTTP_AUTHORIZATION=self.token,
+        response = self.get_auth_get_response(
+            f"{AUDIT_LOGS_URL}?{PAGE_SIZE}=2",
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
+        self.assertEqual(response.data.get("count"), self._AUDIT_LOGS_COUNT)
         self.assertIn(
-            f"{AUDIT_LOGS_URL}?page-number=2&page-size=2",
+            f"{AUDIT_LOGS_URL}?{PAGE_NUMBER}=2&{PAGE_SIZE}=2",
             response.data.get("next", ""),
         )
         self.assertEqual(response.data.get("previous", ""), None)
         self.assertEqual(len(response.data.get("results")), 2)
 
-    def test_page_size_2(self) -> None:
-        """Test page-size parameter for page-number=2"""
+    def test_page_size_page_number_2(self) -> None:
+        """Test for page-size = 2 and page-number = 2"""
 
-        response = self.client.get(
-            f"{AUDIT_LOGS_URL}?page-number=2&page-size=2",
-            HTTP_AUTHORIZATION=self.token,
+        response = self.get_auth_get_response(
+            f"{AUDIT_LOGS_URL}?{PAGE_NUMBER}=2&{PAGE_SIZE}=2",
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get("count"), self.__OBJECTS_COUNT)
+        self.assertEqual(response.data.get("count"), self._AUDIT_LOGS_COUNT)
         self.assertIn(
-            f"{AUDIT_LOGS_URL}?page-number=3&page-size=2",
+            f"{AUDIT_LOGS_URL}?{PAGE_NUMBER}=3&{PAGE_SIZE}=2",
             response.data.get("next", ""),
         )
         self.assertIn(
-            f"{AUDIT_LOGS_URL}?page-size=2",
+            f"{AUDIT_LOGS_URL}?{PAGE_SIZE}=2",
             response.data.get("previous", ""),
         )
         self.assertEqual(len(response.data.get("results")), 2)
@@ -173,86 +207,74 @@ class PaginationParametersTests(TestCase):
         """Test wrong page-number parameter"""
 
         for value in DIFFERENT_VALUES:
-            response = self.client.get(
-                f"{AUDIT_LOGS_URL}?page-number={value}",
-                HTTP_AUTHORIZATION=self.token,
-            )
+            with self.subTest(f"{value=}"):
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?{PAGE_NUMBER}={value}",
+                )
 
-            self.assertEqual(response.status_code, 404)
-            self.assertEqual(response.data.get("detail"), "Invalid page.")
+                self.assertEqual(response.status_code, 404)
+                self.assertEqual(response.data.get("detail"), "Invalid page.")
 
     def test_wrong_page_size(self) -> None:
         """Test wrong page-size parameter"""
 
         for value in WRONG_PAGE_SIZE:
             with self.subTest(f"{value=}"):
-                response = self.client.get(
-                    f"{AUDIT_LOGS_URL}?page-size={value}",
-                    HTTP_AUTHORIZATION=self.token,
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?{PAGE_SIZE}={value}",
                 )
 
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(
                     response.data.get("detail"),
-                    "page-size parameter is wrong",
+                    "Invalid page-size parameter",
                 )
 
 
-class SortByTests(TestCase):
-    """Test list with sort-by param"""
-
-    __OBJECTS_COUNT = 10
+class AuditLogsListViewSortByTests(AuditLogsViewTestsMixin):
+    """Test sort-by param for AuditLogsListView"""
 
     __SORT_BY_PARAMS = (
-        "id", "-id",
-        "service-name", "-service-name",
-        "user-id", "-user-id",
-        "user-name", "-user-name",
-        "event-type", "-event-type",
-        "object-type", "-object-type",
-        "object-name", "-object-name",
-        "description", "-description",
-        "created-at", "-created-at",
+        "id",
+        "-id",
+        "service-name",
+        "-service-name",
+        "user-id",
+        "-user-id",
+        "user-name",
+        "-user-name",
+        "event-type",
+        "-event-type",
+        "object-type",
+        "-object-type",
+        "object-name",
+        "-object-name",
+        "description",
+        "-description",
+        "created-at",
+        "-created-at",
     )
 
-    @classmethod
-    def setUpTestData(cls) -> None:
-        for i in range(cls.__OBJECTS_COUNT):
-            AuditLogs.objects.create(
-                service_name=f"Service name {i}",
-                user_id=i,
-                user_name=f"User name {i}",
-                event_type=f"Event type {i}",
-                object_type=f"Object type {i}",
-                object_name=f"Object name {i}",
-                description=f"Description {i}",
-                prev_value={"test": i},
-                new_value={"test": i},
-                context={"info": f"INFO {i}"},
-            )
-
-        cls.client = Client()
-        cls.token = get_authorization_token(cls.client)
+    _AUDIT_LOGS_COUNT = 10
 
     def test_sort_by_correct_values(self) -> None:
         """Tests for sort-by parameter with correct values"""
 
         for param in self.__SORT_BY_PARAMS:
             with self.subTest(f"{param=}"):
-                response = self.client.get(
-                    f"{AUDIT_LOGS_URL}?sort-by={param}",
-                    HTTP_AUTHORIZATION=self.token,
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?{SORT_BY}={param}",
                 )
 
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(
                     response.data.get("count"),
-                    self.__OBJECTS_COUNT,
+                    self._AUDIT_LOGS_COUNT,
                 )
 
                 results = response.data.get("results")
 
-                self.assertEqual(len(results), self.__OBJECTS_COUNT)
+                self.assertEqual(len(results), self._AUDIT_LOGS_COUNT)
 
                 if param.startswith("-"):
                     results_values = [res.get(param[1:]) for res in results]
@@ -271,13 +293,90 @@ class SortByTests(TestCase):
 
         for param in DIFFERENT_VALUES:
             with self.subTest(f"{param=}"):
-                response = self.client.get(
-                    f"{AUDIT_LOGS_URL}?sort-by={param}",
-                    HTTP_AUTHORIZATION=self.token,
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?{SORT_BY}={param}",
                 )
 
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(
                     response.data.get("detail"),
-                    "Wrong value for sort-by parameter",
+                    f"Wrong value for {SORT_BY} parameter",
                 )
+
+
+class AuditLogsListViewFiltersTests(AuditLogsViewTestsMixin):
+    """Test filters parameters for AuditLogsListView"""
+
+    _AUDIT_LOGS_COUNT = 10
+
+    def test_filter_not_exists_field_value(self) -> None:
+        """Filter logs by not exists field value and should return 0 entries"""
+
+        fields_and_values = {
+            "id": 100,
+            "service-name": "Not exists service name",
+            "user-id": 100,
+            "user-name": "Not exists user name",
+            "event-type": "Not exists event type",
+            "object-type": "Not exists object type",
+            "object-name": "Not exists object name",
+            "description": "Not exists description",
+            "created-at": "2026-12-14T02:00:00.000Z",
+        }
+
+        for field, value in fields_and_values.items():
+            with self.subTest(f"{field=}, {value=}"):
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?filter[{field}]={value}",
+                )
+
+                results = response.data.get("results")
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data.get("count"), 0)
+                self.assertEqual(response.data.get("next", ""), None)
+                self.assertEqual(response.data.get("previous", ""), None)
+                self.assertEqual(results, [])
+
+    def test_filter_exists_field_value(self) -> None:
+        """Filter logs by exists field value and should return 1 entry"""
+
+        log_number = randint(0, self._AUDIT_LOGS_COUNT - 1)
+        log_created_at = AuditLogs.objects.get(user_id=log_number).created_at
+
+        fields_and_values = {
+            "id": AuditLogs.objects.get(user_id=log_number).id,
+            "service-name": f"Service name {log_number}",
+            "user-id": log_number,
+            "user-name": f"User name {log_number}",
+            "event-type": f"Event type {log_number}",
+            "object-type": f"Object type {log_number}",
+            "object-name": f"Object name {log_number}",
+            "description": f"Description {log_number}",
+            "created-at": log_created_at.strftime("%Y-%m-%d %H:%M:%S.%f"),
+        }
+
+        for field, value in fields_and_values.items():
+            with self.subTest(f"{field=}, {value=}"):
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?filter[{field}]={value}",
+                )
+
+                results = response.data.get("results")
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data.get("count"), 1)
+                self.assertEqual(response.data.get("next", ""), None)
+                self.assertEqual(response.data.get("previous", ""), None)
+                self.assertEqual(len(results), 1)
+
+    def test_wrong_fields_values(self) -> None:
+        """Filter logs by wrong fieleds values should return 400 error"""
+
+        for field in "id", "user-id", "created-at":
+            with self.subTest(f"{field=}"):
+                response = self.get_auth_get_response(
+                    f"{AUDIT_LOGS_URL}?filter[{field}]=value",
+                )
+
+                self.assertEqual(response.status_code, 400)

@@ -189,7 +189,7 @@ def get_response_with_pagination(
 
     if not request.GET.get("page-size", "0").isdigit():
         return Response(
-            {"detail": "page-size parameter is wrong"},
+            {"detail": "Invalid page-size parameter"},
             status=HTTP_400_BAD_REQUEST,
         )
 

@@ -142,6 +142,36 @@ class DeleteTagView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         tag = Tag.objects.get(id=tag_id)
+
+        prev_tag_value = {
+            "id": tag.id,
+            "title": tag.title,
+            "weight": str(tag.weight),
+            "created_by": tag.created_by,
+            "created_at": str(tag.created_at) if tag.created_at else tag.created_at,
+            "updated_at": str(tag.updated_at) if tag.updated_at else tag.updated_at,
+            "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
+        }
+
         tag.title = title
         tag.save()
+
+        create_audit_log_entry(request, {
+            "table": "tags",
+            "event_type": "update-tag",
+            "object_type": "tag",
+            "object_name": "Tag",
+            "description": f"Update tag with id {tag_id}",
+            "prev_value": prev_tag_value,
+            "new_value": {
+                "id": tag.id,
+                "title": tag.title,
+                "weight": str(tag.weight),
+                "created_by": tag.created_by,
+                "created_at": str(tag.created_at) if tag.created_at else tag.created_at,
+                "updated_at": str(tag.updated_at) if tag.updated_at else tag.updated_at,
+                "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
+            },
+        })
+
         return Response(TagCreateSerializer(instance=tag).data, status=status.HTTP_200_OK)

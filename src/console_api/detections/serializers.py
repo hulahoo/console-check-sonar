@@ -1,11 +1,11 @@
 """Serializers for detections app"""
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from console_api.detections.models import Detection
 
 
-class DetectionSerializer(serializers.ModelSerializer):
+class DetectionSerializer(ModelSerializer):
     """Serializer for Detection model"""
 
     class Meta:
@@ -17,13 +17,13 @@ class DetectionSerializer(serializers.ModelSerializer):
             "id",
             "feed-names",
             "feeds",
+            "details",
             "tags",
             "tags-weight",
             "indicator-id",
             "indicator-weight",
-            "details",
-            "source",
             "source-event",
+            "source",
             "source-message",
             "detection-event",
             "detection-message",

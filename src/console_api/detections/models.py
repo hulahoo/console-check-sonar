@@ -2,80 +2,64 @@
 from typing import List
 
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db.models import (
+    BigIntegerField,
+    DateTimeField,
+    DecimalField,
+    JSONField,
+    Model,
+    TextField,
+    UUIDField,
+)
 
 from console_api.feed.models import Feed, IndicatorFeedRelationship
 
 
-CREATED_AT = "Дата и время создания"
-
-
-class DetectionTagRelationship(models.Model):
-    """Custom ManyToMany relationship table for Detection and Tag"""
-
-    detection_id = models.BigIntegerField()
-
-    tag_id = models.BigIntegerField()
-
-    created_at = models.DateTimeField(
-        CREATED_AT,
-        auto_now_add=True,
-    )
-
-    class Meta:
-        """Metainformation about the model"""
-
-        verbose_name = "Связь обнаружение-тег"
-        verbose_name_plural = "Связи обнаружение-тег"
-
-        db_table = "detection_tag_relationships"
-
-
-class Detection(models.Model):
+class Detection(Model):
     """Event detection"""
 
-    source = models.TextField(
+    source = TextField(
         "Источник",
     )
 
-    source_message = models.TextField(
+    source_message = TextField(
         "Текст входящего сообщения от SIEM",
     )
 
-    source_event = models.JSONField(
+    source_event = JSONField(
         "Результат парсинга входящего сообщения от SIEM",
     )
 
-    details = models.JSONField(
+    details = JSONField(
         "Дополнительная информация",
     )
 
-    indicator_id = models.UUIDField(
+    indicator_id = UUIDField(
         "Обнаруженный Индикатор для данного события",
     )
 
-    detection_event = models.JSONField(
+    detection_event = JSONField(
         "Объект с информацией об обнаружении",
     )
 
-    detection_message = models.TextField(
+    detection_message = TextField(
         "Текст исходящего сообщения во внешнюю ИС (SIEM)",
     )
 
-    tags_weight = models.DecimalField(
+    tags_weight = DecimalField(
         "Вес тэгов Индикатора на момент обнаружения",
         validators=[MinValueValidator(1), MaxValueValidator(100)],
         decimal_places=5,
         max_digits=8,
     )
 
-    indicator_weight = models.DecimalField(
+    indicator_weight = DecimalField(
         "Вес Индикатора на момент обнаружения",
         decimal_places=5,
         max_digits=8,
     )
 
-    created_at = models.DateTimeField(
+    created_at = DateTimeField(
         "Дата создания обнаружения",
         auto_now_add=True,
     )
@@ -85,8 +69,8 @@ class Detection(models.Model):
         """Return tuple of tags ids that linked with the detection"""
 
         return (
-            relationship.tag_id for relationship in
-            DetectionTagRelationship.objects.filter(
+            relationship.tag_id
+            for relationship in DetectionTagRelationship.objects.filter(
                 detection_id=self.id,
             )
         )
@@ -107,16 +91,13 @@ class Detection(models.Model):
         """Return tuple of feeds that linked with detection's indicator"""
 
         feeds_ids = [
-            relationship.feed_id for relationship in
-            IndicatorFeedRelationship.objects.filter(
+            relationship.feed_id
+            for relationship in IndicatorFeedRelationship.objects.filter(
                 indicator_id=self.indicator_id,
             )
         ]
 
-        return (
-            Feed.objects.get(id=feed_id).title
-            for feed_id in feeds_ids
-        )
+        return (Feed.objects.get(id=feed_id).title for feed_id in feeds_ids)
 
     def __str__(self) -> str:
         return str(self.id)
@@ -126,26 +107,50 @@ class Detection(models.Model):
 
         verbose_name = "Обнаружение"
         verbose_name_plural = "Обнаружения"
+
         ordering = ["-created_at"]
         db_table = "detections"
 
 
-class DetectionFeedRelationship(models.Model):
-    """Custom ManyToMany relationship table for Detection and Feed"""
+class DetectionTagRelationship(Model):
+    """Custom ManyToMany relationship table for Detection and Tag"""
 
-    detection_id = models.BigIntegerField()
+    detection_id = BigIntegerField("ID обнаружения")
 
-    feed_id = models.BigIntegerField()
+    tag_id = BigIntegerField("ID тега")
 
-    created_at = models.DateTimeField(
-        CREATED_AT,
-        auto_now_add=True,
-    )
+    created_at = DateTimeField("Дата создания связи", auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"DetectionTagRelationship ({self.id})"
 
     class Meta:
         """Metainformation about the model"""
 
-        verbose_name = "Связь обнаружение-фид"
-        verbose_name_plural = "Связи обнаружение-фид"
+        verbose_name = "Связь M2M «Обнаружение-Тэг»"
+        verbose_name_plural = "Связи M2M «Обнаружение-Тэг»"
 
+        ordering = ["-created_at"]
+        db_table = "detection_tag_relationships"
+
+
+class DetectionFeedRelationship(Model):
+    """Custom ManyToMany relationship table for Detection and Feed"""
+
+    detection_id = BigIntegerField("ID обнаружения")
+
+    feed_id = BigIntegerField("ID фида")
+
+    created_at = DateTimeField("Дата создания связи", auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"DetectionFeedRelationship ({self.id})"
+
+    class Meta:
+        """Metainformation about the model"""
+
+        verbose_name = "Связь M2M «Обнаружение-Фид»"
+        verbose_name_plural = "Связи M2M «Обнаружение-Фид»"
+
+        ordering = ["-created_at"]
         db_table = "detection_feed_relationships"

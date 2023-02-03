@@ -6,5 +6,5 @@ from console_api.detections.views import DetectionListView
 
 
 urlpatterns = [
-    path('', DetectionListView.as_view(), name='detections'),
+    path("", DetectionListView.as_view(), name="detections"),
 ]

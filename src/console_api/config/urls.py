@@ -46,7 +46,7 @@ urlpatterns = [
     path("api/sessions", CustomAuthTokenView.as_view()),
     path("api/indicators", include("console_api.indicator.urls")),
     path(
-        "api/",
+        "api/doc",
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-api-ui",
     ),
@@ -54,7 +54,7 @@ urlpatterns = [
     path("health/readiness", readiness_view, name="readiness"),
     path("health", readiness_and_liveness_view, name="readiness_and_liveness"),
     path("metrics", metrics_view, name="metrics"),
-    path("host/api", api_res, name="api"),
+    path("api", api_res, name="api"),
     path("api/search", include("console_api.search.urls")),
     path("api/platform-settings", include("console_api.platform_settings.urls")),
 ]

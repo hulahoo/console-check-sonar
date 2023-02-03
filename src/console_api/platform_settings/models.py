@@ -1,33 +1,42 @@
-from django.db import models
+"""Models for platform_settings app"""
+
+from django.db.models import (
+    BigAutoField,
+    BigIntegerField,
+    CharField,
+    DateTimeField,
+    Model,
+    JSONField,
+)
 
 
-class PlatformSettings(models.Model):
+class PlatformSettings(Model):
     """PlatformSettings - data source"""
 
-    id = models.BigAutoField(
+    id = BigAutoField(
         primary_key=True,
     )
 
-    key = models.CharField(
+    key = CharField(
         "Название сервиса",
         max_length=128
     )
 
-    value = models.JSONField(
+    value = JSONField(
         "Значение"
     )
 
-    created_at = models.DateTimeField(
+    created_at = DateTimeField(
         "Дата и время создания",
         auto_now_add=True,
     )
 
-    updated_at = models.DateTimeField(
+    updated_at = DateTimeField(
         "Дата и время обновления",
         auto_now_add=True,
     )
 
-    created_by = models.BigIntegerField(
+    created_by = BigIntegerField(
         "ID пользователя"
     )
 

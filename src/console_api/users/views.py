@@ -242,7 +242,6 @@ class CustomAuthTokenView(ObtainAuthToken):
                         "description": "Create token with id",
                         "new_value": {
                             "key": str(token.key),
-                            "user_id": str(token.user.id),
                             "created_at":
                                 str(token.created_at)
                                 if token.created_at else token.created_at,
@@ -282,7 +281,6 @@ class DeleteAuthTokenView(APIView):
         token = Token.objects.get(key=access_token)
         prev_token_value = {
             "key": str(token.key),
-            "user_id": str(token.user.id),
             "created_at":
                 str(token.created_at)
                 if token.created_at else token.created_at,

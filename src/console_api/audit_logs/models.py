@@ -19,11 +19,15 @@ class AuditLogs(Model):
 
     user_id = BigIntegerField(
         "ID пользователя",
+        null=True,
+        blank=True,
     )
 
     user_name = CharField(
         "Имя пользователя",
         max_length=256,
+        null=True,
+        blank=True,
     )
 
     event_type = CharField(

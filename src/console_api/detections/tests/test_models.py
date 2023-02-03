@@ -2,6 +2,7 @@
 
 from django.db.models import (
     BigAutoField,
+    BigIntegerField,
     DateTimeField,
     DecimalField,
     JSONField,
@@ -16,7 +17,11 @@ from django.core.validators import (
     MinValueValidator,
 )
 
-from console_api.detections.models import Detection
+from console_api.detections.models import (
+    Detection,
+    DetectionFeedRelationship,
+    DetectionTagRelationship,
+)
 from console_api.services import run_field_attribute_test
 
 
@@ -199,4 +204,236 @@ class DetectionTests(TestCase):
         self.assertEqual(
             str(Detection.objects.last()),
             str(Detection.objects.last().id),
+        )
+
+
+class DetectionTagRelationshipTests(TestCase):
+    """Test DetectionTagRelationship model"""
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        DetectionTagRelationship.objects.create(detection_id=1, tag_id=2)
+
+        cls.field_ant_type = {
+            "detection_id": BigIntegerField,
+            "tag_id": BigIntegerField,
+            "created_at": DateTimeField,
+        }
+
+        cls.field_and_verbose_name = {
+            "detection_id": "ID обнаружения",
+            "tag_id": "ID тега",
+            "created_at": "Дата создания связи",
+        }
+
+        cls.field_and_auto_now_add = {
+            "created_at": True,
+        }
+
+        cls.field_and_primary_key = {
+            "id": True,
+            "detection_id": False,
+            "tag_id": False,
+            "created_at": False,
+        }
+
+    def test_verbose_name(self) -> None:
+        """Test verbose_name attribute for fields"""
+
+        run_field_attribute_test(
+            DetectionTagRelationship,
+            self,
+            self.field_and_verbose_name,
+            "verbose_name",
+        )
+
+    def test_auto_now_add(self) -> None:
+        """Test auto_now_add attribute for fields"""
+
+        run_field_attribute_test(
+            DetectionTagRelationship,
+            self,
+            self.field_and_auto_now_add,
+            "auto_now_add",
+        )
+
+    def test_primary_key(self) -> None:
+        """Test primary_key attribute for fields"""
+
+        run_field_attribute_test(
+            DetectionTagRelationship,
+            self,
+            self.field_and_primary_key,
+            "primary_key",
+        )
+
+    def test_fields_types(self) -> None:
+        """Test types for fields"""
+
+        for field, expected_type in self.field_ant_type.items():
+            real_type = DetectionTagRelationship._meta.get_field(field).__class__
+
+            self.assertEqual(real_type, expected_type)
+
+    def test_model_mro(self) -> None:
+        """Test DetectionTagRelationship MRO"""
+
+        self.assertIn(Model, DetectionTagRelationship.mro())
+
+    def test_model_verbose_name(self) -> None:
+        """Test DetectionTagRelationship verbose_name"""
+
+        self.assertEqual(
+            DetectionTagRelationship._meta.verbose_name,
+            "Связь M2M «Обнаружение-Тэг»",
+        )
+
+    def test_model_verbose_name_plural(self) -> None:
+        """Test DetectionTagRelationship verbose_name_plural"""
+
+        self.assertEqual(
+            DetectionTagRelationship._meta.verbose_name_plural,
+            "Связи M2M «Обнаружение-Тэг»",
+        )
+
+    def test_model_ordering(self) -> None:
+        """Test DetectionTagRelationship ordering"""
+
+        self.assertEqual(
+            DetectionTagRelationship._meta.ordering,
+            ["-created_at"],
+        )
+
+    def test_db_table(self) -> None:
+        """Test DetectionTagRelationship db_table"""
+
+        self.assertEqual(
+            DetectionTagRelationship._meta.db_table,
+            "detection_tag_relationships",
+        )
+
+    def test_str(self) -> None:
+        """Test __str__ method"""
+
+        object_ = DetectionTagRelationship.objects.last()
+
+        self.assertEqual(
+            str(object_),
+            f"DetectionTagRelationship ({str(object_.id)})",
+        )
+
+
+class DetectionFeedRelationshipTests(TestCase):
+    """Test DetectionFeedRelationship model"""
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        DetectionFeedRelationship.objects.create(detection_id=1, feed_id=2)
+
+        cls.field_ant_type = {
+            "detection_id": BigIntegerField,
+            "feed_id": BigIntegerField,
+            "created_at": DateTimeField,
+        }
+
+        cls.field_and_verbose_name = {
+            "detection_id": "ID обнаружения",
+            "feed_id": "ID фида",
+            "created_at": "Дата создания связи",
+        }
+
+        cls.field_and_auto_now_add = {
+            "created_at": True,
+        }
+
+        cls.field_and_primary_key = {
+            "id": True,
+            "detection_id": False,
+            "feed_id": False,
+            "created_at": False,
+        }
+
+    def test_verbose_name(self) -> None:
+        """Test verbose_name attribute for fields"""
+
+        run_field_attribute_test(
+            DetectionFeedRelationship,
+            self,
+            self.field_and_verbose_name,
+            "verbose_name",
+        )
+
+    def test_auto_now_add(self) -> None:
+        """Test auto_now_add attribute for fields"""
+
+        run_field_attribute_test(
+            DetectionFeedRelationship,
+            self,
+            self.field_and_auto_now_add,
+            "auto_now_add",
+        )
+
+    def test_primary_key(self) -> None:
+        """Test primary_key attribute for fields"""
+
+        run_field_attribute_test(
+            DetectionFeedRelationship,
+            self,
+            self.field_and_primary_key,
+            "primary_key",
+        )
+
+    def test_fields_types(self) -> None:
+        """Test types for fields"""
+
+        for field, expected_type in self.field_ant_type.items():
+            real_type = DetectionFeedRelationship._meta.get_field(field).__class__
+
+            self.assertEqual(real_type, expected_type)
+
+    def test_model_mro(self) -> None:
+        """Test DetectionFeedRelationship MRO"""
+
+        self.assertIn(Model, DetectionFeedRelationship.mro())
+
+    def test_model_verbose_name(self) -> None:
+        """Test DetectionFeedRelationship verbose_name"""
+
+        self.assertEqual(
+            DetectionFeedRelationship._meta.verbose_name,
+            "Связь M2M «Обнаружение-Фид»",
+        )
+
+    def test_model_verbose_name_plural(self) -> None:
+        """Test DetectionFeedRelationship verbose_name_plural"""
+
+        self.assertEqual(
+            DetectionFeedRelationship._meta.verbose_name_plural,
+            "Связи M2M «Обнаружение-Фид»",
+        )
+
+    def test_model_ordering(self) -> None:
+        """Test DetectionFeedRelationship ordering"""
+
+        self.assertEqual(
+            DetectionFeedRelationship._meta.ordering,
+            ["-created_at"],
+        )
+
+    def test_db_table(self) -> None:
+        """Test DetectionFeedRelationship db_table"""
+
+        self.assertEqual(
+            DetectionFeedRelationship._meta.db_table,
+            "detection_feed_relationships",
+        )
+
+    def test_str(self) -> None:
+        """Test __str__ method"""
+
+        object_ = DetectionFeedRelationship.objects.last()
+
+        self.assertEqual(
+            str(object_),
+            f"DetectionFeedRelationship ({str(object_.id)})",
         )

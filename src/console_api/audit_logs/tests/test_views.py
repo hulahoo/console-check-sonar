@@ -87,7 +87,7 @@ class AuditLogsListViewFieldsTests(AuditLogsViewTestsMixin):
         )
 
         self.assertEqual(
-            AuditLogsListView()._AuditLogsListView__SORT_BY_PARAMS,
+            AuditLogsListView()._SORT_BY_PARAMS,
             expected_sort_by_params,
         )
 

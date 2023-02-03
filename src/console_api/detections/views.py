@@ -1,6 +1,6 @@
 """Views for detections app"""
 
-from rest_framework import generics
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -11,12 +11,31 @@ from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
-    get_sort_by_param,
 )
+from console_api.mixins import SortAndFilterQuerysetMixin
 
 
-class DetectionListView(generics.ListAPIView):
+class DetectionListView(ListAPIView, SortAndFilterQuerysetMixin):
     """View for detections list"""
+
+    _SORT_BY_PARAMS = (
+        "id",
+        "-id",
+        "source",
+        "-source",
+        "source_message",
+        "-source_message",
+        "indicator_id",
+        "-indicator_id",
+        "detection_message",
+        "-detection_message",
+        "tags_weight",
+        "-tags_weight",
+        "indicator_weight",
+        "-indicator_weight",
+        "created_at",
+        "-created_at",
+    )
 
     serializer_class = DetectionSerializer
     queryset = Detection.objects.all()
@@ -24,7 +43,7 @@ class DetectionListView(generics.ListAPIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def __filter_queryset(self, request: Request) -> None:
+    def _filter_queryset(self, request: Request) -> None:
         """Filter the queryset"""
 
         detection_event = get_filter_query_param(request, "detection-event")
@@ -70,17 +89,15 @@ class DetectionListView(generics.ListAPIView):
                 detection_message=detection_message,
             )
 
-    def __sort_queryset(self, request: Request) -> None:
-        """Sort the queryset"""
-
-        if sort_by := get_sort_by_param(request):
-            self.queryset = self.queryset.order_by(sort_by)
-
     def list(self, request: Request, *args, **kwargs) -> Response:
         """Return response with list of detections"""
 
-        self.__filter_queryset(request)
-        self.__sort_queryset(request)
+        response_or_none = self.get_error_or_sort_and_filter_queryset(
+            request, *args, **kwargs
+        )
+
+        if isinstance(response_or_none, Response):
+            return response_or_none
 
         return get_response_with_pagination(
             request, self.queryset, self.get_serializer,

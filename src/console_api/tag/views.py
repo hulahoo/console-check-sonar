@@ -21,6 +21,7 @@ from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
 )
+from console_api.tag.constants import LOG_SERVICE_NAME
 
 
 class TagsView(APIView):
@@ -33,7 +34,7 @@ class TagsView(APIView):
         """Create a log entry for POST method"""
 
         create_audit_log_entry(request, {
-            "table": "Console API | tags",
+            "table": LOG_SERVICE_NAME,
             "event_type": "create-tag",
             "object_type": "tag",
             "object_name": "Tag",
@@ -113,7 +114,7 @@ class DeleteTagView(APIView):
         tag.save()
 
         create_audit_log_entry(request, {
-            "table": "Console API | tags",
+            "table": LOG_SERVICE_NAME,
             "event_type": "delete-tag",
             "object_type": "tag",
             "object_name": "Tag",
@@ -157,7 +158,7 @@ class DeleteTagView(APIView):
         tag.save()
 
         create_audit_log_entry(request, {
-            "table": "Console API | tags",
+            "table": LOG_SERVICE_NAME,
             "event_type": "update-tag",
             "object_type": "tag",
             "object_name": "Tag",

@@ -21,6 +21,7 @@ from .serializers import AuthTokenSerializer
 from console_api.users.models import Token, User
 from console_api.services import (
     CustomTokenAuthentication,
+    create_audit_log_entry,
     get_hashed_password,
     get_not_fields_error,
 )
@@ -38,13 +39,41 @@ class UserView(APIView):
             return None
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
-        """
-        Delete user
-        """
+        """Delete user"""
+
         user = self.get_object(user_id=kwargs.pop("user_id"))
+
         if user:
+            prev_user_value = {
+                "login": user.login,
+                "full_name": user.full_name,
+                "deleted_at": str(user.deleted_at)
+                if user.deleted_at
+                else user.deleted_at,
+            }
+
             user.deleted_at = datetime.now()
             user.save()
+
+            create_audit_log_entry(
+                request,
+                {
+                    "table": "users",
+                    "event_type": "delete-user",
+                    "object_type": "user",
+                    "object_name": "User",
+                    "description": "Delete a user",
+                    "prev_value": prev_user_value,
+                    "new_value": {
+                        "login": user.login,
+                        "full_name": user.full_name,
+                        "deleted_at": str(user.deleted_at)
+                        if user.deleted_at
+                        else user.deleted_at,
+                    },
+                },
+            )
+
             return Response(status=status.HTTP_200_OK)
         return Response(
             status=status.HTTP_404_NOT_FOUND,
@@ -52,9 +81,8 @@ class UserView(APIView):
         )
 
     def post(self, request: Request, user_id: int) -> Response:
-        """
-        Change user data
-        """
+        """Update the user"""
+
         user = self.get_object(user_id=user_id)
 
         if not user:
@@ -63,7 +91,12 @@ class UserView(APIView):
                 data={"detail": "User not found"},
             )
 
-        if error_400 := get_not_fields_error(request, ('role', 'new-pass', 'full-name')):
+        error_400 = get_not_fields_error(
+            request,
+            ("role", "new-pass", "full-name"),
+        )
+
+        if error_400:
             return error_400
 
         if not User.objects.filter(id=user_id).exists():
@@ -72,14 +105,37 @@ class UserView(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        new_pass = request.data.get("new-pass")
-        new_role = request.data.get("role")
-        new_full_name = request.data.get("full-name")
+        prev_user_value = {
+            "login": user.login,
+            "full_name": user.full_name,
+            "updated_at": str(user.updated_at) if user.updated_at else user.updated_at,
+        }
 
-        user.full_name = new_full_name
-        user.role = new_role
+        new_pass = request.data.get("new-pass")
+
+        user.full_name = request.data.get("full-name")
+        user.role = request.data.get("role")
         user.password = get_hashed_password(new_pass)
         user.save()
+
+        create_audit_log_entry(
+            request,
+            {
+                "table": "users",
+                "event_type": "update-user",
+                "object_type": "user",
+                "object_name": "User",
+                "description": "Update the user",
+                "prev_value": prev_user_value,
+                "new_value": {
+                    "login": user.login,
+                    "full_name": user.full_name,
+                    "updated_at": str(user.updated_at)
+                    if user.updated_at
+                    else user.updated_at,
+                },
+            },
+        )
 
         return Response(status=HTTP_200_OK)
 
@@ -91,20 +147,40 @@ class UserDetail(APIView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         error_400 = get_not_fields_error(
-            request, ('login', 'pass-hash', 'full-name', 'role'),
+            request,
+            ("login", "pass-hash", "full-name", "role"),
         )
 
         if error_400:
             return error_400
 
-        user_login = request.data.get('login')
+        user_login = request.data.get("login")
 
         if not User.objects.filter(login=user_login).exists():
+            full_name = request.data.get("full-name")
+            role = request.data.get("role")
+
             User.objects.create(
                 login=user_login,
-                password=request.data.get('pass-hash'),
-                full_name=request.data.get('full-name'),
-                role=request.data.get('role'),
+                password=request.data.get("pass-hash"),
+                full_name=full_name,
+                role=role,
+            )
+
+            create_audit_log_entry(
+                request,
+                {
+                    "table": "users",
+                    "event_type": "create-user",
+                    "object_type": "user",
+                    "object_name": "User",
+                    "description": "Create a user",
+                    "new_value": {
+                        "login": user_login,
+                        "full_name": full_name,
+                        "role": role,
+                    },
+                },
             )
 
         return Response(status=HTTP_201_CREATED)
@@ -142,12 +218,12 @@ class CustomAuthTokenView(ObtainAuthToken):
         try:
             serializer = AuthTokenSerializer(
                 data=request.data,
-                context={'request': request},
+                context={"request": request},
             )
 
             serializer.is_valid(raise_exception=True)
 
-            user = serializer.validated_data['user']
+            user = serializer.validated_data["user"]
 
             if Token.objects.filter(user_id=user.pk).exists():
                 user_token = Token.objects.get(user_id=user.pk).key
@@ -161,10 +237,12 @@ class CustomAuthTokenView(ObtainAuthToken):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        return Response({
-            'access-token': user_token,
-            'user-id': user.pk,
-        })
+        return Response(
+            {
+                "access-token": user_token,
+                "user-id": user.pk,
+            }
+        )
 
 
 class DeleteAuthToken(APIView):
@@ -177,8 +255,7 @@ class DeleteAuthToken(APIView):
 
         if not Token.objects.filter(key=access_token).exists():
             return Response(
-                {"detail": "Token doesn't exists"},
-                status=HTTP_400_BAD_REQUEST
+                {"detail": "Token doesn't exists"}, status=HTTP_400_BAD_REQUEST
             )
 
         Token.objects.get(key=access_token).delete()

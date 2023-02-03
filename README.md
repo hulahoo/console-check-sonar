@@ -48,7 +48,7 @@
 FROM python:3.10.8-slim as deps
 WORKDIR /app
 COPY . ./
-RUN apt-get update -y && apt-get -y install gcc python3-dev
+RUN apt-get update -y && apt-get -y install gcc
 RUN pip --no-cache-dir install -r requirements.txt
 RUN pip --no-cache-dir install -r requirements.setup.txt
 RUN pip install -e .
@@ -62,7 +62,7 @@ RUN ls -ll /app/dist/
 
 FROM python:3.10.8-slim as runtime
 COPY --from=build /app/dist/*.whl /app/
-RUN apt-get update -y && apt-get -y install gcc python3-dev
+RUN apt-get update -y && apt-get -y install gcc
 RUN pip --no-cache-dir install /app/*.whl
 
 ENTRYPOINT ["console-api"]

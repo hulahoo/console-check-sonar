@@ -23,6 +23,11 @@ from console_api.detections.models import (
     DetectionTagRelationship,
 )
 from console_api.services import run_field_attribute_test
+from console_api.feed.models import Feed
+from console_api.indicator.models import (
+    IndicatorFeedRelationship,
+    IndicatorTagRelationship,
+)
 
 
 class DetectionTests(TestCase):
@@ -30,17 +35,54 @@ class DetectionTests(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
+        indicator_id = "40434628-a47a-49c8-8adf-73e66b2b02e5"
+
         Detection.objects.create(
             source="Source",
             source_message="Source message",
             source_event={"test": 1},
             details={"info": "detail"},
-            indicator_id="40434628-a47a-49c8-8adf-73e66b2b02e5",
+            indicator_id=indicator_id,
             detection_event={"info": "event"},
             detection_message="Detection message",
             tags_weight=10,
             indicator_weight=10,
         )
+
+        # For testing tags_ids
+
+        cls.tags_ids = (1, 2, 3, 4)
+
+        for id_ in cls.tags_ids:
+            IndicatorTagRelationship.objects.create(
+                indicator_id=indicator_id,
+                tag_id=id_,
+            )
+
+        # For testing feeds_ids and feeds_names
+
+        for i in range(4):
+            Feed.objects.create(
+                title=f"test{i}.xml",
+                url="http://127.0.0.1:8000/test.xml",
+                format="xml",
+                is_use_taxii=True,
+                auth_type="asdasdsad",
+                certificate=b"certificate",
+                available_fields={'asdasd': 1},
+                provider="test",
+                description="asdasd",
+                max_records_count=12,
+                weight=12,
+            )
+
+        cls.feeds_ids = [feed.id for feed in Feed.objects.all()]
+
+        for id_ in cls.feeds_ids:
+            IndicatorFeedRelationship.objects.create(
+                indicator_id=indicator_id,
+                feed_id=id_,
+            )
 
         cls.field_ant_type = {
             "id": BigAutoField,
@@ -204,6 +246,34 @@ class DetectionTests(TestCase):
         self.assertEqual(
             str(Detection.objects.last()),
             str(Detection.objects.last().id),
+        )
+
+    def test_tags_ids(self) -> None:
+        """Test tags_ids property"""
+
+        self.assertEqual(
+            set(Detection.objects.last().tags_ids),
+            set(self.tags_ids),
+        )
+
+    def test_feeds_ids(self) -> None:
+        """Test feeds_ids property"""
+
+        self.assertEqual(
+            set(Detection.objects.last().feeds_ids),
+            set(self.feeds_ids),
+        )
+
+    def test_feeds_names(self) -> None:
+        """Test feeds_names property"""
+
+        feeds_names = tuple(
+            Feed.objects.get(id=id_).title for id_ in self.feeds_ids
+        )
+
+        self.assertEqual(
+            set(Detection.objects.last().feeds_names),
+            set(feeds_names),
         )
 
 

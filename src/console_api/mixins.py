@@ -1,8 +1,37 @@
-from rest_framework.request import Request
+"""Mixins for the project"""
 
-from console_api.services import get_filter_query_param
-from console_api.indicator.models import IndicatorActivities
+from rest_framework.response import Response
+from rest_framework.request import Request
+from rest_framework.status import HTTP_400_BAD_REQUEST
+
 from console_api.feed.models import IndicatorFeedRelationship, Feed
+from console_api.indicator.models import IndicatorActivities
+from console_api.services import get_filter_query_param
+from console_api.services import get_sort_by_param
+
+
+class SortAndFilterQuerysetMixin:
+    """Mixin for sorting and filtering a queryset"""
+
+    def get_error_or_sort_and_filter_queryset(self, request, *_, **__):
+        """Sort by param and filter the queryset"""
+
+        try:
+            self._filter_queryset(request)
+
+            if sort_by := get_sort_by_param(request):
+                if sort_by not in self._SORT_BY_PARAMS:
+                    return Response(
+                        {"detail": "Wrong value for sort-by parameter"},
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+
+                self.queryset = self.queryset.order_by(sort_by)
+        except Exception as error:
+            return Response(
+                {"detail": str(error)},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
 class IndicatorQueryMixin:

@@ -4,7 +4,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from console_api.audit_logs.models import AuditLogs
 from console_api.audit_logs.serializers import AuditLogsListSerializer
@@ -12,14 +11,14 @@ from console_api.services import (
     CustomTokenAuthentication,
     get_filter_query_param,
     get_response_with_pagination,
-    get_sort_by_param,
 )
+from console_api.mixins import SortAndFilterQuerysetMixin
 
 
-class AuditLogsListView(ListAPIView):
+class AuditLogsListView(ListAPIView, SortAndFilterQuerysetMixin):
     """Audit logs list"""
 
-    __SORT_BY_PARAMS = (
+    _SORT_BY_PARAMS = (
         "id",
         "-id",
         "service_name",
@@ -46,7 +45,7 @@ class AuditLogsListView(ListAPIView):
     queryset = AuditLogs.objects.all()
     serializer_class = AuditLogsListSerializer
 
-    def __filter_queryset(self, request: Request) -> None:
+    def _filter_queryset(self, request: Request) -> None:
         """Filter the queryset"""
 
         if event_id := get_filter_query_param(request, "id"):
@@ -79,22 +78,12 @@ class AuditLogsListView(ListAPIView):
     def list(self, request: Request, *args, **kwargs) -> Response:
         """Return response with list of logs"""
 
-        try:
-            self.__filter_queryset(request)
+        response_or_none = self.get_error_or_sort_and_filter_queryset(
+            request, *args, **kwargs
+        )
 
-            if sort_by := get_sort_by_param(request):
-                if sort_by not in self.__SORT_BY_PARAMS:
-                    return Response(
-                        {"detail": "Wrong value for sort-by parameter"},
-                        status=HTTP_400_BAD_REQUEST,
-                    )
-
-                self.queryset = self.queryset.order_by(sort_by)
-        except Exception as error:
-            return Response(
-                {"detail": str(error)},
-                status=HTTP_400_BAD_REQUEST,
-            )
+        if isinstance(response_or_none, Response):
+            return response_or_none
 
         return get_response_with_pagination(
             request,

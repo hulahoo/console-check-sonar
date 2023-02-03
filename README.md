@@ -8,16 +8,16 @@
 
 ### Без использования Docker
 - Создать файл _.env_ в корне проекта и задать в нём значения
-    ```
-    DEBUG=<True/False>
-    SWAGGER=<True/False>
+```
+DEBUG=<True/False>
+SWAGGER=<True/False>
 
-    APP_POSTGRESQL_HOST=
-    APP_POSTGRESQL_PASSWORD=
-    APP_POSTGRESQL_USER=
-    APP_POSTGRESQL_NAME=
-    APP_POSTGRESQL_PORT=
-    ```
+APP_POSTGRESQL_HOST=
+APP_POSTGRESQL_PASSWORD=
+APP_POSTGRESQL_USER=
+APP_POSTGRESQL_NAME=
+APP_POSTGRESQL_PORT=
+```
 - Создать и активировать виртуальное окружение
     ```bash
     $ python -m venv venv

@@ -3,8 +3,8 @@
 from django.apps import AppConfig
 from django.test import TestCase
 
-from console_api.detections.apps import DetectionsConfig
 from console_api.constants import DEFAULT_AUTO_FIELD
+from console_api.detections.apps import DetectionsConfig
 
 
 class DetectionsConfigTests(TestCase):

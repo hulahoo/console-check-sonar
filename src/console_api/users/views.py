@@ -25,6 +25,8 @@ from console_api.services import (
     get_hashed_password,
     get_not_fields_error,
 )
+from console_api.users.constants import LOG_SERVICE_NAME
+
 
 
 class UserView(APIView):
@@ -58,7 +60,7 @@ class UserView(APIView):
             create_audit_log_entry(
                 request,
                 {
-                    "table": "Console API | users",
+                    "table": LOG_SERVICE_NAME,
                     "event_type": "delete-user",
                     "object_type": "user",
                     "object_name": "User",
@@ -121,7 +123,7 @@ class UserView(APIView):
         create_audit_log_entry(
             request,
             {
-                "table": "Console API | users",
+                "table": LOG_SERVICE_NAME,
                 "event_type": "update-user",
                 "object_type": "user",
                 "object_name": "User",
@@ -170,7 +172,7 @@ class UserDetail(APIView):
             create_audit_log_entry(
                 request,
                 {
-                    "table": "Console API | users",
+                    "table": LOG_SERVICE_NAME,
                     "event_type": "create-user",
                     "object_type": "user",
                     "object_name": "User",

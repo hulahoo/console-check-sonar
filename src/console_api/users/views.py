@@ -28,7 +28,6 @@ from console_api.services import (
 from console_api.users.constants import LOG_SERVICE_NAME
 
 
-
 class UserView(APIView):
 
     authentication_classes = [CustomTokenAuthentication]

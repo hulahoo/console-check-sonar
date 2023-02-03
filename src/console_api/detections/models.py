@@ -1,5 +1,4 @@
 """Models for detections app"""
-from typing import List
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import (
@@ -13,6 +12,7 @@ from django.db.models import (
 )
 
 from console_api.feed.models import Feed, IndicatorFeedRelationship
+from console_api.indicator.models import IndicatorTagRelationship
 
 
 class Detection(Model):
@@ -65,39 +65,35 @@ class Detection(Model):
     )
 
     @property
-    def tags_ids(self) -> tuple:
-        """Return tuple of tags ids that linked with the detection"""
+    def tags_ids(self) -> tuple[int]:
+        """Return tags ids linked with the detection"""
 
-        return (
+        return tuple(
             relationship.tag_id
-            for relationship in DetectionTagRelationship.objects.filter(
-                detection_id=self.id,
+            for relationship in IndicatorTagRelationship.objects.filter(
+                indicator_id=self.indicator_id,
             )
         )
 
     @property
-    def feeds_ids(self) -> List[str] | None:
-        """Return feed's ids linked with the detection"""
+    def feeds_ids(self) -> tuple[int]:
+        """Return feeds ids linked with the detection's indicator"""
 
-        return [
-            rel.feed_id
-            for rel in DetectionFeedRelationship.objects.filter(
-                detection_id=self.id,
-            )
-        ]
-
-    @property
-    def feeds_names(self) -> tuple:
-        """Return tuple of feeds that linked with detection's indicator"""
-
-        feeds_ids = [
+        return tuple(
             relationship.feed_id
             for relationship in IndicatorFeedRelationship.objects.filter(
                 indicator_id=self.indicator_id,
             )
-        ]
+        )
 
-        return (Feed.objects.get(id=feed_id).title for feed_id in feeds_ids)
+    @property
+    def feeds_names(self) -> tuple[str]:
+        """Return feeds titles linked with detection's indicator"""
+
+        return tuple(
+            Feed.objects.get(id=feed_id).title
+            for feed_id in self.feeds_ids
+        )
 
     def __str__(self) -> str:
         return str(self.id)

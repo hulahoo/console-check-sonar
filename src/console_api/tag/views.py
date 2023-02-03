@@ -33,7 +33,7 @@ class TagsView(APIView):
         """Create a log entry for POST method"""
 
         create_audit_log_entry(request, {
-            "table": "tags",
+            "table": "Console API | tags",
             "event_type": "create-tag",
             "object_type": "tag",
             "object_name": "Tag",
@@ -113,7 +113,7 @@ class DeleteTagView(APIView):
         tag.save()
 
         create_audit_log_entry(request, {
-            "table": "tags",
+            "table": "Console API | tags",
             "event_type": "delete-tag",
             "object_type": "tag",
             "object_name": "Tag",
@@ -157,7 +157,7 @@ class DeleteTagView(APIView):
         tag.save()
 
         create_audit_log_entry(request, {
-            "table": "tags",
+            "table": "Console API | tags",
             "event_type": "update-tag",
             "object_type": "tag",
             "object_name": "Tag",

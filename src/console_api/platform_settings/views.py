@@ -54,7 +54,7 @@ class PlatformSettingsView(APIView):
             settings.save()
 
             create_audit_log_entry(request, {
-                "table": "platform_settings",
+                "table": "Console API | platform_settings",
                 "event_type": "update-platform-settings",
                 "object_type": "platform-settings",
                 "object_name": "Platform settings",
@@ -83,7 +83,7 @@ class PlatformSettingsView(APIView):
             settings.save()
 
             create_audit_log_entry(request, {
-                "table": "platform_settings",
+                "table": "Console API | platform_settings",
                 "event_type": "create-platform-settings",
                 "object_type": "platform-settings",
                 "object_name": "Platform settings",

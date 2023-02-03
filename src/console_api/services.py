@@ -129,7 +129,7 @@ def create_audit_log_entry(request: Request, data: dict) -> None:
 
     AuditLogs.objects.create(
         id=new_id,
-        service_name=f"Console API {data.get('table', '')}",
+        service_name=data.get("table", ""),
         user_id=request.user.id,
         user_name=user_name,
         event_type=data.get("event_type", ""),

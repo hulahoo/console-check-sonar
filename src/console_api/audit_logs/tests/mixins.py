@@ -28,7 +28,7 @@ class AuditLogsViewTestsMixin(TestCase):
         cls.client = Client()
 
         cls.token = get_authorization_token(cls.client)
-        AuditLogs.objects.get(service_name="Console API token").delete()
+        AuditLogs.objects.get(service_name="Console API | token").delete()
 
     def get_auth_get_response(self, url: str):
         """Return authorized GET response"""

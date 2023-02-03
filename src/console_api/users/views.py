@@ -58,7 +58,7 @@ class UserView(APIView):
             create_audit_log_entry(
                 request,
                 {
-                    "table": "users",
+                    "table": "Console API | users",
                     "event_type": "delete-user",
                     "object_type": "user",
                     "object_name": "User",
@@ -121,7 +121,7 @@ class UserView(APIView):
         create_audit_log_entry(
             request,
             {
-                "table": "users",
+                "table": "Console API | users",
                 "event_type": "update-user",
                 "object_type": "user",
                 "object_name": "User",
@@ -170,7 +170,7 @@ class UserDetail(APIView):
             create_audit_log_entry(
                 request,
                 {
-                    "table": "users",
+                    "table": "Console API | users",
                     "event_type": "create-user",
                     "object_type": "user",
                     "object_name": "User",
@@ -235,7 +235,7 @@ class CustomAuthTokenView(ObtainAuthToken):
                 create_audit_log_entry(
                     request,
                     {
-                        "table": "token",
+                        "table": "Console API | token",
                         "event_type": "create-token",
                         "object_type": "token",
                         "object_name": "Token",
@@ -291,7 +291,7 @@ class DeleteAuthTokenView(APIView):
         create_audit_log_entry(
             request,
             {
-                "table": "token",
+                "table": "Console API | token",
                 "event_type": "delete-token",
                 "object_type": "token",
                 "object_name": "Token",

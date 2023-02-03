@@ -103,7 +103,7 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
         self.perform_create(serializer)
 
         create_audit_log_entry(request, {
-            "table": "indicators",
+            "table": "Console API | indicators",
             "event_type": "create-indicator",
             "object_type": "indicator",
             "object_name": "Indicator",
@@ -150,7 +150,7 @@ class MarkListAsNotFalsePositiveView(APIView):
             indicator.save()
 
         create_audit_log_entry(request, {
-            "table": "indicators",
+            "table": "Console API | indicators",
             "event_type": "mark-indicators-list-as-not-false-positive",
             "object_type": "indicator",
             "object_name": "Indicator",
@@ -186,7 +186,7 @@ class MarkIndicatorAsFalsePositiveView(APIView):
         })
 
         create_audit_log_entry(request, {
-            "table": "indicators",
+            "table": "Console API | indicators",
             "event_type": "mark-indicator-as-false-positive",
             "object_type": "indicator",
             "object_name": "Indicator",
@@ -226,7 +226,7 @@ class IndicatorDetailView(APIView):
         serializer.save()
 
         create_audit_log_entry(request, {
-            "table": "indicators",
+            "table": "Console API | indicators",
             "event_type": "change-indicator",
             "object_type": "indicator",
             "object_name": "Indicator",
@@ -266,7 +266,7 @@ class IndicatorDetailView(APIView):
         indicator.save()
 
         create_audit_log_entry(request, {
-            "table": "indicators",
+            "table": "Console API | indicators",
             "event_type": "delete-indicator",
             "object_type": "indicator",
             "object_name": "Indicator",
@@ -340,7 +340,7 @@ class ChangeIndicatorTagsView(APIView):
             })
 
             create_audit_log_entry(request, {
-                "table": "indicators",
+                "table": "Console API | indicators",
                 "event_type": "change-indicator-tags",
                 "object_type": "indicator",
                 "object_name": "Indicator",
@@ -388,7 +388,7 @@ class IndicatorAddComment(APIView):
         })
 
         create_audit_log_entry(request, {
-            "table": "indicator_activities",
+            "table": "Console API | indicator_activities",
             "event_type": "add-comment",
             "object_type": "IndicatorActivities",
             "object_name": "Comment",
@@ -436,7 +436,7 @@ class IndicatorIsSendingToDetectionsView(APIView):
         })
 
         create_audit_log_entry(request, {
-            "table": "indicators",
+            "table": "Console API | indicators",
             "event_type": "change-indicator-is-sending-to-detections",
             "object_type": "indicator",
             "object_name": "Indicator",

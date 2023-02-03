@@ -88,7 +88,7 @@ class FeedView(APIView):
             feed = Feed.objects.get(title=request.data["feed-name"])
 
             create_audit_log_entry(request, {
-                "table": "feeds",
+                "table": "Console API | feeds",
                 "event_type": "create-feed",
                 "object_type": "feed",
                 "object_name": "Feed",
@@ -169,7 +169,7 @@ class FeedUpdate(APIView):
         serializer.save()
 
         create_audit_log_entry(request, {
-            "table": "feeds",
+            "table": "Console API | feeds",
             "event_type": "update-feed",
             "object_type": "feed",
             "object_name": "Feed",

@@ -1,6 +1,6 @@
 """Test views.py file"""
 
-from random import randint
+import secrets
 
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -341,7 +341,7 @@ class AuditLogsListViewFiltersTests(AuditLogsViewTestsMixin):
     def test_filter_exists_field_value(self) -> None:
         """Filter logs by exists field value and should return 1 entry"""
 
-        log_number = randint(0, self._AUDIT_LOGS_COUNT - 1)
+        log_number = secrets.randbelow(self._AUDIT_LOGS_COUNT - 1)
         log_created_at = AuditLogs.objects.get(user_id=log_number).created_at
 
         fields_and_values = {

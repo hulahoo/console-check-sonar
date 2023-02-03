@@ -13,7 +13,7 @@ from console_api.system.views import (
     liveness_view,
     metrics_view,
 )
-from console_api.users.views import CustomAuthTokenView, DeleteAuthToken
+from console_api.users.views import CustomAuthTokenView, DeleteAuthTokenView
 
 
 schema_view = get_schema_view(
@@ -42,7 +42,7 @@ urlpatterns = [
     path("api/tags", include("console_api.tag.urls")),
     path("api/users", include("console_api.users.urls")),
     path("api/detections", include("console_api.detections.urls")),
-    path("api/sessions/<uuid:access_token>", DeleteAuthToken.as_view()),
+    path("api/sessions/<uuid:access_token>", DeleteAuthTokenView.as_view()),
     path("api/sessions", CustomAuthTokenView.as_view()),
     path("api/indicators", include("console_api.indicator.urls")),
     path(

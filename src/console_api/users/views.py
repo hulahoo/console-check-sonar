@@ -231,6 +231,24 @@ class CustomAuthTokenView(ObtainAuthToken):
                 user_token = uuid4()
                 token = Token.objects.create(key=user_token, user_id=user.pk)
                 token.save()
+
+                create_audit_log_entry(
+                    request,
+                    {
+                        "table": "token",
+                        "event_type": "create-token",
+                        "object_type": "token",
+                        "object_name": "Token",
+                        "description": "Create token with id",
+                        "new_value": {
+                            "key": str(token.key),
+                            "user_id": str(token.user.id),
+                            "created_at":
+                                str(token.created_at)
+                                if token.created_at else token.created_at,
+                        },
+                    },
+                )
         except Exception as error:
             return Response(
                 {"detail": str(error)},
@@ -245,12 +263,15 @@ class CustomAuthTokenView(ObtainAuthToken):
         )
 
 
-class DeleteAuthToken(APIView):
+class DeleteAuthTokenView(APIView):
+    """Delete an authentication token"""
+
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
         """Delete token"""
+
         access_token = kwargs.get("access_token")
 
         if not Token.objects.filter(key=access_token).exists():
@@ -258,6 +279,27 @@ class DeleteAuthToken(APIView):
                 {"detail": "Token doesn't exists"}, status=HTTP_400_BAD_REQUEST
             )
 
-        Token.objects.get(key=access_token).delete()
+        token = Token.objects.get(key=access_token)
+        prev_token_value = {
+            "key": str(token.key),
+            "user_id": str(token.user.id),
+            "created_at":
+                str(token.created_at)
+                if token.created_at else token.created_at,
+        }
+
+        token.delete()
+
+        create_audit_log_entry(
+            request,
+            {
+                "table": "token",
+                "event_type": "delete-token",
+                "object_type": "token",
+                "object_name": "Token",
+                "description": "Delete the token",
+                "prev_value": prev_token_value,
+            },
+        )
 
         return Response(status=HTTP_200_OK)

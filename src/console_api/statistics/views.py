@@ -1,6 +1,6 @@
 """Views for statistics app"""
+import json
 import requests
-from os import environ
 from typing import Union
 from collections import defaultdict
 
@@ -210,5 +210,5 @@ class FeedForceUpdateStatistics(APIView):
             response = requests.get(feeds_update_statistics)
         except Exception as error:
             return Response({"detail": str(error)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(response, status=HTTP_200_OK)
+        
+        return Response(json.loads(response), status=HTTP_200_OK)

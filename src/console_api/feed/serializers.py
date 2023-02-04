@@ -94,6 +94,7 @@ class FeedsListSerializer(ModelSerializer):
             "polling-frequency",
             "status",
             "created-at",
+            "is-active"
         ]
 
         extra_kwargs = {
@@ -105,7 +106,7 @@ class FeedsListSerializer(ModelSerializer):
             "auth-pass": {"source": "auth_pass"},
             "parsing-rules": {"source": "parsing_rules"},
             "feed-name": {"source": "title"},
-            "is-enabled": {"source": "is_active"},
+            "is-active": {"source": "is_active"},
             "is-truncating": {"source": "is_truncating"},
             "max-records-count": {"source": "max_records_count"},
             "available-fields": {"source": "available_fields"},

@@ -211,4 +211,4 @@ class FeedForceUpdateStatistics(APIView):
         except Exception as error:
             return Response({"detail": str(error)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         
-        return Response(json.loads(response), status=HTTP_200_OK)
+        return Response(response, status=HTTP_200_OK)

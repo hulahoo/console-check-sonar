@@ -1,15 +1,19 @@
 """Views for statistics app"""
+import requests
+from os import environ
 from typing import Union
 from collections import defaultdict
 
+from django.conf import settings
 from django.db.models import Count
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_200_OK
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -195,3 +199,16 @@ def feeds_intersection_view(request: Request) -> Response:
         feed_index += 1
 
     return Response(status=200, data=result)
+
+class FeedForceUpdateStatistics(APIView):
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        feeds_update_statistics = f"{settings.FEEDS_IMPORTING_SERVICE_URL}/api/force-update/statistics"
+        try:
+            response = requests.get(feeds_update_statistics)
+        except Exception as error:
+            return Response({"detail": str(error)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(response, status=HTTP_200_OK)

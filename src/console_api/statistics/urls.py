@@ -8,6 +8,7 @@ from console_api.statistics.views import (
     detected_indicators_view,
     feeds_intersection_view,
     FeedsStatisticView,
+    FeedForceUpdateStatistics,
     indicators_statistic_view,
 )
 
@@ -43,4 +44,10 @@ urlpatterns = [
         feeds_intersection_view,
         name="feeds_intersections",
     ),
+    path(
+        "/feeds-force-update",
+        FeedForceUpdateStatistics.as_view(),
+        name="feeds-force-update-statistics"
+
+    )
 ]

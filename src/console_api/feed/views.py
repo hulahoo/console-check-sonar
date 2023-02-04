@@ -11,7 +11,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import (
     HTTP_200_OK,
-    HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
 from rest_framework.generics import ListAPIView
@@ -36,12 +35,7 @@ class UpdateFeedsNowView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
-        tip_feeds_import_worker_host = environ.get(
-            "TIP_FEEDS_IMPORT_WORKER_HOST",
-            "https://develop.tip-feeds-import-worker.rshb.axept.com",
-        )
-
-        feeds_update_url = f"{tip_feeds_import_worker_host}/api/force-update"
+        feeds_update_url = f"{settings.FEEDS_IMPORTING_SERVICE_URL}/api/force-update"
 
         try:
             get(feeds_update_url)
@@ -56,7 +50,7 @@ class UpdateFeedsNowView(APIView):
             "description": "Update feeds",
         })
 
-        return Response("Updated", status=HTTP_201_CREATED)
+        return Response("Started", status=HTTP_200_OK)
 
 
 class ProvidersListView(ListAPIView):

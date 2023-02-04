@@ -150,5 +150,5 @@ PASSWORD_HASHERS = [
 
 FEEDS_IMPORTING_SERVICE_URL = env(
     "FEEDS_IMPORTING_SERVICE_URL",
-    "https://feeds-import-worker",
+    "https://develop.tip-feeds-import-worker.rshb.axept.com",
 )

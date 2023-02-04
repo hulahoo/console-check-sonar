@@ -85,7 +85,6 @@ class FeedsListSerializer(ModelSerializer):
             "feed-name",
             "provider",
             "description",
-            "is-enabled",
             "is-truncating",
             "max-records-count",
             "weight",

@@ -6,6 +6,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
+from console_api.config.logger_config import logger
 from console_api.feed.models import IndicatorFeedRelationship, Feed
 from console_api.tag.models import IndicatorTagRelationship, Tag
 
@@ -166,18 +167,26 @@ class Indicator(models.Model):
         )
 
     @property
-    def feeds_names(self) -> tuple:
-        """Return tuple of names for feeds that linked with the indicator"""
+    def feeds_names(self) -> list:
+        """Return list of names for feeds that linked with the indicator"""
 
-        feeds = [
+        feeds_id = [
             relationship.feed_id
             for relationship in IndicatorFeedRelationship.objects.filter(
                 indicator_id=self.id,
             )
         ]
-        if feeds:
-            return (Feed.objects.get(id=feed_id).title for feed_id in feeds)
-        return ()
+        logger.info(f"Retrieved indicator feeds: {feeds_id}")
+        if feeds_id:
+            feeds = list()
+            for feed_id in feeds_id:
+                try:
+                    feed = Feed.objects.get(id=feed_id).title
+                    feeds.append(feed)
+                except Feed.DoesNotExist:
+                    continue
+            return feeds
+        return list()
 
     @property
     def tags_ids(self) -> tuple:

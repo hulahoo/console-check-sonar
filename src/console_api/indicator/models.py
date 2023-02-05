@@ -175,8 +175,9 @@ class Indicator(models.Model):
                 indicator_id=self.id,
             )
         ]
-
-        return (Feed.objects.get(id=feed_id).title for feed_id in feeds)
+        if feeds:
+            return (Feed.objects.get(id=feed_id).title for feed_id in feeds)
+        return ()
 
     @property
     def tags_ids(self) -> tuple:

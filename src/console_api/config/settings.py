@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "console_api.audit_logs.apps.AuditLogsConfig",
     "console_api.search.apps.SearchConfig",
     "console_api.platform_settings.apps.PlatformSettingsConfig",
+    "console_api.context_sources.apps.ContextSourcesConfig",
 ]
 
 DJANGO_MIDDLEWARE = [
@@ -119,8 +120,9 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = (str(BASE_DIR.joinpath('static_files')),)
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")

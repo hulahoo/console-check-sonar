@@ -84,7 +84,7 @@ class DetectionTests(TestCase):
                 feed_id=id_,
             )
 
-        cls.field_ant_type = {
+        cls.field_and_type = {
             "id": BigAutoField,
             "source": TextField,
             "source_message": TextField,
@@ -210,7 +210,7 @@ class DetectionTests(TestCase):
     def test_fields_types(self) -> None:
         """Test types for fields"""
 
-        for field, expected_type in self.field_ant_type.items():
+        for field, expected_type in self.field_and_type.items():
             real_type = Detection._meta.get_field(field).__class__
 
             self.assertEqual(real_type, expected_type)
@@ -284,7 +284,7 @@ class DetectionTagRelationshipTests(TestCase):
     def setUpTestData(cls) -> None:
         DetectionTagRelationship.objects.create(detection_id=1, tag_id=2)
 
-        cls.field_ant_type = {
+        cls.field_and_type = {
             "detection_id": BigIntegerField,
             "tag_id": BigIntegerField,
             "created_at": DateTimeField,
@@ -340,7 +340,7 @@ class DetectionTagRelationshipTests(TestCase):
     def test_fields_types(self) -> None:
         """Test types for fields"""
 
-        for field, expected_type in self.field_ant_type.items():
+        for field, expected_type in self.field_and_type.items():
             real_type = DetectionTagRelationship._meta.get_field(field).__class__
 
             self.assertEqual(real_type, expected_type)
@@ -400,7 +400,7 @@ class DetectionFeedRelationshipTests(TestCase):
     def setUpTestData(cls) -> None:
         DetectionFeedRelationship.objects.create(detection_id=1, feed_id=2)
 
-        cls.field_ant_type = {
+        cls.field_and_type = {
             "detection_id": BigIntegerField,
             "feed_id": BigIntegerField,
             "created_at": DateTimeField,
@@ -456,7 +456,7 @@ class DetectionFeedRelationshipTests(TestCase):
     def test_fields_types(self) -> None:
         """Test types for fields"""
 
-        for field, expected_type in self.field_ant_type.items():
+        for field, expected_type in self.field_and_type.items():
             real_type = DetectionFeedRelationship._meta.get_field(field).__class__
 
             self.assertEqual(real_type, expected_type)

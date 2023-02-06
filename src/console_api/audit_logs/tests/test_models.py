@@ -35,7 +35,7 @@ class AuditLogsTests(TestCase):
             created_at=datetime(2022, 11, 11),
         )
 
-        cls.field_ant_type = {
+        cls.field_and_type = {
             "id": BigAutoField,
             "service_name": CharField,
             "user_id": BigIntegerField,
@@ -135,7 +135,7 @@ class AuditLogsTests(TestCase):
     def test_fields_types(self) -> None:
         """Test types for fields"""
 
-        for field, expected_type in self.field_ant_type.items():
+        for field, expected_type in self.field_and_type.items():
             real_type = AuditLogs._meta.get_field(field).__class__
 
             self.assertEqual(real_type, expected_type)

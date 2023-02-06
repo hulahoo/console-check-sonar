@@ -53,7 +53,6 @@ class Indicator(models.Model):
         validators=[MaxValueValidator(100), MinValueValidator(0)],
         decimal_places=3,
         max_digits=6,
-        null=True,
     )
 
     feeds_weight = models.DecimalField(
@@ -126,6 +125,15 @@ class Indicator(models.Model):
         null=True,
         blank=True,
     )
+
+    def save(self, *args, **kwargs):
+        if not self.updated_at:
+            self.updated_at = self.created_at
+
+        if not self.weight:
+            self.weight = self.feeds_weight
+
+        super().save(*args, **kwargs)
 
     @property
     def feeds(self) -> tuple:

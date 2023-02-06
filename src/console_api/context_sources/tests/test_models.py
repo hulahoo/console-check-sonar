@@ -30,7 +30,7 @@ class ContextSourcesTests(TestCase):
             created_by=1,
         )
 
-        cls.field_ant_type = {
+        cls.field_and_type = {
             "id": BigAutoField,
             "ioc_type": CharField,
             "source_url": CharField,
@@ -180,7 +180,7 @@ class ContextSourcesTests(TestCase):
     def test_fields_types(self) -> None:
         """Test types for fields"""
 
-        for field, expected_type in self.field_ant_type.items():
+        for field, expected_type in self.field_and_type.items():
             real_type = ContextSources._meta.get_field(field).__class__
 
             self.assertEqual(real_type, expected_type)

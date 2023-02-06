@@ -20,6 +20,7 @@ from console_api.context_sources.services import (
     get_context_source_or_error_response,
     get_context_source_logging_data,
 )
+from console_api.context_sources.constants import LOG_SERVICE_NAME
 from console_api.services import (
     CustomTokenAuthentication,
     create_audit_log_entry,
@@ -80,9 +81,9 @@ class ContextSourcesView(ModelViewSet):
         )
 
         create_audit_log_entry(request, {
-            "table": "Console API | context_sources",
+            "table": LOG_SERVICE_NAME,
             "event_type": "create-context-sources",
-            "object_type": "context source",
+            "object_type": "context source update",
             "object_name": "Context source",
             "description": "Create a new context source",
             "new_value": {
@@ -126,7 +127,7 @@ class ContextSourceDetailView(APIView):
         serializer.save()
 
         create_audit_log_entry(request, {
-            "table": "Console API | context_sources",
+            "table": LOG_SERVICE_NAME,
             "event_type": "change-context-source",
             "object_type": "context source",
             "object_name": "Context Source",
@@ -165,7 +166,7 @@ class ContextSourceDetailView(APIView):
         create_audit_log_entry(request, {
             "table": "Console API | context_sources",
             "event_type": "delete-context-source",
-            "object_type": "context source",
+            "object_type": "context source deletion",
             "object_name": "Context Source",
             "description": "Delete context source",
             "prev_value": prev_source_value,

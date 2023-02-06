@@ -77,7 +77,6 @@ class ContextSourcesTests(TestCase):
             "request_body": True,
             "inbound_removable_prefix": True,
             "outbound_appendable_prefix": True,
-            "created_at": True,
             "created_by": True,
         }
 

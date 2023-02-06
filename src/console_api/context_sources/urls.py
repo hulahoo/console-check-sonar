@@ -1,10 +1,13 @@
 """Urls for context_sources app"""
 
-from django.urls import path
+from console_api.context_sources.views import ContextSourcesView
 
-from console_api.context_sources.views import ContextSourcesListView
+from rest_framework.routers import DefaultRouter
 
 
-urlpatterns = [
-    path("", ContextSourcesListView.as_view(), name="context_sources_list"),
-]
+router = DefaultRouter()
+router.register("", ContextSourcesView)
+
+urlpatterns = []
+
+urlpatterns += router.urls

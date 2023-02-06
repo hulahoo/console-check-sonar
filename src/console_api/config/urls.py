@@ -57,6 +57,7 @@ urlpatterns = [
     path("api", api_res, name="api"),
     path("api/search", include("console_api.search.urls")),
     path("api/platform-settings", include("console_api.platform_settings.urls")),
+    path("api/context-sources", include("console_api.context_sources.urls")),
 ]
 
 if settings.DEBUG:

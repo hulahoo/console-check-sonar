@@ -4,11 +4,19 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+)
+from rest_framework.views import APIView
 
 from console_api.context_sources.models import ContextSources
 from console_api.context_sources.serializers import (
     ContextSourcesListSerializer,
+)
+from console_api.context_sources.services import (
+    get_context_source_or_error_response,
 )
 from console_api.services import (
     CustomTokenAuthentication,
@@ -89,3 +97,44 @@ class ContextSourcesView(ModelViewSet):
         })
 
         return Response(status=HTTP_201_CREATED)
+
+
+class ContextSourceDetailView(APIView):
+    """View for detail of the context source"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request: Request, *args, **kwargs) -> Response:
+        """Delete the context source"""
+
+        source_id = kwargs.get("source_id")
+        source = get_context_source_or_error_response(source_id)
+
+        if isinstance(source, Response):
+            return source
+
+        prev_source_value = {
+            "id": source.id,
+            "ioc-type": source.ioc_type,
+            "source-url": source.source_url,
+            "request-method": source.request_method,
+            "request-headers": source.request_headers,
+            "request-body": source.request_body,
+            "inbound-removable-prefix": source.inbound_removable_prefix,
+            "outbound-appendable-prefix": source.outbound_appendable_prefix,
+            "created-by": source.created_by,
+        }
+
+        source.delete()
+
+        create_audit_log_entry(request, {
+            "table": "Console API | context_sources",
+            "event_type": "delete-context-source",
+            "object_type": "context source",
+            "object_name": "Context Source",
+            "description": "Delete context source",
+            "prev_value": prev_source_value,
+        })
+
+        return Response(status=HTTP_200_OK)

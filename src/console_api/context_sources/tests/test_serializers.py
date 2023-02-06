@@ -23,15 +23,15 @@ class ContextSourcesListSerializerTests(TestCase):
 
         expected_fields = [
             "id",
-            "ioc_type",
-            "source_url",
-            "request_method",
-            "request_headers",
-            "request_body",
-            "inbound_removable_prefix",
-            "outbound_appendable_prefix",
-            "created_at",
-            "created_by",
+            "ioc-type",
+            "source-url",
+            "request-method",
+            "request-headers",
+            "request-body",
+            "inbound-removable-prefix",
+            "outbound-appendable-prefix",
+            "created-at",
+            "created-by",
         ]
 
         self.assertEqual(

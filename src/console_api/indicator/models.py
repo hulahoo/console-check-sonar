@@ -74,7 +74,6 @@ class Indicator(models.Model):
         validators=[MaxValueValidator(100), MinValueValidator(0)],
         decimal_places=3,
         max_digits=6,
-        null=True,
     )
 
     is_archived = models.BooleanField(

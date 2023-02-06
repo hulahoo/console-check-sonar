@@ -52,6 +52,23 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
 
         self.queryset = self.get_queryset()
 
+        for ind in self.queryset:
+            if not ind.updated_at:
+                ind.updated_at = ind.created_at
+                ind.save()
+
+            if not ind.weight:
+                ind.weight = ind.feeds_weight
+                ind.save()
+
+            if not ind.feeds_weight:
+                ind.feeds_weight = 0
+                ind.save()
+
+            if not ind.tags_weight:
+                ind.tags_weight = 0
+                ind.save()
+
         self.add_queryset_filters(request=request)
         self.add_counter_queryset_filters(request=request)
         self.add_boolean_filters(request=request)

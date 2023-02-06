@@ -129,6 +129,9 @@ class Indicator(models.Model):
         if not self.updated_at:
             self.updated_at = self.created_at
 
+        if not self.feeds_weight:
+            self.feeds_weight = 0
+
         if not self.weight:
             self.weight = self.feeds_weight
 

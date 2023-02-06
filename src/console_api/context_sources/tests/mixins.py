@@ -6,8 +6,8 @@ from console_api.context_sources.models import ContextSources
 from console_api.test_utils import get_authorization_token
 
 
-class ContextSourcesListViewTestsMixin(TestCase):
-    """Mixin for ContextSourcesListView tests"""
+class ContextSourcesViewTestsMixin(TestCase):
+    """Mixin for ContextSourcesView tests"""
 
     @classmethod
     def setUpTestData(cls) -> None:

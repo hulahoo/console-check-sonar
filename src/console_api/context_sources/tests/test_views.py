@@ -1,13 +1,12 @@
 """Test views.py file"""
 
-from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 
 from console_api.context_sources.models import ContextSources
-from console_api.context_sources.serializers import ContextSourcesListSerializer
 from console_api.context_sources.tests.constants import CONTEXT_SOURCES_URL
-from console_api.context_sources.views import ContextSourcesListView
-from console_api.context_sources.tests.mixins import ContextSourcesListViewTestsMixin
+from console_api.context_sources.views import ContextSourcesView
+from console_api.context_sources.tests.mixins import ContextSourcesViewTestsMixin
 from console_api.constants import (
     DIFFERENT_VALUES,
     PAGE_NUMBER,
@@ -17,8 +16,8 @@ from console_api.constants import (
 from console_api.services import CustomTokenAuthentication
 
 
-class ContextSourcesListViewFieldsTests(ContextSourcesListViewTestsMixin):
-    """Test fields for ContextSourcesListView"""
+class ContextSourcesViewFieldsTests(ContextSourcesViewTestsMixin):
+    """Test fields for ContextSourcesView"""
 
     _CONTEXT_SOURCES_COUNT = 3
 
@@ -26,7 +25,7 @@ class ContextSourcesListViewFieldsTests(ContextSourcesListViewTestsMixin):
         """Test authentication_classes field"""
 
         self.assertEqual(
-            ContextSourcesListView.authentication_classes,
+            ContextSourcesView.authentication_classes,
             [CustomTokenAuthentication],
         )
 
@@ -34,7 +33,7 @@ class ContextSourcesListViewFieldsTests(ContextSourcesListViewTestsMixin):
         """Test permission_classes field"""
 
         self.assertEqual(
-            ContextSourcesListView.permission_classes,
+            ContextSourcesView.permission_classes,
             [IsAuthenticated],
         )
 
@@ -42,26 +41,18 @@ class ContextSourcesListViewFieldsTests(ContextSourcesListViewTestsMixin):
         """Test queryset field"""
 
         self.assertEqual(
-            [log.id for log in ContextSourcesListView().get_queryset()],
+            [log.id for log in ContextSourcesView().get_queryset()],
             [log.id for log in ContextSources.objects.all()],
-        )
-
-    def test_serializer_class(self) -> None:
-        """Test serializer_class field"""
-
-        self.assertEqual(
-            ContextSourcesListView.serializer_class,
-            ContextSourcesListSerializer,
         )
 
     def test_mro(self) -> None:
         """Test MRO"""
 
-        self.assertIn(ListAPIView, ContextSourcesListView.mro())
+        self.assertIn(ModelViewSet, ContextSourcesView.mro())
 
 
-class ContextSourcesListViewWithoutParamsTests(ContextSourcesListViewTestsMixin):
-    """Test ContextSourcesListView without parameters"""
+class ContextSourcesViewWithoutParamsTests(ContextSourcesViewTestsMixin):
+    """Test ContextSourcesView without parameters"""
 
     _CONTEXT_SOURCES_COUNT = 1
 
@@ -100,8 +91,8 @@ class ContextSourcesListViewWithoutParamsTests(ContextSourcesListViewTestsMixin)
             self.assertNotEqual(results.get("created-at"), None)
 
 
-class ContextSourcesListViewPaginationParametersTests(ContextSourcesListViewTestsMixin):
-    """Test page-number and page-size parameters for ContextSourcesListView"""
+class ContextSourcesViewPaginationParametersTests(ContextSourcesViewTestsMixin):
+    """Test page-number and page-size parameters for ContextSourcesView"""
 
     _CONTEXT_SOURCES_COUNT = 50
 

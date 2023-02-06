@@ -39,3 +39,36 @@ class ContextSourcesListSerializer(ModelSerializer):
             "created-at": {"source": "created_at"},
             "created-by": {"source": "created_by"},
         }
+
+
+class ContextSourcesDetailSerializer(ModelSerializer):
+    """Serializer for context sources detail"""
+
+    class Meta:
+        """Metainformation about the serializer"""
+
+        model = ContextSources
+
+        fields = [
+            "ioc-type",
+            "source-url",
+            "request-method",
+            "request-headers",
+            "request-body",
+            "inbound-removable-prefix",
+            "outbound-appendable-prefix",
+            "created-by",
+        ]
+
+        extra_kwargs = {
+            "ioc-type": {"source": "ioc_type"},
+            "source-url": {"source": "source_url"},
+            "request-method": {"source": "request_method"},
+            "request-headers": {"source": "request_headers"},
+            "request-body": {"source": "request_body"},
+            "inbound-removable-prefix": {"source": "inbound_removable_prefix"},
+            "outbound-appendable-prefix": {
+                "source": "outbound_appendable_prefix",
+            },
+            "created-by": {"source": "created_by"},
+        }

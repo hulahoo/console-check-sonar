@@ -120,5 +120,13 @@ services:
 ## Тесты
 ### Запуск тестов приложения audit_logs
 ```bash
-docker-compose exec console python src/console_api/manage.py test audit_logs.tests
+docker-compose exec console python src/console_api/manage.py test audit_logs
+```
+### Запуск тестов приложения detections
+```bash
+docker-compose exec console python src/console_api/manage.py test detections
+```
+### Запуск тестов приложения context_sources
+```bash
+docker-compose exec console python src/console_api/manage.py test context_sources
 ```

@@ -13,10 +13,12 @@ from rest_framework.views import APIView
 
 from console_api.context_sources.models import ContextSources
 from console_api.context_sources.serializers import (
+    ContextSourcesDetailSerializer,
     ContextSourcesListSerializer,
 )
 from console_api.context_sources.services import (
     get_context_source_or_error_response,
+    get_context_source_logging_data,
 )
 from console_api.services import (
     CustomTokenAuthentication,
@@ -104,6 +106,38 @@ class ContextSourceDetailView(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        """Change data of the context source"""
+
+        source_id = kwargs.get("source_id")
+        source = get_context_source_or_error_response(source_id)
+
+        if isinstance(source, Response):
+            return source
+
+        prev_source_value = get_context_source_logging_data(source)
+
+        serializer = ContextSourcesDetailSerializer(source, data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+
+        create_audit_log_entry(request, {
+            "table": "Console API | context_sources",
+            "event_type": "change-context-source",
+            "object_type": "context source",
+            "object_name": "Context Source",
+            "description": "Change context source",
+            "prev_value": prev_source_value,
+            "new_value": get_context_source_logging_data(
+                ContextSources.objects.get(id=source_id),
+            ),
+        })
+
+        return Response(status=HTTP_200_OK)
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
         """Delete the context source"""

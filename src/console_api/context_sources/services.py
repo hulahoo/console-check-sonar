@@ -18,3 +18,19 @@ def get_context_source_or_error_response(
             status=HTTP_400_BAD_REQUEST,
         )
     )
+
+
+def get_context_source_logging_data(source) -> dict:
+    """Return context source data for logging"""
+
+    return {
+        "id": source.id,
+        "ioc-type": source.ioc_type,
+        "source-url": source.source_url,
+        "request-method": source.request_method,
+        "request-headers": source.request_headers,
+        "request-body": source.request_body,
+        "inbound-removable-prefix": source.inbound_removable_prefix,
+        "outbound-appendable-prefix": source.outbound_appendable_prefix,
+        "created-by": source.created_by,
+    }

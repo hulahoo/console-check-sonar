@@ -11,6 +11,7 @@ from console_api.indicator.views import (
     IndicatorIsSendingToDetectionsView,
     MarkIndicatorAsFalsePositiveView,
     MarkListAsNotFalsePositiveView,
+    ScoreIndicatorsView
 )
 
 router = DefaultRouter()
@@ -59,6 +60,11 @@ urlpatterns = [
         MarkListAsNotFalsePositiveView.as_view(),
         name="list_as_not_false_positive",
     ),
+    path(
+        "/update-now",
+        ScoreIndicatorsView.as_view(),
+        name="update-indicators"
+    )
 ]
 
 urlpatterns += router.urls

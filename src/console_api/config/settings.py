@@ -154,3 +154,7 @@ FEEDS_IMPORTING_SERVICE_URL = env(
     "FEEDS_IMPORTING_SERVICE_URL",
     "https://develop.tip-feeds-import-worker.rshb.axept.com",
 )
+SCORE_SERVICE_URL = env(
+    "SCORE_SERVICE_URL",
+    "https://data-processing-worker.develop.cti.rshb.axept.com"
+)

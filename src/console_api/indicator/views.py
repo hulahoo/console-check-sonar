@@ -1,13 +1,15 @@
 """Views for detections app"""
-
+import requests
 from datetime import datetime
 
+from django.conf import settings
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
 
 from console_api.indicator.models import Indicator
 from console_api.indicator.serializers import (
@@ -448,3 +450,29 @@ class IndicatorIsSendingToDetectionsView(APIView):
             data={"data": "is_sending_to_detections changed"},
             status=status.HTTP_200_OK,
         )
+
+
+
+class ScoreIndicatorsView(APIView):
+    """Update feeds now"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        score_service_update_endpoint = f"{settings.SCORE_SERVICE_URL}/api/force-update"
+
+        try:
+            requests.get(score_service_update_endpoint)
+        except Exception as error:
+            return Response({"detail": str(error)}, status=HTTP_400_BAD_REQUEST)
+
+        create_audit_log_entry(request, {
+            "table": "data-processing-worker",
+            "event_type": "update-indicators",
+            "object_type": "indicator",
+            "object_name": "Indicator",
+            "description": "Score indicator weight",
+        })
+
+        return Response("Started", status=HTTP_200_OK)

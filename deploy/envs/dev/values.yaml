@@ -9,6 +9,7 @@ env:
   DEBUG: True
   SWAGGER: True
   FEEDS_IMPORTING_SERVICE_URL: http://feeds-importing-worker.isys-threat-intelligence-dev
+  SCORE_SERVICE_URL: https://data-proccessing-worker.threat-intelligence.dev.rshbdev.ru
 
 resources:
   limits:
@@ -38,4 +39,8 @@ links:
   - targetProtocol: HTTP
     targetInformationSystemId: threat-intelligence
     targetServiceId: feeds-importing-worker
+
+  - targetProtocol: HTTP
+    targetInformationSystemId: threat-intelligence
+    targetServiceId: data-processing-worker
 

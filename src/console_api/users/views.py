@@ -92,12 +92,7 @@ class UserView(APIView):
                 data={"detail": "User not found"},
             )
 
-        error_400 = get_not_fields_error(
-            request,
-            ("role", "new-pass", "full-name"),
-        )
-
-        if error_400:
+        if error_400 := get_not_fields_error(request, ("new-pass",)):
             return error_400
 
         if not User.objects.filter(id=user_id).exists():
@@ -114,8 +109,6 @@ class UserView(APIView):
 
         new_pass = request.data.get("new-pass")
 
-        user.full_name = request.data.get("full-name")
-        user.role = request.data.get("role")
         user.password = get_hashed_password(new_pass)
         user.save()
 
@@ -123,10 +116,10 @@ class UserView(APIView):
             request,
             {
                 "table": LOG_SERVICE_NAME,
-                "event_type": "update-user",
+                "event_type": "change-user-password",
                 "object_type": "user",
                 "object_name": "User",
-                "description": "Update the user",
+                "description": "Change user password",
                 "prev_value": prev_user_value,
                 "new_value": {
                     "login": user.login,

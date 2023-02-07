@@ -122,30 +122,23 @@ class IndicatorQueryMixin:
     def add_queryset_filters(self, request: Request) -> None:
         """Filter the queryset"""
 
-        indicator_id = get_filter_query_param(request, "indicator-id")
-        ioc_type = get_filter_query_param(request, "ioc-type")
-        value = get_filter_query_param(request, "value")
-        context = get_filter_query_param(request, "context")
-
-        created_by = get_filter_query_param(request, "created-by")
-
-        comment = get_filter_query_param(request, "comment")
-
-        if indicator_id:
+        if indicator_id := get_filter_query_param(request, "id"):
             self.queryset = self.queryset.filter(id=indicator_id)
-        if ioc_type:
-            self.queryset = self.queryset.filter(ioc_type=ioc_type)
-        if value:
-            self.queryset = self.queryset.filter(value=value)
-        if context:
-            self.queryset = self.queryset.filter(context=context)
 
-        if created_by:
+        if ioc_type := get_filter_query_param(request, "ioc-type"):
+            self.queryset = self.queryset.filter(ioc_type=ioc_type)
+
+        if value := get_filter_query_param(request, "value"):
+            self.queryset = self.queryset.filter(value=value)
+
+        if created_by := get_filter_query_param(request, "created-by"):
             self.queryset = self.queryset.filter(created_by=created_by)
 
-        if comment:
+        if comment := get_filter_query_param(request, "comment"):
             self.queryset = self.queryset.filter(
-                id__in=IndicatorActivities.objects.values("indicator_id").filter(details__icontains=comment)
+                id__in=IndicatorActivities.objects.values(
+                    "indicator_id",
+                ).filter(details__icontains=comment)
             )
 
     def add_queryset_at_time_filters(self, request: Request) -> None:

@@ -92,7 +92,7 @@ class UserView(APIView):
                 data={"detail": "User not found"},
             )
 
-        if error_400 := get_not_fields_error(request, ("new-pass",)):
+        if error_400 := get_not_fields_error(request, ("prev-pass", "new-pass")):
             return error_400
 
         if not User.objects.filter(id=user_id).exists():

@@ -73,8 +73,10 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
         """Sort the queryset by the given parameter"""
 
         if sort_by := get_sort_by_param(request):
-            if sort_by in ["ioc_weight", "-ioc_weight"]:
+            if sort_by == "ioc_weight":
                 sort_by = "weight"
+            elif sort_by == "-ioc_weight":
+                sort_by = "-weight"
 
             self.queryset = self.queryset.order_by(sort_by)
 

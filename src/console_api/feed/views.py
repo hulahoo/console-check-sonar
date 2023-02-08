@@ -1,5 +1,6 @@
 """Views for feed app"""
 
+from datetime import datetime
 from os import environ
 from requests import get
 
@@ -26,6 +27,13 @@ from console_api.services import (
     get_feed_logging_data,
     get_response_with_pagination,
 )
+
+
+class FeedsLastUpdateView(APIView):
+    """Last feeds update view"""
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        return Response(datetime.now().isoformat(), status=HTTP_200_OK)
 
 
 class UpdateFeedsNowView(APIView):

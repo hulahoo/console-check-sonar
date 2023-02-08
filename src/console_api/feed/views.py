@@ -58,7 +58,7 @@ class UpdateFeedsNowView(APIView):
             "description": "Update feeds",
         })
 
-        return Response("Started", status=HTTP_200_OK)
+        return Response(status=HTTP_200_OK)
 
 
 class ProvidersListView(ListAPIView):

@@ -53,26 +53,19 @@ def indicators_statistic_view(request: Request) -> Response | JsonResponse:
 
     statistic = defaultdict(dict)
 
-    indicators = Indicator.objects.values(
-        "id", "ioc_type",
-    ).annotate(tcount=Count("ioc_type")).order_by()
+    raw_sql = """SELECT 1 as id, indicators.ioc_type, COUNT(*)
+    FROM indicators
+    INNER JOIN {table} ON indicators.id = {table}.indicator_id
+    GROUP BY indicators.ioc_type"""
 
-    for indicator in indicators:
-        indicator_type = indicator["ioc_type"]
+    detections_count = Indicator.objects.raw(raw_sql.format(table='detections'))
+    checked_count = Indicator.objects.raw(raw_sql.format(table='stat_checked_objects'))
 
-        statistic[indicator_type].setdefault('detections_count', 0)
-        statistic[indicator_type].setdefault('checked_count', 0)
+    for indicator in detections_count:
+        statistic[indicator["ioc_type"]].setdefault('detections_count', indicator["count"])
 
-        detections_count = Detection.objects.filter(
-            indicator_id=indicator["id"],
-        ).count()
-
-        checked_count = StatCheckedObjects.objects.filter(
-            indicator_id=indicator["id"],
-        ).count()
-
-        statistic[indicator_type]['detections_count'] += detections_count
-        statistic[indicator_type]['checked_count'] += checked_count
+    for indicator in checked_count:
+        statistic[indicator["ioc_type"]].setdefault('checked_count', indicator["count"])
 
     result = [
         {
@@ -200,6 +193,7 @@ def feeds_intersection_view(request: Request) -> Response:
 
     return Response(status=200, data=result)
 
+
 class FeedForceUpdateStatistics(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -210,5 +204,5 @@ class FeedForceUpdateStatistics(APIView):
             response = requests.get(feeds_update_statistics)
         except Exception as error:
             return Response({"detail": str(error)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
         return Response(response, status=HTTP_200_OK)

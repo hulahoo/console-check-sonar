@@ -377,7 +377,7 @@ class IndicatorAddComment(APIView):
 
         if not request.data.get("details"):
             return Response(
-                {"error": "Details not specified"},
+                {"detail": "Details not specified"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

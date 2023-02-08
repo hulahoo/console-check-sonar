@@ -446,11 +446,7 @@ class IndicatorIsSendingToDetectionsView(APIView):
             "new_value": get_indicator_logging_data(indicator),
         })
 
-        return Response(
-            data={"data": "is_sending_to_detections changed"},
-            status=status.HTTP_200_OK,
-        )
-
+        return Response(status=status.HTTP_200_OK)
 
 
 class ScoreIndicatorsView(APIView):

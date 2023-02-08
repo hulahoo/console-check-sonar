@@ -168,7 +168,7 @@ class Indicator(models.Model):
         return (
             {
                 "type": activity.activity_type,
-                "details": [tag.id for tag in self.tags_ids],
+                "details": [tag.get("id") for tag in self.tags_ids],
                 "created-at": activity.created_at,
             }
             for activity in IndicatorActivities.objects.filter(

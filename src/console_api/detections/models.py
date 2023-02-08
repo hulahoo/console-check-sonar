@@ -64,6 +64,10 @@ class Detection(Model):
         auto_now_add=True,
     )
 
+    def save(self, *args, **kwargs):
+        if not self.details:
+            self.details = {}
+
     @property
     def tags_ids(self) -> tuple[int]:
         """Return tags ids linked with the detection"""

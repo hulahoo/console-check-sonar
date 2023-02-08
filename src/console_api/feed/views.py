@@ -1,5 +1,6 @@
 """Views for feed app"""
 
+from datetime import datetime
 from os import environ
 from requests import get
 
@@ -28,6 +29,13 @@ from console_api.services import (
 )
 
 
+class FeedsLastUpdateView(APIView):
+    """Last feeds update view"""
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        return Response(datetime.now().isoformat(), status=HTTP_200_OK)
+
+
 class UpdateFeedsNowView(APIView):
     """Update feeds now"""
 
@@ -50,7 +58,7 @@ class UpdateFeedsNowView(APIView):
             "description": "Update feeds",
         })
 
-        return Response("Started", status=HTTP_200_OK)
+        return Response(status=HTTP_200_OK)
 
 
 class ProvidersListView(ListAPIView):

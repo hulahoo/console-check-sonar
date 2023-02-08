@@ -35,7 +35,7 @@ urlpatterns = [
 
     # Mark as_false_positive
     path(
-        "/<uuid:indicator_id>/as_false_positive",
+        "/<uuid:indicator_id>/as-false-positive",
         MarkIndicatorAsFalsePositiveView.as_view(),
         name="indicator_as_false_positive",
     ),
@@ -49,14 +49,14 @@ urlpatterns = [
 
     # Indicator is_sending_to_detections
     path(
-        "/<uuid:indicator_id>/is_sending_to_detections",
+        "/<uuid:indicator_id>/is-sending-to-detections",
         IndicatorIsSendingToDetectionsView.as_view(),
         name="indicator_is_send_to_detecions",
     ),
 
     # Mark list of indicators as false positive
     path(
-        "/list_as_not_false_positive",
+        "/list-as-not-false-positive",
         MarkListAsNotFalsePositiveView.as_view(),
         name="list_as_not_false_positive",
     ),

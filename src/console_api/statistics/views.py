@@ -62,16 +62,16 @@ def indicators_statistic_view(request: Request) -> Response | JsonResponse:
     checked_count = Indicator.objects.raw(raw_sql.format(table='stat_checked_objects'))
 
     for indicator in detections_count:
-        statistic[indicator["ioc_type"]].setdefault('detections_count', indicator["count"])
+        statistic[indicator.ioc_type].setdefault('detections_count', indicator.count)
 
     for indicator in checked_count:
-        statistic[indicator["ioc_type"]].setdefault('checked_count', indicator["count"])
+        statistic[indicator.ioc_type].setdefault('checked_count', indicator.count)
 
     result = [
         {
             "indicator-type": type_,
-            "detections-count": value['detections_count'],
-            "checked-count": value['checked_count']
+            "detections-count": value['detections_count'] if 'detections_count' in value else 0,
+            "checked-count": value['checked_count'] if 'checked_count' in value else 0
         } for type_, value in statistic.items()
     ]
 

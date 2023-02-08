@@ -6,6 +6,7 @@ from console_api.feed.views import (
     FeedPreview,
     FeedView,
     FeedUpdate,
+    FeedsLastUpdateView,
     ProvidersListView,
     UpdateFeedsNowView,
 )
@@ -45,5 +46,12 @@ urlpatterns = [
         "",
         FeedView.as_view(),
         name="feeds_view",
+    ),
+
+    # Create feed and get feeds list
+    path(
+        "/last-update",
+        FeedsLastUpdateView.as_view(),
+        name="feeds_last_update",
     ),
 ]

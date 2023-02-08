@@ -113,10 +113,7 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
             "new_value": request.data,
         })
 
-        return Response(
-            status=status.HTTP_201_CREATED,
-            data={"data": "Indicator created successfully"},
-        )
+        return Response(status=status.HTTP_201_CREATED)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         """Return response with list of indicators"""

@@ -12,11 +12,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-8&pnw5q%u_ht#1zdz@j4n1tvw!kbcvk_3lnw6+ulo$07p998xf'
 
-
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -56,6 +54,8 @@ DJANGO_MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'console_api.middleware.profiling.time_profiling',
+
 ]
 
 THIRD_PARTY_MIDDLEWARE = []
@@ -83,7 +83,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'console_api.config.wsgi.application'
-
 
 DATABASES = {
     'default': {

@@ -47,7 +47,7 @@ class DetectionListView(ListAPIView, SortAndFilterQuerysetMixin):
 
     def __filter_by_feed_name(self, request: Request) -> None:
 
-        if feed_name := get_filter_query_param(request, "feed-name"):
+        if feed_name := get_filter_query_param(request, "value"):
             feed_id = Feed.objects.get(title=feed_name).id
 
             detections_ids = [

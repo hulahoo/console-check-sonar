@@ -42,7 +42,27 @@ class IndicatorFeedSerializer(serializers.ModelSerializer):
 
 
 class IndicatorListSerializer(serializers.ModelSerializer):
+    """Serializer for IndicatorsView view for get method"""
+
+    def to_representation(self, instance):
+        """Convert `username` to lowercase."""
+
+        data = super().to_representation(instance)
+
+        if not data['updated-at']:
+            data['updated-at'] = data['created-at']
+
+        if not data['ioc-weight']:
+            data['ioc-weight'] = 0
+
+        if not data['tags-weight']:
+            data['tags-weight'] = 0
+
+        return data
+
     class Meta:
+        """Metainformation about the serializer"""
+
         model = Indicator
 
         fields = [

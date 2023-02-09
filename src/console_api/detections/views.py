@@ -1,11 +1,12 @@
 """Views for detections app"""
 
+from django.db.models import Q
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from console_api.detections.models import Detection
+from console_api.detections.models import Detection, DetectionFeedRelationship
 from console_api.detections.serializers import DetectionSerializer
 from console_api.services import (
     CustomTokenAuthentication,
@@ -13,6 +14,7 @@ from console_api.services import (
     get_response_with_pagination,
 )
 from console_api.mixins import SortAndFilterQuerysetMixin
+from console_api.feed.models import Feed
 
 
 class DetectionListView(ListAPIView, SortAndFilterQuerysetMixin):
@@ -42,6 +44,22 @@ class DetectionListView(ListAPIView, SortAndFilterQuerysetMixin):
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+    def __filter_by_feed_name(self, request: Request) -> None:
+
+        if feed_name := get_filter_query_param(request, "feed-name"):
+            feed_id = Feed.objects.get(title=feed_name).id
+
+            detections_ids = [
+                rel.detection_id for rel in
+                DetectionFeedRelationship.objects.filter(feed_id=feed_id)
+            ]
+
+            self.queryset = self.queryset.filter(
+                Q(id__in=detections_ids)
+                | Q(source__icontains=feed_name)
+                | Q(details__icontains=feed_name)
+            )
 
     def _filter_queryset(self, request: Request) -> None:
         """Filter the queryset"""
@@ -88,6 +106,8 @@ class DetectionListView(ListAPIView, SortAndFilterQuerysetMixin):
             self.queryset = self.queryset.filter(
                 detection_message=detection_message,
             )
+
+        self.__filter_by_feed_name(request)
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         """Return response with list of detections"""

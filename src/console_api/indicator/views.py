@@ -36,10 +36,7 @@ from console_api.indicator.constants import LOG_SERVICE_NAME
 class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
     """/indicators endpoint view"""
 
-    queryset = Indicator.objects.filter(
-        deleted_at=None,
-        is_false_positive=False,
-    )
+    queryset = Indicator.objects.filter(deleted_at=None)
 
     serializer_classes = {
         "list": IndicatorListSerializer,

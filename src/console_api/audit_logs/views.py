@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from console_api.audit_logs.models import AuditLogs
 from console_api.audit_logs.serializers import AuditLogsListSerializer
@@ -13,6 +14,37 @@ from console_api.services import (
     get_response_with_pagination,
 )
 from console_api.mixins import SortAndFilterQuerysetMixin
+
+
+class AuditLogsFiltersView(ListAPIView):
+    """Audit logs filters view"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        """Return list with filters fields"""
+
+        filters_field = request.GET.get("field").replace("-", "_")
+
+        if filters_field not in ("service_name", "event_type", "object_type"):
+            return Response(
+                {"detail": "Wrong field value"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        audit_logs = AuditLogs.objects.all().order_by(
+            filters_field,
+        ).distinct(filters_field)
+
+        if filters_field == "service_name":
+            filters = [log.service_name for log in audit_logs]
+        elif filters_field == "event_type":
+            filters = [log.event_type for log in audit_logs]
+        elif filters_field == "object_type":
+            filters = [log.object_type for log in audit_logs]
+
+        return Response(filters, status=HTTP_200_OK)
 
 
 class AuditLogsListView(ListAPIView, SortAndFilterQuerysetMixin):

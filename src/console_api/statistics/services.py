@@ -47,12 +47,12 @@ def get_objects_data_for_statistics(request: Request, model) -> dict:
     start_period_at, finish_period_at = get_period_query_params(request)
 
     if not start_period_at or not finish_period_at:
-        return {"error": "Start or finish period not specified"}
+        return {"detail": "Start or finish period not specified"}
 
     period_format = FREQUENCY_AND_FORMAT.get(frequency)
 
     if not period_format:
-        return {"error": "Invalid group-by"}
+        return {"detail": "Invalid group-by"}
 
     objects = model.objects.filter(
         created_at__range=(start_period_at, finish_period_at),

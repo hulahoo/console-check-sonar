@@ -142,7 +142,7 @@ class UserDetail(APIView):
     def post(self, request: Request, *args, **kwargs) -> Response:
         error_400 = get_not_fields_error(
             request,
-            ("login", "pass-hash", "full-name", "role"),
+            ("login", "password", "full-name", "role"),
         )
 
         if error_400:
@@ -154,9 +154,11 @@ class UserDetail(APIView):
             full_name = request.data.get("full-name")
             role = request.data.get("role")
 
+            pass_hash = get_hashed_password(request.data.get("password"))
+
             User.objects.create(
                 login=user_login,
-                password=request.data.get("pass-hash"),
+                password=pass_hash,
                 full_name=full_name,
                 role=role,
             )

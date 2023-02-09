@@ -10,6 +10,12 @@ from console_api.services import get_filter_query_param
 from console_api.services import get_sort_by_param
 
 
+def get_boolean_from_str(string: str) -> bool:
+    """Return boolean from string"""
+
+    return string.lower() == 'true'
+
+
 class SortAndFilterQuerysetMixin:
     """Mixin for sorting and filtering a queryset"""
 
@@ -71,12 +77,22 @@ class IndicatorQueryMixin:
         is_archived = get_filter_query_param(request, "is-archived")
 
         if is_sending_to_detections:
+            is_sending_to_detections = get_boolean_from_str(is_sending_to_detections)
+
             self.queryset = self.queryset.filter(
                 is_sending_to_detections=is_sending_to_detections
             )
+
         if is_false_positive:
+            is_false_positive = get_boolean_from_str(is_false_positive)
+
             self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
+        else:
+            self.queryset = self.queryset.filter(is_false_positive=False)
+
         if is_archived:
+            is_archived = get_boolean_from_str(is_archived)
+
             self.queryset = self.queryset.filter(is_archived=is_archived)
 
     def add_weight_filters(self, request: Request) -> None:

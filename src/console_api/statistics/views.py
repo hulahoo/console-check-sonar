@@ -91,7 +91,7 @@ def detected_indicators_view(request: Request) -> Union[Response, JsonResponse]:
 
     if "error" in statistics_data.keys():
         return Response(
-            {"error": statistics_data["error"]},
+            {"detail": statistics_data["error"]},
             HTTP_400_BAD_REQUEST,
         )
 
@@ -114,7 +114,7 @@ def detected_objects_view(request: Request) -> Union[Response, JsonResponse]:
 
     if "error" in statistics_data.keys():
         return Response(
-            {"error": statistics_data["error"]},
+            {"detail": statistics_data["error"]},
             HTTP_400_BAD_REQUEST,
         )
 
@@ -137,7 +137,7 @@ def checked_objects_view(request: Request) -> Union[Response, JsonResponse]:
 
     if "error" in statistics_data.keys():
         return Response(
-            {"error": statistics_data["error"]},
+            {"detail": statistics_data["error"]},
             HTTP_400_BAD_REQUEST,
         )
 

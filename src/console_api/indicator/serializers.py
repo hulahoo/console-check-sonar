@@ -45,7 +45,7 @@ class IndicatorListSerializer(serializers.ModelSerializer):
     """Serializer for IndicatorsView view for get method"""
 
     def to_representation(self, instance):
-        """Convert `username` to lowercase."""
+        """Convert representation from null to valid value"""
 
         data = super().to_representation(instance)
 

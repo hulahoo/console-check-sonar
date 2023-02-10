@@ -452,7 +452,7 @@ class ScoreIndicatorsView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request, *args, **kwargs) -> Response:
+    def post(self, request: Request, *args, **kwargs) -> Response:
         score_service_update_endpoint = f"{settings.SCORE_SERVICE_URL}/api/force-update"
 
         try:

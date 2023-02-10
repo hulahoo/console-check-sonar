@@ -141,8 +141,8 @@ class SearchTagsView(APIView):
                             "id": tag.id,
                             "title": tag.title,
                             "weight": tag.weight,
-                            "created_by": tag.created_by,
-                            "created_at": tag.created_at,
+                            "created-by": tag.created_by,
+                            "created-at": tag.created_at,
                         }
                         for tag in tags
                     ],

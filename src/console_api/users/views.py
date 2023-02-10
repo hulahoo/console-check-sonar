@@ -15,6 +15,7 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
 )
 
 from .serializers import AuthTokenSerializer
@@ -85,17 +86,17 @@ class UserView(APIView):
         )
 
     def post(self, request: Request, user_id: int) -> Response:
-        """Update the user"""
+        """Change user password"""
 
         user = self.get_object(user_id=user_id)
 
         if not user:
             return Response(
-                status=status.HTTP_404_NOT_FOUND,
                 data={"detail": "User not found"},
+                status=HTTP_404_NOT_FOUND,
             )
 
-        if error_400 := get_not_fields_error(request, ("prev-pass", "new-pass")):
+        if error_400 := get_not_fields_error(request, ("password",)):
             return error_400
 
         if not User.objects.filter(id=user_id).exists():
@@ -107,12 +108,14 @@ class UserView(APIView):
         prev_user_value = {
             "login": user.login,
             "full_name": user.full_name,
-            "updated_at": str(user.updated_at) if user.updated_at else user.updated_at,
+            "updated_at": str(user.updated_at)
+            if user.updated_at
+            else user.updated_at,
         }
 
-        new_pass = request.data.get("new-pass")
+        new_password = request.data.get("password")
 
-        user.password = get_hashed_password(new_pass)
+        user.password = get_hashed_password(new_password)
         user.save()
 
         create_audit_log_entry(

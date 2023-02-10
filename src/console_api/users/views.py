@@ -197,16 +197,6 @@ class UserDetail(APIView):
         return Response({"results": data}, status=HTTP_200_OK)
 
 
-class Logout(APIView):
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request: Request, *args, **kwargs) -> Response:
-        request.user.token.delete()
-
-        return Response(status=status.HTTP_200_OK)
-
-
 class CustomAuthTokenView(ObtainAuthToken):
     """Custom token authorization generator"""
 

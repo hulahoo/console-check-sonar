@@ -8,6 +8,37 @@ from console_api.detections.models import Detection
 class DetectionSerializer(ModelSerializer):
     """Serializer for Detection model"""
 
+    def to_representation(self, instance):
+        """Convert representation from null to valid value"""
+
+        data = super().to_representation(instance)
+
+        if not data["source"]:
+            data["source"] = ""
+
+        if not data["source-message"]:
+            data["source-message"] = ""
+
+        if not data["detection-message"]:
+            data["detection-message"] = ""
+
+        if not data["tags-weight"]:
+            data["tags-weight"] = 0
+
+        if not data["indicator-weight"]:
+            data["tags-weight"] = 0
+
+        if not data["details"]:
+            data["details"] = {}
+
+        if not data["source-event"]:
+            data["source-event"] = {}
+
+        if not data["detection-event"]:
+            data["detection-event"] = {}
+
+        return data
+
     class Meta:
         """Metainformation about the serializer"""
 

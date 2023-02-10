@@ -179,4 +179,4 @@ class DeleteOrUpdateTagView(APIView):
             },
         })
 
-        return Response(TagCreateSerializer(instance=tag).data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)

@@ -10,10 +10,11 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 
+from console_api.constants import CREDS_ERROR, SEARCH_QUERY_ERROR
 from console_api.detections.models import Detection
 from console_api.indicator.models import Indicator
 from console_api.search.serializers import SearchHistorySerializer
-from console_api.constants import CREDS_ERROR, SEARCH_QUERY_ERROR
+from console_api.users.models import User
 
 
 def get_search_history(
@@ -116,7 +117,10 @@ def get_search_results_response(
         status=HTTP_200_OK,
         data={
             "created-at": result.created_at,
-            "created-by": result.created_by,
+            "created-by": {
+                "id": result.created_by,
+                "login": User.objects.get(id=result.created_by).login,
+            },
             "results": search_results,
         },
     )

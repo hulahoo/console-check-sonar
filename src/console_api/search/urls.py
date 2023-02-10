@@ -17,7 +17,7 @@ urlpatterns = [
         name="history",
     ),
     path(
-        "/by-text",
+        "/indicators/by-text",
         search_indicators_by_text_view,
         name="by_text",
     ),

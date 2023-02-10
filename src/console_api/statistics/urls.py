@@ -48,6 +48,5 @@ urlpatterns = [
         "/feeds-force-update",
         FeedForceUpdateStatistics.as_view(),
         name="feeds-force-update-statistics"
-
     )
 ]

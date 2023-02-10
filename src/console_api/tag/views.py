@@ -82,7 +82,7 @@ class TagsView(APIView):
         )
 
 
-class DeleteTagView(APIView):
+class DeleteOrUpdateTagView(APIView):
     """Delete the tag"""
 
     authentication_classes = [CustomTokenAuthentication]
@@ -135,7 +135,6 @@ class DeleteTagView(APIView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         tag_id = kwargs.get("tag_id")
-        title = request.data.get("title")
 
         if not Tag.objects.filter(id=tag_id).exists():
             return Response(
@@ -154,7 +153,12 @@ class DeleteTagView(APIView):
             "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
         }
 
-        tag.title = title
+        if title := request.data.get("title"):
+            tag.title = title
+
+        if weight := request.data.get("weight"):
+            tag.weight = weight
+
         tag.save()
 
         create_audit_log_entry(request, {

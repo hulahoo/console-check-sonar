@@ -16,6 +16,9 @@ class TagsListSerializer(ModelSerializer):
         if not data["updated-at"]:
             data["updated-at"] = data["created-at"]
 
+        if not data["title"]:
+            data["title"] = ""
+
         if not data["weight"]:
             data["weight"] = 0
 

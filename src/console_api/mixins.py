@@ -74,7 +74,6 @@ class IndicatorQueryMixin:
             request, "is-sending-to-detections"
         )
         is_false_positive = get_filter_query_param(request, "is-false-positive")
-        is_archived = get_filter_query_param(request, "is-archived")
 
         if is_sending_to_detections:
             is_sending_to_detections = get_boolean_from_str(is_sending_to_detections)
@@ -89,11 +88,6 @@ class IndicatorQueryMixin:
             self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
         else:
             self.queryset = self.queryset.filter(is_false_positive=False)
-
-        if is_archived:
-            is_archived = get_boolean_from_str(is_archived)
-
-            self.queryset = self.queryset.filter(is_archived=is_archived)
 
     def add_weight_filters(self, request: Request) -> None:
         """Filter the queryset"""

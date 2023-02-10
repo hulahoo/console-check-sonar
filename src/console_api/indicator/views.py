@@ -21,7 +21,11 @@ from console_api.indicator.services import (
     create_indicator_activity,
     get_indicator_or_error_response,
 )
-from console_api.mixins import IndicatorQueryMixin
+from console_api.mixins import (
+    get_boolean_from_str,
+    get_filter_query_param,
+    IndicatorQueryMixin
+)
 from console_api.services import (
     CustomTokenAuthentication,
     create_audit_log_entry,
@@ -36,7 +40,7 @@ from console_api.indicator.constants import LOG_SERVICE_NAME
 class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
     """/indicators endpoint view"""
 
-    queryset = Indicator.objects.filter(deleted_at=None)
+    queryset = Indicator.objects.all()
 
     serializer_classes = {
         "list": IndicatorListSerializer,
@@ -50,6 +54,17 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
         """Return response with list of indicators"""
 
         self.queryset = self.get_queryset()
+
+        if is_archived := get_filter_query_param(request, "is-archived"):
+            if is_archived := get_boolean_from_str(is_archived):
+                self.queryset = self.queryset.filter(is_archived=is_archived)
+            else:
+                self.queryset = self.queryset.filter(
+                    deleted_at=None,
+                    is_archived=is_archived,
+                )
+        else:
+            self.queryset = self.queryset.filter(deleted_at=None)
 
         self.add_queryset_filters(request=request)
         self.add_counter_queryset_filters(request=request)
@@ -261,6 +276,7 @@ class IndicatorDetailView(APIView):
         prev_indicator_value = get_indicator_logging_data(indicator)
 
         indicator.deleted_at = datetime.now()
+        indicator.is_archived = True
         indicator.save()
 
         create_audit_log_entry(request, {

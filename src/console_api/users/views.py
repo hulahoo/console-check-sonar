@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
@@ -41,9 +42,7 @@ class UserView(APIView):
     def delete(self, request: Request, *args, **kwargs) -> Response:
         """Delete user"""
 
-        user = self.get_object(user_id=kwargs.pop("user_id"))
-
-        if user:
+        if user := self.get_object(user_id=kwargs.pop("user_id")):
             prev_user_value = {
                 "login": user.login,
                 "full_name": user.full_name,
@@ -53,6 +52,10 @@ class UserView(APIView):
             }
 
             user.deleted_at = datetime.now()
+
+            if Token.objects.filter(user=user.id).exists():
+                Token.objects.get(user=user.id).delete()
+
             user.save()
 
             create_audit_log_entry(
@@ -75,6 +78,7 @@ class UserView(APIView):
             )
 
             return Response(status=status.HTTP_200_OK)
+
         return Response(
             status=status.HTTP_404_NOT_FOUND,
             data={"detail": "User not found"},
@@ -149,7 +153,12 @@ class UserDetail(APIView):
 
         user_login = request.data.get("login")
 
-        if not User.objects.filter(login=user_login).exists():
+        if User.objects.filter(~Q(deleted_at=None), login=user_login).exists():
+            user = User.objects.get(login=user_login)
+            user.deleted_at = None
+            user.save()
+
+        elif not User.objects.filter(login=user_login).exists():
             full_name = request.data.get("full-name")
             role = request.data.get("role")
 
@@ -209,6 +218,12 @@ class CustomAuthTokenView(ObtainAuthToken):
             serializer.is_valid(raise_exception=True)
 
             user = serializer.validated_data["user"]
+
+            if not User.objects.filter(login=user.login, deleted_at=None).exists():
+                return Response(
+                    {"detail": "User does not exist"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
 
             if Token.objects.filter(user_id=user.pk).exists():
                 user_token = Token.objects.get(user_id=user.pk).key

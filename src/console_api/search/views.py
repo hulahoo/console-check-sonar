@@ -1,7 +1,5 @@
 """Views for search app"""
 
-from json import loads
-
 from django.core import serializers
 from django.views.decorators.http import require_http_methods
 from rest_framework.views import APIView
@@ -12,8 +10,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_200_OK
 
 from console_api.search.models import History
-from console_api.services import CustomTokenAuthentication
-from console_api.search.serializers import SearchHistorySerializer
+from console_api.services import (
+    CustomTokenAuthentication,
+    get_response_with_pagination,
+)
+from console_api.search.serializers import (
+    SearchHistorySerializer,
+    SearchHistoryListSerializer,
+)
 from console_api.tag.models import Tag
 from console_api.search.services import (
     get_creds_error_response,
@@ -25,7 +29,6 @@ from console_api.search.services import (
     get_search_query_error_response,
     get_search_results_response,
 )
-from console_api.users.models import User
 
 
 @api_view(["GET"])
@@ -86,21 +89,10 @@ def search_history_view(request: Request) -> Response:
     if not CustomTokenAuthentication().authenticate(request):
         return get_creds_error_response()
 
-    return Response(
-        status=HTTP_200_OK,
-        data=[
-            {
-                "id": history.id,
-                "status": "detected" if loads(history.results) else "not-detected",
-                "created-at": history.created_at,
-                "created-by": {
-                    "id": history.created_by,
-                    "login": User.objects.get(id=history.created_by).login,
-                },
-                "query": history.query_text,
-            }
-            for history in History.objects.all()
-        ],
+    return get_response_with_pagination(
+        request,
+        History.objects.all(),
+        SearchHistoryListSerializer,
     )
 
 

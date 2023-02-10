@@ -26,7 +26,7 @@ class DetectionSerializer(ModelSerializer):
             data["tags-weight"] = 0
 
         if not data["indicator-weight"]:
-            data["tags-weight"] = 0
+            data["indicator-weight"] = 0
 
         if not data["details"]:
             data["details"] = {}

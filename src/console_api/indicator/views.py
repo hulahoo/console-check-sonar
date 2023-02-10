@@ -452,7 +452,7 @@ class ScoreIndicatorsView(APIView):
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request: Request, *args, **kwargs) -> Response:
+    def get(self, request: Request, *args, **kwargs) -> Response:
         score_service_update_endpoint = f"{settings.SCORE_SERVICE_URL}/api/force-update"
 
         try:
@@ -468,4 +468,4 @@ class ScoreIndicatorsView(APIView):
             "description": "Score indicator weight",
         })
 
-        return Response("Started", status=HTTP_200_OK)
+        return Response(status=HTTP_200_OK)

@@ -36,7 +36,7 @@ class UserView(APIView):
 
     def get_object(self, user_id: int) -> Optional[User]:
         try:
-            return User.objects.get(id=user_id)
+            return User.objects.get(deleted_at=None, id=user_id)
         except User.DoesNotExist:
             return None
 

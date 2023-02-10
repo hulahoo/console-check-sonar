@@ -25,6 +25,7 @@ from console_api.search.services import (
     get_search_query_error_response,
     get_search_results_response,
 )
+from console_api.users.models import User
 
 
 @api_view(["GET"])
@@ -90,10 +91,12 @@ def search_history_view(request: Request) -> Response:
         data=[
             {
                 "id": history.id,
-                "status":
-                    "detected" if loads(history.results) else "not-detected",
+                "status": "detected" if loads(history.results) else "not-detected",
                 "created-at": history.created_at,
-                "created-by": history.created_by,
+                "created-by": {
+                    "id": history.created_by,
+                    "login": User.objects.get(id=history.created_by).login,
+                },
                 "query": history.query_text,
             }
             for history in History.objects.all()

@@ -244,6 +244,7 @@ class CustomAuthTokenView(ObtainAuthToken):
             {
                 "access-token": user_token,
                 "user-id": user.pk,
+                "user-role": user.role,
             }
         )
 

@@ -46,20 +46,22 @@ class DetectionListView(ListAPIView, SortAndFilterQuerysetMixin):
     permission_classes = [IsAuthenticated]
 
     def __filter_by_feed_name(self, request: Request) -> None:
-
         if feed_name := get_filter_query_param(request, "value"):
-            feed_id = Feed.objects.get(title=feed_name).id
+            if not Feed.objects.filter(title=feed_name).exists():
+                self.queryset = []
+            else:
+                feed_id = Feed.objects.get(title=feed_name).id
 
-            detections_ids = [
-                rel.detection_id for rel in
-                DetectionFeedRelationship.objects.filter(feed_id=feed_id)
-            ]
+                detections_ids = [
+                    rel.detection_id for rel in
+                    DetectionFeedRelationship.objects.filter(feed_id=feed_id)
+                ]
 
-            self.queryset = self.queryset.filter(
-                Q(id__in=detections_ids)
-                | Q(source__icontains=feed_name)
-                | Q(details__icontains=feed_name)
-            )
+                self.queryset = self.queryset.filter(
+                    Q(id__in=detections_ids)
+                    | Q(source__icontains=feed_name)
+                    | Q(details__icontains=feed_name)
+                )
 
     def _filter_queryset(self, request: Request) -> None:
         """Filter the queryset"""

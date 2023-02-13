@@ -10,6 +10,7 @@ from console_api.indicator.models import Indicator
 from console_api.config.logger_config import logger
 from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.feed.models import Feed, IndicatorFeedRelationship
+from console_api.indicator.services import create_indicator_activity
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -141,6 +142,7 @@ class IndicatorCreateSerializer(serializers.Serializer):
     context = serializers.JSONField(required=True)
 
     def create(self, validated_data):
+        request = self.context.get("request")
         tags_id_list = validated_data.pop("tags")
         tags: List[Tag] = Tag.objects.filter(pk__in=tags_id_list)
         logger.info(f"Retrieved tags: {tags}")
@@ -152,9 +154,16 @@ class IndicatorCreateSerializer(serializers.Serializer):
             )
 
         validated_data["tags_weight"] = sum(tag.weight for tag in tags)
+        validated_data["feeds_weight"] = 100
 
         try:
             indicator = Indicator.objects.create(**validated_data)
+            create_indicator_activity({
+                "indicator_id": indicator.id,
+                "activity_type": "Create indicator",
+                "created_by": request.user.id,
+                "details": request.data.get("details"),
+            })
             logger.info(f"Created indicator: {indicator.id}")
         except IntegrityError as error:
             raise serializers.ValidationError(
@@ -166,5 +175,22 @@ class IndicatorCreateSerializer(serializers.Serializer):
                 indicator_id=indicator.id,
                 tag_id=tag.id
             )
+            create_indicator_activity({
+                "indicator_id": indicator.id,
+                "activity_type": "Added tag",
+                "created_by": request.user.id,
+                "details": {"tag": tag.id},
+            })
+
+        IndicatorFeedRelationship.objects.create(
+            indicator_id=indicator.id,
+            feed_id=-1
+        )
+        create_indicator_activity({
+                "indicator_id": indicator.id,
+                "activity_type": "Added Internal TI feed",
+                "created_by": request.user.id,
+                "details": {},
+            })
 
         return indicator

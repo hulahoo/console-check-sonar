@@ -279,6 +279,13 @@ class IndicatorDetailView(APIView):
         indicator.is_archived = True
         indicator.save()
 
+        create_indicator_activity({
+            "indicator_id": indicator_id,
+            "activity_type": "Delete indicator",
+            "created_by": request.user.id,
+            "details": request.data.get("details"),
+        })
+
         create_audit_log_entry(request, {
             "table": LOG_SERVICE_NAME,
             "event_type": "delete-indicator",

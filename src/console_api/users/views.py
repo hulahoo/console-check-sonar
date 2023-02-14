@@ -160,7 +160,6 @@ class UserDetail(APIView):
             user = User.objects.get(login=user_login)
             user.deleted_at = None
             user.save()
-
         elif not User.objects.filter(login=user_login).exists():
             full_name = request.data.get("full-name")
             role = request.data.get("role")
@@ -188,6 +187,11 @@ class UserDetail(APIView):
                         "role": role,
                     },
                 },
+            )
+        elif User.objects.filter(login=user_login).exists():
+            return Response(
+                {"detail": f"User {user_login} already exists"},
+                status=HTTP_400_BAD_REQUEST,
             )
 
         return Response(status=HTTP_201_CREATED)

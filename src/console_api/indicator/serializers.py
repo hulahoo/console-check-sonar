@@ -107,6 +107,12 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
         if not data['updated-at']:
             data['updated-at'] = data['created-at']
 
+        if not data['last-time-actuation']:
+            data['last-time-actuation'] = data['updated-at']
+
+        if not data['first-time-actuation']:
+            data['first-time-actuation'] = data['created-at']
+
         if not data['external-source-link']:
             data['external-source-link'] = ""
 

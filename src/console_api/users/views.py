@@ -18,7 +18,7 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
 )
 
-from .serializers import AuthTokenSerializer
+from .serializers import AuthTokenSerializer, UserUpdateSerializer
 from console_api.users.models import Token, User
 from console_api.services import (
     CustomTokenAuthentication,
@@ -27,6 +27,73 @@ from console_api.services import (
     get_not_fields_error,
 )
 from console_api.users.constants import LOG_SERVICE_NAME
+
+
+class UserChangePasswordView(APIView):
+    """View for changing user's password"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, user_id: int) -> Optional[User]:
+        try:
+            return User.objects.get(deleted_at=None, id=user_id)
+        except User.DoesNotExist:
+            return None
+
+    def post(self, request: Request, user_id: int) -> Response:
+        """Change user password"""
+
+        user = self.get_object(user_id=user_id)
+
+        if not user:
+            return Response(
+                data={"detail": "User not found"},
+                status=HTTP_404_NOT_FOUND,
+            )
+
+        if error_400 := get_not_fields_error(request, ("password",)):
+            return error_400
+
+        if not User.objects.filter(id=user_id).exists():
+            return Response(
+                {"detail": "User does not exist"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        prev_user_value = {
+            "login": user.login,
+            "full_name": user.full_name,
+            "updated_at": str(user.updated_at)
+            if user.updated_at
+            else user.updated_at,
+        }
+
+        new_password = request.data.get("password")
+
+        user.password = get_hashed_password(new_password)
+        user.save()
+
+        create_audit_log_entry(
+            request,
+            {
+                "table": LOG_SERVICE_NAME,
+                "event_type": "change-user-password",
+                "object_type": "user",
+                "object_name": "User",
+                "description": "Change user password",
+                "prev_value": prev_user_value,
+                "new_value": {
+                    "login": user.login,
+                    "full_name": user.full_name,
+                    "updated_at": str(user.updated_at)
+                    if user.updated_at
+                    else user.updated_at,
+                },
+            },
+        )
+
+        return Response(status=HTTP_200_OK)
 
 
 class UserView(APIView):
@@ -86,24 +153,15 @@ class UserView(APIView):
         )
 
     def post(self, request: Request, user_id: int) -> Response:
-        """Change user password"""
-
-        user = self.get_object(user_id=user_id)
-
-        if not user:
-            return Response(
-                data={"detail": "User not found"},
-                status=HTTP_404_NOT_FOUND,
-            )
-
-        if error_400 := get_not_fields_error(request, ("password",)):
-            return error_400
+        """Change user data"""
 
         if not User.objects.filter(id=user_id).exists():
             return Response(
-                {"detail": "User does not exist"},
-                status=HTTP_400_BAD_REQUEST,
+                {"detail": f"User with id {user_id} doesn't exists"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+
+        user = User.objects.get(id=user_id)
 
         prev_user_value = {
             "login": user.login,
@@ -113,19 +171,26 @@ class UserView(APIView):
             else user.updated_at,
         }
 
-        new_password = request.data.get("password")
+        serializer = UserUpdateSerializer(
+            user,
+            data=request.data,
+            partial=True,
+            fields=request.data.keys()
+        )
 
-        user.password = get_hashed_password(new_password)
-        user.save()
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
 
         create_audit_log_entry(
             request,
             {
                 "table": LOG_SERVICE_NAME,
-                "event_type": "change-user-password",
+                "event_type": "update-user",
                 "object_type": "user",
                 "object_name": "User",
-                "description": "Change user password",
+                "description": "Update user data",
                 "prev_value": prev_user_value,
                 "new_value": {
                     "login": user.login,

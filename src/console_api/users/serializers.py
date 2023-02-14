@@ -4,6 +4,7 @@ from rest_framework.serializers import (
     ValidationError,
     CharField,
     Serializer,
+    ModelSerializer,
 )
 
 from console_api.users.models import User
@@ -53,3 +54,38 @@ class AuthTokenSerializer(Serializer):
         attrs["user"] = user
 
         return attrs
+
+
+class UserUpdateSerializer(ModelSerializer):
+    """Serializer for list of feeds"""
+
+    class Meta:
+        """Metainformation about the serializer"""
+
+        model = User
+
+        fields = [
+            "login",
+            "full-name",
+            "role",
+            "is-active",
+            "created-by",
+        ]
+
+        extra_kwargs = {
+            "full-name": {"source": "full_name"},
+            "is-active": {"source": "is_active"},
+            "created-by": {"source": "created_by"},
+        }
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            allowed = set(fields)
+            existing = set(self.fields)
+
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)

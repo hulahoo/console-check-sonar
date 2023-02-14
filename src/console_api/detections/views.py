@@ -46,7 +46,7 @@ class DetectionListView(ListAPIView, SortAndFilterQuerysetMixin):
     permission_classes = [IsAuthenticated]
 
     def __filter_by_feed_name(self, request: Request) -> None:
-        if feed_name := get_filter_query_param(request, "value"):
+        if feed_name := get_filter_query_param(request, "query"):
             if not Feed.objects.filter(title=feed_name).exists():
                 self.queryset = self.queryset.filter(
                     Q(source__icontains=feed_name)

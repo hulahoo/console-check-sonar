@@ -67,6 +67,46 @@ class FeedSerializer(ModelSerializer):
 class FeedsListSerializer(ModelSerializer):
     """Serializer for list of feeds"""
 
+    def to_representation(self, instance):
+        """Convert representation from null to valid value"""
+
+        data = super().to_representation(instance)
+
+        if not data["max-records-count"]:
+            data["max-records-count"] = 0
+
+        if not data["auth-type"]:
+            data["auth-type"] = ""
+
+        if not data["auth-api-token"]:
+            data["auth-api-token"] = ""
+
+        if not data["auth-login"]:
+            data["auth-login"] = ""
+
+        if not data["auth-pass"]:
+            data["auth-pass"] = ""
+
+        if not data["available-fields"]:
+            data["available-fields"] = {}
+
+        if not data["weight"]:
+            data["weight"] = 0
+
+        if not data["certificate"]:
+            data["certificate"] = b""
+
+        if not data["description"]:
+            data["description"] = ""
+
+        if not data["is-use-taxii"]:
+            data["is-use-taxii"] = False
+
+        if not data["parsing-rules"]:
+            data["parsing-rules"] = False
+
+        return data
+
     class Meta:
         """Metainformation about the serializer"""
 

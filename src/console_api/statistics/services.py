@@ -92,7 +92,7 @@ def get_indicators_statistic() -> list:
     """
 
     raw_sql_checked_count = """
-    SELECT stat_checked_objects.ioc_type, COUNT(*)
+    SELECT 1 as id, stat_checked_objects.ioc_type, COUNT(*)
     FROM stat_checked_objects
     GROUP BY stat_checked_objects.ioc_type
     """

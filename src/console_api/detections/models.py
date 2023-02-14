@@ -13,6 +13,7 @@ from django.db.models import (
 
 from console_api.feed.models import Feed, IndicatorFeedRelationship
 from console_api.indicator.models import IndicatorTagRelationship
+from console_api.tag.models import Tag
 
 
 class Detection(Model):
@@ -72,11 +73,19 @@ class Detection(Model):
     def tags_ids(self) -> tuple[int]:
         """Return tags ids linked with the detection"""
 
-        return tuple(
-            relationship.tag_id
+        tags = (
+            Tag.objects.get(id=relationship.tag_id)
             for relationship in IndicatorTagRelationship.objects.filter(
                 indicator_id=self.indicator_id,
             )
+        )
+
+        return (
+            {
+                "id": tag.id,
+                "title": tag.title,
+                "weight": tag.weight,
+            } for tag in tags
         )
 
     @property

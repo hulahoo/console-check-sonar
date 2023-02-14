@@ -125,6 +125,18 @@ class Indicator(models.Model):
         blank=True,
     )
 
+    last_time_actuation = models.DateTimeField(
+        "Когда сработал последний раз",
+        null=True,
+        blank=True,
+    )
+
+    first_time_actuation = models.DateTimeField(
+        "Когда сработал первый раз",
+        null=True,
+        blank=True,
+    )
+
     def save(self, *args, **kwargs):
         if not self.updated_at:
             self.updated_at = self.created_at

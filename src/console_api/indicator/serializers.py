@@ -96,6 +96,28 @@ class IndicatorListSerializer(serializers.ModelSerializer):
 class IndicatorDetailSerializer(serializers.ModelSerializer):
     """Serializer for IndicatorDetailView"""
 
+    def to_representation(self, instance):
+        """Convert representation from null to valid value"""
+
+        data = super().to_representation(instance)
+
+        if not data['context']:
+            data['context'] = {}
+
+        if not data['updated-at']:
+            data['updated-at'] = data['created-at']
+
+        if not data['external-source-link']:
+            data['external-source-link'] = ""
+
+        if not data['ioc-weight']:
+            data['ioc-weight'] = 0
+
+        if not data['tags-weight']:
+            data['tags-weight'] = 0
+
+        return data
+
     class Meta:
         """Metainformation about the serializer"""
 
@@ -116,6 +138,8 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "is-false-positive",
             "feeds",
             "activities",
+            "last-time-actuation",
+            "first-time-actuation",
         ]
 
         extra_kwargs = {
@@ -128,6 +152,8 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "tags": {"source": "tags_ids"},
             "tags-weight": {"source": "tags_weight"},
             "external-source-link": {"source": "external_source_link"},
+            "last-time-actuation": {"source": "last_time_actuation"},
+            "first-time-actuation": {"source": "first_time_actuation"},
         }
 
 

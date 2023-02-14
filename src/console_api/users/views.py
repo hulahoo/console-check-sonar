@@ -181,6 +181,10 @@ class UserView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        if new_password := request.data.get("password"):
+            user.password = get_hashed_password(new_password)
+            user.save()
+
         serializer.save()
 
         create_audit_log_entry(

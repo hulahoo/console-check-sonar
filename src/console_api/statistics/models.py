@@ -23,7 +23,7 @@ class StatMatchedObjects(models.Model):
 class StatCheckedObjects(models.Model):
     """stat_checked_objects table"""
 
-    indicator_id = models.UUIDField()
+    ioc_type = models.CharField(max_length=32)
 
     created_at = models.DateTimeField(
         "Дата и время создания",

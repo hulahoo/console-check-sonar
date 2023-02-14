@@ -135,6 +135,7 @@ class Feed(models.Model):
     max_records_count = models.DecimalField(
         decimal_places=5,
         max_digits=20,
+        default=None,
     )
 
     created_at = models.DateTimeField(

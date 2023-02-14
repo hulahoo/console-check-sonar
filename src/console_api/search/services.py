@@ -37,22 +37,10 @@ def get_search_history(
 def get_detections_by_query(query: str) -> QuerySet:
     """Return detections found by query"""
 
-    if Feed.objects.filter(title=query).exists():
-        feed_id = Feed.objects.get(title=query).id
-
-        detection_ids = DetectionFeedRelationship.objects.filter(
-            feed_id=feed_id,
-        )
-
-        return Detection.objects.filter(
-            Q(source__icontains=query)
-            | Q(details__icontains=query)
-            | Q(id__in=detection_ids)
-        )
-
     return Detection.objects.filter(
-        Q(source__icontains=query)
-        | Q(details__icontains=query)
+        Q(source__contains=query)
+        | Q(source_message__contains=query)
+        | Q(detection_message__contains=query)
     )
 
 

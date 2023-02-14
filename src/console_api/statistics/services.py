@@ -1,10 +1,11 @@
 """Services for statistics app"""
-
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 from rest_framework.request import Request
 from pandas import date_range
 
+from console_api.indicator.models import Indicator
 from console_api.statistics.constants import (
     FREQUENCY_AND_FORMAT,
     GROUP_BY_AND_FREQUENCY,
@@ -78,3 +79,39 @@ def get_objects_data_for_statistics(request: Request, model) -> dict:
         "labels": list(date_and_objects_amount.keys()),
         "values": list(date_and_objects_amount.values()),
     }
+
+
+def get_indicators_statistic() -> list:
+    statistic = defaultdict(dict)
+
+    raw_sql_detections_count = """
+    SELECT 1 as id, indicators.ioc_type, COUNT(*)
+    FROM indicators
+    INNER JOIN {table} ON indicators.id = {table}.indicator_id
+    GROUP BY indicators.ioc_type
+    """
+
+    raw_sql_checked_count = """
+    SELECT stat_checked_objects.ioc_type, COUNT(*)
+    FROM stat_checked_objects
+    GROUP BY stat_checked_objects.ioc_type
+    """
+
+    detections_count = Indicator.objects.raw(raw_sql_detections_count.format(table='detections'))
+    checked_count = Indicator.objects.raw(raw_sql_checked_count)
+
+    for indicator in detections_count:
+        statistic[indicator.ioc_type].setdefault('detections_count', indicator.count)
+
+    for indicator in checked_count:
+        statistic[indicator.ioc_type].setdefault('checked_count', indicator.count)
+
+    result = [
+        {
+            "indicator-type": type_,
+            "detections-count": value['detections_count'] if 'detections_count' in value else 0,
+            "checked-count": value['checked_count'] if 'checked_count' in value else 0
+        } for type_, value in statistic.items()
+    ]
+
+    return result

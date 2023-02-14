@@ -1,11 +1,8 @@
 """Views for statistics app"""
-import json
 import requests
 from typing import Union
-from collections import defaultdict
 
 from django.conf import settings
-from django.db.models import Count
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from rest_framework import generics
@@ -26,9 +23,8 @@ from console_api.statistics.models import (
     StatCheckedObjects,
     StatMatchedObjects,
 )
-from console_api.statistics.services import get_objects_data_for_statistics
+from console_api.statistics.services import get_objects_data_for_statistics, get_indicators_statistic
 from console_api.services import CustomTokenAuthentication
-from console_api.indicator.models import Indicator
 
 
 class FeedsStatisticView(generics.ListAPIView):
@@ -51,29 +47,7 @@ def indicators_statistic_view(request: Request) -> Response | JsonResponse:
     if not CustomTokenAuthentication().authenticate(request):
         return Response({"detail": CREDS_ERROR}, status=HTTP_403_FORBIDDEN)
 
-    statistic = defaultdict(dict)
-
-    raw_sql = """SELECT 1 as id, indicators.ioc_type, COUNT(*)
-    FROM indicators
-    INNER JOIN {table} ON indicators.id = {table}.indicator_id
-    GROUP BY indicators.ioc_type"""
-
-    detections_count = Indicator.objects.raw(raw_sql.format(table='detections'))
-    checked_count = Indicator.objects.raw(raw_sql.format(table='stat_checked_objects'))
-
-    for indicator in detections_count:
-        statistic[indicator.ioc_type].setdefault('detections_count', indicator.count)
-
-    for indicator in checked_count:
-        statistic[indicator.ioc_type].setdefault('checked_count', indicator.count)
-
-    result = [
-        {
-            "indicator-type": type_,
-            "detections-count": value['detections_count'] if 'detections_count' in value else 0,
-            "checked-count": value['checked_count'] if 'checked_count' in value else 0
-        } for type_, value in statistic.items()
-    ]
+    result = get_indicators_statistic()
 
     return JsonResponse(result, safe=False)
 

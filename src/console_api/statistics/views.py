@@ -138,14 +138,15 @@ class FeedsIntersectionView(RetrieveAPIView):
         """Return indicators relevants to the request params"""
 
         is_false_positive = request.GET.get("enable-false-positive", "false")
-        is_false_positive = get_boolean_from_str(is_false_positive)
 
-        return tuple(
-            indicator.get("id")
-            for indicator in Indicator.objects.filter(
-                is_false_positive=is_false_positive,
+        if is_false_positive := get_boolean_from_str(is_false_positive):
+            indicators = Indicator.objects.all().values("id")
+        else:
+            indicators = Indicator.objects.filter(
+                is_false_positive=False,
             ).values("id")
-        )
+
+        return tuple(ind.get("id") for ind in indicators)
 
     def __get_relevant_feeds_and_indicators_ids(
             self, feeds, relevant_indicators) -> dict:

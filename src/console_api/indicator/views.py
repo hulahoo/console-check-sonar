@@ -188,7 +188,10 @@ class MarkIndicatorAsFalsePositiveView(APIView):
 
         prev_indicator_value = get_indicator_logging_data(indicator)
 
-        indicator.is_false_positive = True
+        is_false_positive = request.POST.get("is-false-positive", "true")
+        is_false_positive = get_boolean_from_str(is_false_positive)
+
+        indicator.is_false_positive = is_false_positive
         indicator.save()
 
         create_indicator_activity({

@@ -204,6 +204,10 @@ class FeedUpdate(APIView):
                 {"detail": f"Error occured while deleting feed: {e.args}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+        return Response(
+            {"detail": "Feed deleted"},
+            status=status.HTTP_200_OK
+        )
 
     @staticmethod
     def remove_indicator_feed_relationship(deleted_at: datetime, feed_id: int):

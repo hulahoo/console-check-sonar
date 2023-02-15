@@ -158,8 +158,8 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "tags": {"source": "tags_ids"},
             "tags-weight": {"source": "tags_weight"},
             "external-source-link": {"source": "external_source_link"},
-            "last-time-actuation": {"source": "last_time_actuation"},
-            "first-time-actuation": {"source": "first_time_actuation"},
+            "last-time-actuation": {"source": "last_detected_at"},
+            "first-time-actuation": {"source": "first_detected_at"},
         }
 
 

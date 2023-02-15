@@ -107,6 +107,14 @@ class Detection(Model):
             Feed.objects.get(id=feed_id).title
             for feed_id in self.feeds_ids
         )
+    
+    @property
+    def feed_providers(self) -> tuple[str]:
+        """Return feeds providers linked with detection's indicator"""
+        return tuple(
+            Feed.objects.get(id=feed_id).provider
+            for feed_id in self.feeds_ids
+        )
 
     def __str__(self) -> str:
         return str(self.id)

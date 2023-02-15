@@ -1,5 +1,6 @@
 """Views for detections app"""
 import requests
+from typing import List
 from datetime import datetime
 
 from django.conf import settings
@@ -338,22 +339,26 @@ class ChangeIndicatorTagsView(APIView):
             )
 
         new_tags = [int(tag) for tag in tags if tag != ""]
+        tags: List[Tag] = Tag.objects.get(id__in=new_tags)
+
+        if len(new_tags) != tags:
+            return Response(
+                {"detail": "Tags wrong"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if Indicator.objects.filter(id=indicator_id).exists():
-            if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
-                return Response(
-                    {"detail": "Tags wrong"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
             IndicatorTagRelationship.objects.filter(
                 indicator_id=indicator_id,
             ).delete()
+            indicator = Indicator.objects.get(id=indicator_id)
+            indicator.tags_weight = sum(tag.weight for tag in tags)
+            indicator.save()
 
-            for tag in new_tags:
+            for tag in tags:
                 IndicatorTagRelationship.objects.create(
                     indicator_id=indicator_id,
-                    tag_id=tag,
+                    tag_id=tag.id,
                 )
 
             create_indicator_activity({

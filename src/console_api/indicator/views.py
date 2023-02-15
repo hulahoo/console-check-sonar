@@ -34,6 +34,7 @@ from console_api.services import (
     get_indicator_logging_data,
     get_sort_by_param,
 )
+from console_api.config.logger_config import logger
 from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.indicator.constants import LOG_SERVICE_NAME
 
@@ -341,9 +342,12 @@ class ChangeIndicatorTagsView(APIView):
             )
 
         new_tags = [int(tag) for tag in tags if tag != ""]
-        tags: List[Tag] = Tag.objects.filter(id__in=new_tags)
+        logger.info(f"New tags to add: {new_tags}")
 
-        if len(new_tags) != tags:
+        tags: List[Tag] = Tag.objects.filter(id__in=new_tags)
+        logger.info(f"Retrieved tags: {tags}")
+
+        if len(new_tags) != len(tags):
             return Response(
                 {"detail": "Tags wrong"},
                 status=status.HTTP_400_BAD_REQUEST,

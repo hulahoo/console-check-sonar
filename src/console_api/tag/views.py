@@ -20,6 +20,7 @@ from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
+    get_sort_by_param,
 )
 from console_api.tag.constants import LOG_SERVICE_NAME
 
@@ -29,6 +30,13 @@ class TagsView(APIView):
 
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+    queryset = Tag.objects.filter(deleted_at=None)
+
+    __SORT_BY_PARAMS = (
+        "title", "-title", "weight", "-weight", "created_at", "-created_at",
+        "updated_at", "-updated_at",
+    )
 
     def __create_post_log_entry(self, request: Request, tag_data: dict) -> None:
         """Create a log entry for POST method"""
@@ -75,10 +83,13 @@ class TagsView(APIView):
     def get(self, request: Request, *args, **kwargs) -> Response:
         """Return a list of tags"""
 
+        sort_by = get_sort_by_param(request)
+
+        if sort_by and sort_by in self.__SORT_BY_PARAMS:
+            self.queryset = self.queryset.order_by(sort_by)
+
         return get_response_with_pagination(
-            request=request,
-            objects=Tag.objects.filter(deleted_at=None),
-            serializer=TagsListSerializer,
+            request, self.queryset, TagsListSerializer
         )
 
 

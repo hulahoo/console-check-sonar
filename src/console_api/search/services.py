@@ -44,13 +44,17 @@ def get_detections_by_query(query: str) -> QuerySet:
     )
 
 
-def get_indicators_by_query(query: str) -> QuerySet:
+def get_indicators_by_query(query_type: str, value: str) -> QuerySet:
     """Return indicators found by query"""
 
-    return Indicator.objects.filter(
-        value__contains=query,
-        deleted_at=None,
+    indicators = Indicator.objects.filter(
+        value__contains=value, deleted_at=None
     )
+
+    if query_type == "file":
+        indicators = indicators.filter(ioc_type="hash")
+
+    return indicators
 
 
 def get_detections_search_results(detections: QuerySet) -> tuple:

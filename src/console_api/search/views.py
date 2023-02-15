@@ -7,7 +7,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+    HTTP_501_NOT_IMPLEMENTED,
+)
 
 from console_api.search.models import History
 from console_api.services import (
@@ -58,23 +62,31 @@ def search_detections_by_text_view(request: Request) -> Response:
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
-def search_indicators_by_text_view(request: Request) -> Response:
-    """Search indicators by text"""
+def search_indicators_view(request: Request) -> Response:
+    """Search indicators"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return get_creds_error_response()
 
     user, _ = CustomTokenAuthentication().authenticate(request)
 
-    query = request.GET.get("query")
+    query_type = request.GET.get("query-type")
+    value = request.GET.get("value")
 
-    if not query:
-        return get_search_query_error_response()
+    if not query_type or not value:
+        return Response(
+            {"detail": "query-type or value param not specified"},
+            status=HTTP_400_BAD_REQUEST,
+        )
 
-    indicators = get_indicators_by_query(query)
+    if query_type == "log-file":
+        return Response(status=HTTP_501_NOT_IMPLEMENTED)
 
-    fields = ("id", "value")
-    search_history = get_search_history(query, indicators, fields, user.id)
+    indicators = get_indicators_by_query(query_type, value)
+
+    search_history = get_search_history(
+        f"{query_type}, {value}", indicators, ("id", "value"), user.id
+    )
 
     search_results = get_indicators_search_results(indicators)
 

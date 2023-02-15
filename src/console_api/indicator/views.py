@@ -225,10 +225,12 @@ class IndicatorDetailView(APIView):
         """Change data of the indicator"""
 
         indicator_id = kwargs.get("indicator_id")
-        indicator = get_indicator_or_error_response(indicator_id)
-
-        if isinstance(indicator, Response):
-            return indicator
+        if not Indicator.objects.filter(id=indicator_id, deleted_at=None).exists():
+            return Response(
+                {"detail": f"Indicator with id {indicator_id} doesn't exists"},
+                status=HTTP_400_BAD_REQUEST,
+        )
+        indicator = Indicator.objects.get(id=indicator_id)
 
         prev_indicator_value = get_indicator_logging_data(indicator)
 

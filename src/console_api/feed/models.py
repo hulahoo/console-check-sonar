@@ -5,8 +5,8 @@ from django.db import models
 
 
 FEED_STATUSES = (
-    ("failed_to_update", "failed-to-update"),
-    ("is_loading", "is-loading"),
+    ("failed-to-update", "failed-to-update"),
+    ("is-loading", "is-loading"),
     ("normal", "normal"),
 )
 

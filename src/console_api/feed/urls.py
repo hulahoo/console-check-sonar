@@ -27,7 +27,7 @@ urlpatterns = [
         name="feed_preview",
     ),
 
-    # Update feed
+    # Update feed or delete
     path(
         "/<int:feed_id>",
         FeedUpdate.as_view(),

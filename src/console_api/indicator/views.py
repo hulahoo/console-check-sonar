@@ -229,7 +229,7 @@ class IndicatorDetailView(APIView):
             return Response(
                 {"detail": f"Indicator with id {indicator_id} doesn't exists"},
                 status=HTTP_400_BAD_REQUEST,
-        )
+            )
         indicator = Indicator.objects.get(id=indicator_id)
 
         prev_indicator_value = get_indicator_logging_data(indicator)

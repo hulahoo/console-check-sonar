@@ -148,6 +148,13 @@ class Feed(models.Model):
         auto_now=True,
     )
 
+    is_deleted = models.BooleanField(
+        "Статус удаления",
+        default=False
+    )
+    deleted_at = models.DateTimeField("Дата и время удаления")
+    deleted_by = models.BigIntegerField("Удалено пользователем")
+
     def __str__(self) -> str:
         return str(self.title)
 

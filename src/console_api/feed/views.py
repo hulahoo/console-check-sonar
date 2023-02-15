@@ -1,7 +1,6 @@
 """Views for feed app"""
 
 from datetime import datetime
-from os import environ
 from requests import get
 
 from django.conf import settings
@@ -16,7 +15,7 @@ from rest_framework.status import (
 )
 from rest_framework.generics import ListAPIView
 
-from console_api.feed.models import Feed
+from console_api.feed.models import Feed, IndicatorFeedRelationship
 from console_api.feed.serializers import (
     FeedSerializer,
     FeedsListSerializer,
@@ -181,3 +180,35 @@ class FeedUpdate(APIView):
         })
 
         return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request: Request, *args, **kwargs) -> Response:
+        feed_id = kwargs.get("feed_id")
+        now = datetime.now()
+
+        if not Feed.objects.filter(id=feed_id).exists():
+            return Response(
+                {"detail": f"Feed with id {feed_id} doesn't exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        feed = Feed.objects.get(id=feed_id)
+        try:
+            feed.is_active = False
+            feed.is_deleted = True
+            feed.deleted_at = now
+            feed.deleted_by = request.user.id
+            feed.save()
+            self.remove_indicator_feed_relationship(deleted_at=now, feed_id=feed.id)
+        except Exception as e:
+            return Response(
+                {"detail": f"Error occured while deleting feed: {e.args}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    @staticmethod
+    def remove_indicator_feed_relationship(deleted_at: datetime, feed_id: int):
+        IndicatorFeedRelationship.objects.filter(
+            feed_id=feed_id
+        ).update(
+            deleted_at=deleted_at
+        )

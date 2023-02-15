@@ -79,6 +79,11 @@ def search_indicators_view(request: Request) -> Response:
             status=HTTP_400_BAD_REQUEST,
         )
 
+    if query_type not in ("log-file", "file", "text"):
+        return Response(
+            {"detail": "Wrong query-type"}, status=HTTP_400_BAD_REQUEST
+        )
+
     if query_type == "log-file":
         return Response(status=HTTP_501_NOT_IMPLEMENTED)
 

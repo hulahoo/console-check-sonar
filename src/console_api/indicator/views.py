@@ -341,7 +341,7 @@ class ChangeIndicatorTagsView(APIView):
             )
 
         new_tags = [int(tag) for tag in tags if tag != ""]
-        tags: List[Tag] = Tag.objects.get(id__in=new_tags)
+        tags: List[Tag] = Tag.objects.filter(id__in=new_tags)
 
         if len(new_tags) != tags:
             return Response(

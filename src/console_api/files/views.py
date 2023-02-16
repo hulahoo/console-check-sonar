@@ -16,8 +16,8 @@ from console_api.services import (
 
 
 class FilesView(APIView):
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [CustomTokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request: Request, *args, **kwargs) -> Response:

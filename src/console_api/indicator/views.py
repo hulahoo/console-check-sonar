@@ -1,5 +1,6 @@
 """Views for detections app"""
 import requests
+from typing import List
 from datetime import datetime
 
 from django.conf import settings
@@ -33,6 +34,7 @@ from console_api.services import (
     get_indicator_logging_data,
     get_sort_by_param,
 )
+from console_api.config.logger_config import logger
 from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.indicator.constants import LOG_SERVICE_NAME
 
@@ -224,10 +226,12 @@ class IndicatorDetailView(APIView):
         """Change data of the indicator"""
 
         indicator_id = kwargs.get("indicator_id")
-        indicator = get_indicator_or_error_response(indicator_id)
-
-        if isinstance(indicator, Response):
-            return indicator
+        if not Indicator.objects.filter(id=indicator_id, deleted_at=None).exists():
+            return Response(
+                {"detail": f"Indicator with id {indicator_id} doesn't exists"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        indicator = Indicator.objects.get(id=indicator_id)
 
         prev_indicator_value = get_indicator_logging_data(indicator)
 
@@ -338,22 +342,29 @@ class ChangeIndicatorTagsView(APIView):
             )
 
         new_tags = [int(tag) for tag in tags if tag != ""]
+        logger.info(f"New tags to add: {new_tags}")
+
+        tags: List[Tag] = Tag.objects.filter(id__in=new_tags)
+        logger.info(f"Retrieved tags: {tags}")
+
+        if len(new_tags) != len(tags):
+            return Response(
+                {"detail": "Tags wrong"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if Indicator.objects.filter(id=indicator_id).exists():
-            if any(not Tag.objects.filter(id=tag).exists() for tag in new_tags):
-                return Response(
-                    {"detail": "Tags wrong"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
             IndicatorTagRelationship.objects.filter(
                 indicator_id=indicator_id,
             ).delete()
+            indicator = Indicator.objects.get(id=indicator_id)
+            indicator.tags_weight = sum(tag.weight for tag in tags)
+            indicator.save()
 
-            for tag in new_tags:
+            for tag in tags:
                 IndicatorTagRelationship.objects.create(
                     indicator_id=indicator_id,
-                    tag_id=tag,
+                    tag_id=tag.id,
                 )
 
             create_indicator_activity({

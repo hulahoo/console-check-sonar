@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "console_api.search.apps.SearchConfig",
     "console_api.platform_settings.apps.PlatformSettingsConfig",
     "console_api.context_sources.apps.ContextSourcesConfig",
+    "console_api.files.apps.FilesConfig",
 ]
 
 DJANGO_MIDDLEWARE = [

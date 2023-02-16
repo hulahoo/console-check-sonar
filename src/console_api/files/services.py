@@ -19,13 +19,7 @@ def update_key_with_ts(file_name: str) -> str:
 
 def get_hash(file_content):
 
-    file_hash_md5 = hashlib.md5()
-    file_hash_md5.update(file_content)
-
-    file_hash_sha1 = hashlib.sha1()
-    file_hash_sha1.update(file_content)
-
     file_hash_sha256 = hashlib.sha256()
     file_hash_sha256.update(file_content)
 
-    return file_hash_md5.hexdigest(),file_hash_sha1.hexdigest(),file_hash_sha256.hexdigest()
+    return file_hash_sha256.hexdigest()

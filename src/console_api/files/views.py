@@ -33,22 +33,22 @@ class FilesView(APIView):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             content = request.FILES['file'].read()
-            hash_md5, hash_sha1, hash_sha256 = get_hash(content)
+            hash_sha256 = get_hash(content)
             key = update_key_with_ts(key + '_' + request.FILES['file'].name)
             instance = Files(
                 content=content,
                 key=key,
                 bucket=bucket,
-                hash_md5=hash_md5,
-                hash_sha1=hash_sha1,
+                hash_md5=hash_sha256,
+                hash_sha1=hash_sha256,
                 hash_sha256=hash_sha256)
             instance.save()
 
             return Response(status=HTTP_201_CREATED,
                             data={'file-size': request.FILES['file'].size,
                                   'file-name': key,
-                                  'hash-md5': hash_md5,
-                                  'hash-sha1': hash_sha1,
+                                  'hash-md5': hash_sha256,
+                                  'hash-sha1': hash_sha256,
                                   'hash-sha256': hash_sha256}
                             )
         else:

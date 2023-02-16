@@ -111,7 +111,7 @@ class ProvidersListView(ListAPIView):
     def list(self, request: Request, *args, **kwargs) -> Response:
         """Return list with providers"""
 
-        feeds = Feed.objects.all().order_by("provider").distinct("provider")
+        feeds = Feed.objects.filter(is_deleted=False).order_by("provider").distinct("provider")
 
         return Response([feed.provider for feed in feeds], status=HTTP_200_OK)
 

@@ -1,5 +1,4 @@
 """Models for indicator app"""
-
 from uuid import uuid4
 
 from django.db import models
@@ -205,7 +204,7 @@ class Indicator(models.Model):
         tags = (
             Tag.objects.get(id=relationship.tag_id)
             for relationship in IndicatorTagRelationship.objects.filter(
-                indicator_id=self.id,
+                indicator_id=self.id, is_deleted=False
             )
         )
 

@@ -13,8 +13,9 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 
-from console_api.tag.models import Tag
-from console_api.tag.services import get_new_tag_id
+from console_api.config.logger_config import logger
+from console_api.tag.models import Tag, IndicatorTagRelationship
+from console_api.tag.services import get_new_tag_id, calculate_tags_weight
 from console_api.services import create_audit_log_entry, get_not_fields_error
 from console_api.tag.serializers import TagCreateSerializer, TagsListSerializer
 from console_api.services import (
@@ -101,7 +102,7 @@ class DeleteOrUpdateTagView(APIView):
 
     def delete(self, request: Request, *args, **kwargs) -> Response:
         """Mark the tag as deleted"""
-
+        now = datetime.now()
         tag_id = kwargs.get("tag_id")
 
         if not Tag.objects.filter(id=tag_id, deleted_at=None).exists():
@@ -121,7 +122,7 @@ class DeleteOrUpdateTagView(APIView):
             "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
         }
 
-        tag.deleted_at = datetime.now()
+        tag.deleted_at = now
         tag.save()
 
         create_audit_log_entry(request, {
@@ -141,8 +142,25 @@ class DeleteOrUpdateTagView(APIView):
                 "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
             },
         })
-
+        self.delete_tag_indicator_relationship(deleted_at=now, tag_id=tag_id)
+        self.recalculate_indicator_tags_weight(tag_id=tag_id, updated_at=now, request=request)
         return Response(status=HTTP_200_OK)
+
+    @staticmethod
+    def recalculate_indicator_tags_weight(tag_id: int, updated_at: datetime, request: Request):
+        calculate_tags_weight(tag_id=tag_id, updated_at=updated_at, request=request)
+        logger.info("Indicator tags_weight recalculated")
+
+    @staticmethod
+    def delete_tag_indicator_relationship(deleted_at: datetime, tag_id: int, request: Request):
+        IndicatorTagRelationship.objects.filter(
+            tag_id=tag_id
+        ).update(
+            deleted_at=deleted_at,
+            deleted_by=request.user.id,
+            is_deleted=True
+        )
+        logger.info("Indicator tag relationship deleted")
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         tag_id = kwargs.get("tag_id")

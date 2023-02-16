@@ -15,6 +15,7 @@ from rest_framework.status import (
 )
 from rest_framework.generics import ListAPIView
 
+from console_api.config.logger_config import logger
 from console_api.feed.models import Feed, IndicatorFeedRelationship
 from console_api.feed.serializers import (
     FeedSerializer,
@@ -85,7 +86,7 @@ class FeedUpdateFrequency(APIView):
             "object_name": "Feed",
             "description": f"Set frequency for feeds update to: {request.data.get('delay', 0)}min",
         })
-
+        logger.info(f"Income data: {request.data}")
         return self.handler(data=request.data)
 
     def get(self, request: Request, *args, **kwargs) -> Response:

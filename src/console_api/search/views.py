@@ -70,12 +70,12 @@ def search_indicators_view(request: Request) -> Response:
 
     user, _ = CustomTokenAuthentication().authenticate(request)
 
-    query_type = request.GET.get("query-type")
+    query_type = request.GET.get("query-type", "text")
     value = request.GET.get("value")
 
-    if not query_type or not value:
+    if not value:
         return Response(
-            {"detail": "query-type or value param not specified"},
+            {"detail": "value param not specified"},
             status=HTTP_400_BAD_REQUEST,
         )
 

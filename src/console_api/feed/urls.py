@@ -6,6 +6,7 @@ from console_api.feed.views import (
     FeedPreview,
     FeedView,
     FeedUpdate,
+    FeedUpdateFrequency,
     FeedsLastUpdateView,
     ProvidersListView,
     UpdateFeedsNowView,
@@ -19,7 +20,11 @@ urlpatterns = [
         UpdateFeedsNowView.as_view(),
         name="update_now",
     ),
-
+    path(
+        "/current-frequency",
+        FeedUpdateFrequency.as_view(),
+        name="set-frequency-update"
+    ),
     # Feed preview
     path(
         "/feed-preview",

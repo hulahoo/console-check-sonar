@@ -1,5 +1,4 @@
 """Models for indicator app"""
-import json
 from uuid import uuid4
 
 from django.db import models
@@ -164,7 +163,7 @@ class Indicator(models.Model):
     @property
     def get_context(self) -> dict:
         context = dict()
-        for key in json.loads(self.context):
+        for key in self.context:
             context = self.context[key]
         return context
 

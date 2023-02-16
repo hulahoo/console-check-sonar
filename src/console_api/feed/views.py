@@ -71,7 +71,7 @@ class FeedUpdateFrequency(APIView):
     def handler(self, data: dict) -> Response:
         if not data:
             with get(self.frequency_url) as response:
-                logger.info(f"Response for frequency: raw {response.raw}{response}")
+                logger.info(f"Response for frequency: raw {response.raw}{response.__dict__}")
                 response.raise_for_status()
                 return Response(response, status=HTTP_200_OK)
         else:

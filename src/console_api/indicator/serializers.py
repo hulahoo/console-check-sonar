@@ -153,6 +153,7 @@ class IndicatorDetailSerializer(serializers.ModelSerializer):
             "is-false-positive": {"source": "is_false_positive"},
             "is-sending-to-detections": {"source": "is_sending_to_detections"},
             "created-at": {"source": "created_at"},
+            "context": {"source": "get_context"},
             "updated-at": {"source": "updated_at"},
             "ioc-weight": {"source": "weight"},
             "tags": {"source": "tags_ids"},

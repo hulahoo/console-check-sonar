@@ -1,5 +1,4 @@
 """Models for indicator app"""
-
 from uuid import uuid4
 
 from django.db import models
@@ -162,13 +161,20 @@ class Indicator(models.Model):
         return tuple(data)
 
     @property
+    def get_context(self) -> dict:
+        context = dict()
+        for key in self.context:
+            context = self.context[key]
+        return context
+
+    @property
     def activities(self) -> tuple:
         """Return tuple of activities that linked with the indicator"""
 
         return (
             {
                 "type": activity.activity_type,
-                "details": [tag.get("id") for tag in self.tags_ids],
+                "details": activity.details or {},
                 "created-at": activity.created_at,
             }
             for activity in IndicatorActivities.objects.filter(
@@ -205,7 +211,7 @@ class Indicator(models.Model):
         tags = (
             Tag.objects.get(id=relationship.tag_id)
             for relationship in IndicatorTagRelationship.objects.filter(
-                indicator_id=self.id,
+                indicator_id=self.id, is_deleted=False
             )
         )
 

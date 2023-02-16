@@ -6,7 +6,7 @@ from console_api.statistics.views import (
     checked_objects_view,
     detected_objects_view,
     detected_indicators_view,
-    feeds_intersection_view,
+    FeedsIntersectionView,
     FeedsStatisticView,
     FeedForceUpdateStatistics,
     indicators_statistic_view,
@@ -41,12 +41,13 @@ urlpatterns = [
     ),
     path(
         "/feeds-intersections",
-        feeds_intersection_view,
+        FeedsIntersectionView.as_view(),
         name="feeds_intersections",
     ),
     path(
         "/feeds-force-update",
         FeedForceUpdateStatistics.as_view(),
-        name="feeds-force-update-statistics"
-    )
+        name="feeds-force-update-statistics",
+    ),
+
 ]

@@ -3,7 +3,7 @@
 from django.urls import path
 
 from console_api.search.views import (
-    search_indicators_by_text_view,
+    search_indicators_view,
     search_detections_by_text_view,
     search_history_view,
     SearchTagsView,
@@ -17,8 +17,9 @@ urlpatterns = [
         name="history",
     ),
     path(
-        "/indicators/by-text",
-        search_indicators_by_text_view,
+        "/indicators",
+        search_indicators_view,
+
         name="by_text",
     ),
     path(

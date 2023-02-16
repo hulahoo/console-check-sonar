@@ -7,7 +7,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+    HTTP_501_NOT_IMPLEMENTED,
+)
 
 from console_api.search.models import History
 from console_api.services import (
@@ -58,23 +62,47 @@ def search_detections_by_text_view(request: Request) -> Response:
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
-def search_indicators_by_text_view(request: Request) -> Response:
-    """Search indicators by text"""
+def search_indicators_view(request: Request) -> Response:
+    """Search indicators"""
 
     if not CustomTokenAuthentication().authenticate(request):
         return get_creds_error_response()
 
     user, _ = CustomTokenAuthentication().authenticate(request)
 
-    query = request.GET.get("query")
+    query_type = request.GET.get("query-type", "text")
 
-    if not query:
-        return get_search_query_error_response()
+    if query_type == "log-file":
+        return Response(status=HTTP_501_NOT_IMPLEMENTED)
+    elif query_type == "hashes":
+        values = request.GET.get("values")
 
-    indicators = get_indicators_by_query(query)
+        if not values:
+            return Response(
+                {"detail": "values param not specified"},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
-    fields = ("id", "value")
-    search_history = get_search_history(query, indicators, fields, user.id)
+        values = values.replace("[", "").replace("]", "").replace(" ", "")
+        values = values.split(",")
+    elif query_type == "text":
+        if value := request.GET.get("value"):
+            values = [value]
+        else:
+            return Response(
+                {"detail": "value param not specified"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+    else:
+        return Response(
+            {"detail": "Wrong query-type"}, status=HTTP_400_BAD_REQUEST
+        )
+
+    indicators = get_indicators_by_query(query_type, values)
+
+    search_history = get_search_history(
+        f"{query_type}, {values}", indicators, ("id", "value"), user.id
+    )
 
     search_results = get_indicators_search_results(indicators)
 

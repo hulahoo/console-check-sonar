@@ -44,13 +44,22 @@ def get_detections_by_query(query: str) -> QuerySet:
     )
 
 
-def get_indicators_by_query(query: str) -> QuerySet:
+def get_indicators_by_query(query_type: str, values: list) -> QuerySet:
     """Return indicators found by query"""
 
-    return Indicator.objects.filter(
-        value__contains=query,
-        deleted_at=None,
+    indicators = Indicator.objects.filter(
+        value__icontains=values[0], deleted_at=None
     )
+
+    for val in values[1:]:
+        indicators |= Indicator.objects.filter(
+            value__icontains=val, deleted_at=None
+        )
+
+    if query_type == "hashes":
+        indicators = indicators.filter(ioc_type="hash")
+
+    return indicators
 
 
 def get_detections_search_results(detections: QuerySet) -> tuple:

@@ -67,7 +67,8 @@ class IndicatorQueryMixin:
                 total_detected_counter=total_detected_counter
             )
 
-    def add_boolean_filters(self, request: Request) -> None:
+    def add_boolean_filters(self, request: Request, is_archived: bool) -> None:
+
         """Filter the queryset"""
 
         is_sending_to_detections = get_filter_query_param(
@@ -82,12 +83,11 @@ class IndicatorQueryMixin:
                 is_sending_to_detections=is_sending_to_detections
             )
 
-        if is_false_positive:
-            is_false_positive = get_boolean_from_str(is_false_positive)
+        if not is_false_positive:
+            is_false_positive = is_archived
 
-            self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
-        else:
-            self.queryset = self.queryset.filter(is_false_positive=False)
+        self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
+
 
     def add_weight_filters(self, request: Request) -> None:
         """Filter the queryset"""

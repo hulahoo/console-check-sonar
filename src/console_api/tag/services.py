@@ -29,11 +29,12 @@ def calculate_tags_weight(tag_id: int, updated_at: datetime, request: Request):
         tags_weight=max(tag.weight for tag in tags) / 100 if tags else 0,
         updated_at=updated_at
     )
-    create_indicator_activity(
-        {
-            "indicator_id": rel.indicator_id,
-            "activity_type": "update-indicator-tags-weight",
-            "created_by": request.user.id,
-            "details": request.data.get("details"),
-        } for rel in relationship
-    )
+    for rel in relationship:
+        create_indicator_activity(
+            {
+                "indicator_id": rel.indicator_id,
+                "activity_type": "update-indicator-tags-weight",
+                "created_by": request.user.id,
+                "details": request.data.get("details"),
+            }
+        )

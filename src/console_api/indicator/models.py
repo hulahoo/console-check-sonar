@@ -167,7 +167,7 @@ class Indicator(models.Model):
         return (
             {
                 "type": activity.activity_type,
-                "details": activity.details,
+                "details": activity.details or {},
                 "created-at": activity.created_at,
             }
             for activity in IndicatorActivities.objects.filter(

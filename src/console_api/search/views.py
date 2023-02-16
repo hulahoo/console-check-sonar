@@ -71,26 +71,37 @@ def search_indicators_view(request: Request) -> Response:
     user, _ = CustomTokenAuthentication().authenticate(request)
 
     query_type = request.GET.get("query-type", "text")
-    value = request.GET.get("value")
 
-    if not value:
-        return Response(
-            {"detail": "value param not specified"},
-            status=HTTP_400_BAD_REQUEST,
-        )
+    if query_type == "log-file":
+        return Response(status=HTTP_501_NOT_IMPLEMENTED)
+    elif query_type == "hashes":
+        values = request.GET.get("values")
 
-    if query_type not in ("log-file", "file", "text"):
+        if not values:
+            return Response(
+                {"detail": "values param not specified"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        values = values.replace("[", "").replace("]", "").replace(" ", "")
+        values = values.split(",")
+    elif query_type == "text":
+        if value := request.GET.get("value"):
+            values = [value]
+        else:
+            return Response(
+                {"detail": "value param not specified"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+    else:
         return Response(
             {"detail": "Wrong query-type"}, status=HTTP_400_BAD_REQUEST
         )
 
-    if query_type == "log-file":
-        return Response(status=HTTP_501_NOT_IMPLEMENTED)
-
-    indicators = get_indicators_by_query(query_type, value)
+    indicators = get_indicators_by_query(query_type, values)
 
     search_history = get_search_history(
-        f"{query_type}, {value}", indicators, ("id", "value"), user.id
+        f"{query_type}, {values}", indicators, ("id", "value"), user.id
     )
 
     search_results = get_indicators_search_results(indicators)

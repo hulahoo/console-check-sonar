@@ -1,5 +1,6 @@
 """Views for feed app"""
 
+import json
 from datetime import datetime
 from requests import get, post
 
@@ -68,14 +69,13 @@ class FeedUpdateFrequency(APIView):
     permission_classes = [IsAuthenticated]
     frequency_url = f"{settings.FEEDS_IMPORTING_SERVICE_URL}/api/current-frequency"
 
-    def handler(self, data: dict) -> Response:
+    def handler(self, data: str) -> Response:
         if not data:
             with get(self.frequency_url) as response:
-                logger.info(f"Response for frequency: raw {response.raw}{response.__dict__}")
                 response.raise_for_status()
-                return Response(response, status=HTTP_200_OK)
+                return Response(json.loads(response.content), status=HTTP_200_OK)
         else:
-            with post(self.frequency_url, data=data) as response:
+            with post(self.frequency_url, json=data) as response:
                 response.raise_for_status()
                 return Response(status=HTTP_201_CREATED)
 
@@ -87,8 +87,8 @@ class FeedUpdateFrequency(APIView):
             "object_name": "Feed",
             "description": f"Set frequency for feeds update to: {request.data.get('delay', 0)}min",
         })
-        logger.info(f"Income data: {request.data}")
-        return self.handler(data=request.data)
+        logger.info(f"Income data: {json.dumps(request.data)}")
+        return self.handler(data=json.dumps(request.data))
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         create_audit_log_entry(request, {

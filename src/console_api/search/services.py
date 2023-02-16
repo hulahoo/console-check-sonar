@@ -46,15 +46,10 @@ def get_detections_by_query(query: str) -> QuerySet:
 
 def get_indicators_by_query(query_type: str, value: str) -> QuerySet:
     """Return indicators found by query"""
-    from console_api.config.logger_config import logger
-
-    logger.debug(Indicator.objects.count())
-    logger.debug(value)
 
     indicators = Indicator.objects.filter(
         value__icontains=value, deleted_at=None
     )
-    logger.debug(indicators.count())
 
     if query_type == "file":
         indicators = indicators.filter(ioc_type="hash")

@@ -16,8 +16,8 @@ from console_api.services import (
 
 
 class FilesView(APIView):
-    authentication_classes = [CustomTokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [CustomTokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
@@ -47,7 +47,7 @@ class FilesView(APIView):
                 bucket=bucket,
                 hash_md5=hash_md5,
                 hash_sha1=hash_sha1,
-                hash_sha256=hash_sha256),
+                hash_sha256=hash_sha256)
             instance.save()
 
             return Response(status=HTTP_201_CREATED,

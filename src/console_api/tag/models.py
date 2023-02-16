@@ -64,6 +64,13 @@ class IndicatorTagRelationship(models.Model):
         "Дата и время создания",
         auto_now_add=True,
     )
+    created_by = models.BigIntegerField()
+    is_deleted = models.BooleanField(
+        "Удалена ли связь",
+        default=False
+    )
+    deleted_at = models.DateField("Дата удаления")
+    deleted_by = models.BigIntegerField("Кем удалена связь")
 
     class Meta:
         """Metainformation about the model"""

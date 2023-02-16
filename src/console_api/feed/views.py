@@ -1,7 +1,7 @@
 """Views for feed app"""
 
 from datetime import datetime
-from requests import get
+from requests import get, post
 
 from django.conf import settings
 from rest_framework import status
@@ -10,11 +10,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import (
-    HTTP_200_OK,
+    HTTP_200_OK, HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
 from rest_framework.generics import ListAPIView
 
+from console_api.config.logger_config import logger
 from console_api.feed.models import Feed, IndicatorFeedRelationship
 from console_api.feed.serializers import (
     FeedSerializer,
@@ -60,6 +61,47 @@ class UpdateFeedsNowView(APIView):
         return Response(status=HTTP_200_OK)
 
 
+class FeedUpdateFrequency(APIView):
+    """Set global frequency for feeds update"""
+
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    frequency_url = f"{settings.FEEDS_IMPORTING_SERVICE_URL}/api/current-frequency"
+
+    def handler(self, data: dict) -> Response:
+        if not data:
+            with get(self.frequency_url) as response:
+                logger.info(f"Response for frequency: raw {response.raw}{response.__dict__}")
+                response.raise_for_status()
+                return Response(response, status=HTTP_200_OK)
+        else:
+            with post(self.frequency_url, data=data) as response:
+                response.raise_for_status()
+                return Response(status=HTTP_201_CREATED)
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        create_audit_log_entry(request, {
+            "table": "Feeds-importing-worker",
+            "event_type": "update-feeds",
+            "object_type": "feed",
+            "object_name": "Feed",
+            "description": f"Set frequency for feeds update to: {request.data.get('delay', 0)}min",
+        })
+        logger.info(f"Income data: {request.data}")
+        return self.handler(data=request.data)
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        create_audit_log_entry(request, {
+            "table": "Feeds-importing-worker",
+            "event_type": "update-feeds",
+            "object_type": "feed",
+            "object_name": "Feed",
+            "description": "Get frequency update detail"
+        })
+
+        return self.handler(data=request.data)
+
+
 class ProvidersListView(ListAPIView):
     """List with feeds providers"""
 
@@ -69,7 +111,7 @@ class ProvidersListView(ListAPIView):
     def list(self, request: Request, *args, **kwargs) -> Response:
         """Return list with providers"""
 
-        feeds = Feed.objects.all().order_by("provider").distinct("provider")
+        feeds = Feed.objects.filter(is_deleted=False).order_by("provider").distinct("provider")
 
         return Response([feed.provider for feed in feeds], status=HTTP_200_OK)
 
@@ -104,7 +146,7 @@ class FeedView(APIView):
     def get(self, request: Request, *args, **kwargs) -> Response:
         return get_response_with_pagination(
             request=request,
-            objects=Feed.objects.all(),
+            objects=Feed.objects.filter(is_deleted=False),
             serializer=FeedsListSerializer,
         )
 
@@ -198,7 +240,7 @@ class FeedUpdate(APIView):
             feed.deleted_at = now
             feed.deleted_by = request.user.id
             feed.save()
-            self.remove_indicator_feed_relationship(deleted_at=now, feed_id=feed.id)
+            self.delete_indicator_feed_relationship(deleted_at=now, feed_id=feed.id)
         except Exception as e:
             return Response(
                 {"detail": f"Error occured while deleting feed: {e.args}"},
@@ -210,7 +252,7 @@ class FeedUpdate(APIView):
         )
 
     @staticmethod
-    def remove_indicator_feed_relationship(deleted_at: datetime, feed_id: int):
+    def delete_indicator_feed_relationship(deleted_at: datetime, feed_id: int):
         IndicatorFeedRelationship.objects.filter(
             feed_id=feed_id
         ).update(

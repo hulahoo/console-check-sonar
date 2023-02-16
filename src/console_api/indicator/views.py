@@ -358,7 +358,7 @@ class ChangeIndicatorTagsView(APIView):
                 indicator_id=indicator_id,
             ).delete()
             indicator = Indicator.objects.get(id=indicator_id)
-            indicator.tags_weight = sum(tag.weight for tag in tags)
+            indicator.tags_weight = max(tag.weight for tag in indicator.tags) / 100
             indicator.save()
 
             for tag in tags:

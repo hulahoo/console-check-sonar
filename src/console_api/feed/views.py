@@ -61,7 +61,6 @@ class UpdateFeedsNowView(APIView):
 
         return Response(status=HTTP_200_OK)
 
-
 class FeedUpdateFrequency(APIView):
     """Set global frequency for feeds update"""
 

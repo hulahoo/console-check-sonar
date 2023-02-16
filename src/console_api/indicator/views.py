@@ -1,6 +1,8 @@
 """Views for detections app"""
 import requests
+
 from typing import List
+
 from datetime import datetime
 
 from django.conf import settings
@@ -34,6 +36,7 @@ from console_api.services import (
     get_indicator_logging_data,
     get_sort_by_param,
 )
+
 from console_api.config.logger_config import logger
 from console_api.tag.models import Tag, IndicatorTagRelationship
 from console_api.indicator.constants import LOG_SERVICE_NAME

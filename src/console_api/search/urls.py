@@ -19,6 +19,7 @@ urlpatterns = [
     path(
         "/indicators",
         search_indicators_view,
+
         name="by_text",
     ),
     path(

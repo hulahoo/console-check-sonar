@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from requests import get
+
 from typing import Union
 
 from django.conf import settings
@@ -19,6 +20,7 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
     HTTP_500_INTERNAL_SERVER_ERROR,
 )
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -38,6 +40,7 @@ from console_api.statistics.services import (
 )
 from console_api.services import CustomTokenAuthentication
 from console_api.mixins import get_boolean_from_str
+
 
 
 class FeedsStatisticView(generics.ListAPIView):
@@ -240,5 +243,20 @@ class FeedForceUpdateStatistics(APIView):
             return Response(
                 {"detail": str(error)}, status=HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+    return Response(status=200, data=result)
+
+
+class FeedForceUpdateStatistics(APIView):
+    authentication_classes = [CustomTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        feeds_update_statistics = f"{settings.FEEDS_IMPORTING_SERVICE_URL}/api/force-update/statistics"
+        try:
+            response = requests.get(feeds_update_statistics)
+        except Exception as error:
+            return Response({"detail": str(error)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(response, status=HTTP_200_OK)

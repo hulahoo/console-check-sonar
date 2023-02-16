@@ -68,6 +68,7 @@ class IndicatorQueryMixin:
             )
 
     def add_boolean_filters(self, request: Request, is_archived: bool) -> None:
+
         """Filter the queryset"""
 
         is_sending_to_detections = get_filter_query_param(
@@ -86,6 +87,7 @@ class IndicatorQueryMixin:
             is_false_positive = is_archived
 
         self.queryset = self.queryset.filter(is_false_positive=is_false_positive)
+
 
     def add_weight_filters(self, request: Request) -> None:
         """Filter the queryset"""

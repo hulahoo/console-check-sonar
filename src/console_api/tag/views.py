@@ -142,7 +142,7 @@ class DeleteOrUpdateTagView(APIView):
                 "deleted_at": str(tag.deleted_at) if tag.deleted_at else tag.deleted_at,
             },
         })
-        self.delete_tag_indicator_relationship(deleted_at=now, tag_id=tag_id)
+        self.delete_tag_indicator_relationship(deleted_at=now, tag_id=tag_id, request=request)
         self.recalculate_indicator_tags_weight(tag_id=tag_id, updated_at=now, request=request)
         return Response(status=HTTP_200_OK)
 

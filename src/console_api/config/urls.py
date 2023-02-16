@@ -15,7 +15,6 @@ from console_api.system.views import (
 )
 from console_api.users.views import CustomAuthTokenView, DeleteAuthTokenView
 
-
 schema_view = get_schema_view(
     openapi.Info(
         title="Console API",
@@ -31,6 +30,7 @@ schema_view = get_schema_view(
         path("api/tag/", include("console_api.tag.urls")),
         path("api/detections/", include("console_api.detections.urls")),
         path("api/indicators/", include("console_api.indicator.urls")),
+        path("api/files/", include("console_api.files.urls")),
     ],
 )
 
@@ -58,6 +58,7 @@ urlpatterns = [
     path("api/search", include("console_api.search.urls")),
     path("api/platform-settings", include("console_api.platform_settings.urls")),
     path("api/context-sources", include("console_api.context_sources.urls")),
+    path("api/files", include("console_api.files.urls")),
 ]
 
 if settings.DEBUG:

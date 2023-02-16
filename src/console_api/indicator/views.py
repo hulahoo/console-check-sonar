@@ -70,7 +70,7 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
 
         self.add_queryset_filters(request=request)
         self.add_counter_queryset_filters(request=request)
-        self.add_boolean_filters(request=request)
+        self.add_boolean_filters(request, bool(is_archived))
         self.add_weight_filters(request=request)
         self.add_queryset_at_time_filters(request=request)
 

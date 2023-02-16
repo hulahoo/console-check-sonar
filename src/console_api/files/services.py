@@ -11,8 +11,10 @@ def get_time_prefix() -> int:
 
 def update_key_with_ts(file_name: str) -> str:
     file_name = file_name.split('.')
-    file_name = file_name[0] + '_' + str(get_time_prefix()) + '.' + file_name[1]
-    return file_name
+    updated_file_name = file_name[0] + '_' + str(get_time_prefix())
+    if len(file_name) == 2:
+        updated_file_name = updated_file_name + '.' + file_name[1]
+    return updated_file_name
 
 
 def get_hash(file_content):

@@ -47,7 +47,7 @@ class FilesView(APIView):
                 bucket=bucket,
                 hash_md5=hash_md5,
                 hash_sha1=hash_sha1,
-                hash_sha256=hash_sha256),
+                hash_sha256=hash_sha256)
             instance.save()
 
             return Response(status=HTTP_201_CREATED,

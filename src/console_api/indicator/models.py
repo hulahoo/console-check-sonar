@@ -163,8 +163,10 @@ class Indicator(models.Model):
     @property
     def get_context(self) -> dict:
         context = dict()
-        for key in self.context:
-            context = self.context[key]
+        if self.context:
+            for key in self.context:
+                context = self.context[key]
+            return context
         return context
 
     @property

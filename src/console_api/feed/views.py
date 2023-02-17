@@ -88,7 +88,7 @@ class FeedUpdateFrequency(APIView):
             "description": f"Set frequency for feeds update to: {request.data.get('delay', 0)}min",
         })
         logger.info(f"Income data: {json.dumps(request.data)}")
-        return self.handler(data=json.dumps(request.data))
+        return self.handler(data=request.data)
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         create_audit_log_entry(request, {

@@ -78,4 +78,4 @@ class AuditLogs(Model):
         verbose_name = "Журнал действий пользователя"
         verbose_name_plural = "Журналы действий пользователя"
 
-        ordering = ["service_name"]
+        ordering = ["-created_at"]

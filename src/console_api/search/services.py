@@ -16,6 +16,7 @@ from console_api.indicator.models import Indicator
 from console_api.search.serializers import SearchHistorySerializer
 from console_api.users.models import User
 from console_api.feed.models import Feed
+from console_api.config.logger_config import logger
 
 
 def get_search_history(
@@ -85,6 +86,9 @@ def get_detections_search_results(detections: QuerySet) -> tuple:
 
 def get_indicators_search_results(indicators: QuerySet) -> tuple:
     """Return search indicators results"""
+
+    for indicator in indicators:
+        logger.debug(indicator.feeds)
 
     return tuple(
         {

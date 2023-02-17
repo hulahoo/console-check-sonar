@@ -1,4 +1,5 @@
 """Views for search app"""
+from random import randint
 
 from django.core import serializers
 from django.views.decorators.http import require_http_methods
@@ -11,8 +12,11 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
     HTTP_501_NOT_IMPLEMENTED,
+    HTTP_404_NOT_FOUND,
+    HTTP_202_ACCEPTED
 )
 
+from console_api.files.models import Files
 from console_api.search.models import History
 from console_api.services import (
     CustomTokenAuthentication,
@@ -125,7 +129,6 @@ def search_history_view(request: Request) -> Response:
 
 
 class SearchTagsView(APIView):
-
     authentication_classes = [CustomTokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -171,3 +174,58 @@ class SearchTagsView(APIView):
                     ],
                 },
             )
+
+
+@api_view(["GET"])
+@require_http_methods(["GET"])
+def file_search_job_status(request: Request, *args, **kwargs) -> Response:
+    if not CustomTokenAuthentication().authenticate(request):
+        return get_creds_error_response()
+
+    job_id = request.GET.get("job-id")
+
+    return Response(status=HTTP_200_OK, data={'status': f'{job_id} in progress'})
+
+
+@api_view(["GET"])
+@require_http_methods(["GET"])
+def file_search_job_result(request: Request, *args, **kwargs) -> Response:
+    if not CustomTokenAuthentication().authenticate(request):
+        return get_creds_error_response()
+
+    job_id = request.GET.get("job-id")
+    checked_obj = randint(100, 10000)
+    detection = randint(checked_obj / 5, checked_obj / 2)
+
+    return Response(status=HTTP_200_OK, data={'job-id': job_id,
+                                              'checked-obj': checked_obj,
+                                              'detection': detection})
+
+
+@api_view(["POST"])
+@require_http_methods(["POST"])
+def file_search_start_job(request: Request, *args, **kwargs) -> Response:
+    if not CustomTokenAuthentication().authenticate(request):
+        return get_creds_error_response()
+
+    key = request.POST.get("key")
+    bucket = request.POST.get("bucket")
+
+    instance = Files.objects.get(key=key, bucket=bucket)
+    if not instance:
+        return Response(status=HTTP_404_NOT_FOUND, data='File not found')
+
+    job_id = randint(1, 1000)
+
+    return Response(status=HTTP_202_ACCEPTED, data={'job_id': job_id})
+
+
+@api_view(["POST"])
+@require_http_methods(["POST"])
+def file_search_stop_job(request: Request, *args, **kwargs) -> Response:
+    if not CustomTokenAuthentication().authenticate(request):
+        return get_creds_error_response()
+
+    job_id = request.POST.get("job_id")
+
+    return Response(status=HTTP_200_OK, data={'job_id': job_id})

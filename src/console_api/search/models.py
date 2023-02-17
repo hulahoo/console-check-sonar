@@ -36,3 +36,6 @@ class History(models.Model):
     created_by = models.BigIntegerField(
         "Кто запросил поиск",
     )
+
+    class Meta:
+        ordering = ["-created_at"]

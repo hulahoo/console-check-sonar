@@ -261,7 +261,7 @@ class IndicatorDetailView(APIView):
         """Return info about the indicator"""
 
         indicator_id = kwargs.get("indicator_id")
-        if not Indicator.objects.filter(id=indicator_id, deleted_at=None).exists():
+        if not Indicator.objects.filter(id=indicator_id).exists():
             return Response(
                 {"detail": f"Indicator with id {indicator_id} doesn't exists"},
                 status=HTTP_400_BAD_REQUEST,

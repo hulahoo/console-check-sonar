@@ -69,7 +69,9 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
                     is_archived=is_archived,
                 )
         else:
-            self.queryset = self.queryset.filter(deleted_at=None)
+            self.queryset = self.queryset.filter(
+                deleted_at=None, is_archived=False
+            )
 
         self.add_queryset_filters(request=request)
         self.add_counter_queryset_filters(request=request)
@@ -264,10 +266,12 @@ class IndicatorDetailView(APIView):
         """Return info about the indicator"""
 
         indicator_id = kwargs.get("indicator_id")
-        indicator = get_indicator_or_error_response(indicator_id)
-
-        if isinstance(indicator, Response):
-            return indicator
+        if not Indicator.objects.filter(id=indicator_id).exists():
+            return Response(
+                {"detail": f"Indicator with id {indicator_id} doesn't exists"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        indicator = Indicator.objects.get(id=indicator_id)
 
         return Response(
             data=IndicatorDetailSerializer(indicator).data,

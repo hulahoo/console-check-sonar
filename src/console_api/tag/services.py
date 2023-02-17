@@ -24,7 +24,7 @@ def calculate_tags_weight(tag_id: int, updated_at: datetime, request: Request):
     relationship: List[IndicatorTagRelationship] = IndicatorTagRelationship.objects.filter(
         tag_id=tag_id, is_deleted=False
     )
-    tags: List[Tag] = Tag.objects.filter(id__in=[tag.tag_id for tag in relationship])
+    tags: List[Tag] = Tag.objects.filter(id__in=[tag.tag_id for tag in relationship if not tag.is_deleted])
     Indicator.objects.filter(id__in=[indicator.indicator_id for indicator in relationship]).update(
         tags_weight=max(tag.weight for tag in tags) / 100 if tags else 0,
         updated_at=updated_at

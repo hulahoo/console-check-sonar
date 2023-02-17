@@ -24,6 +24,6 @@ def execute() -> None:
             "gunicorn",
             "-b 0.0.0.0:8080",
             "console_api.config.wsgi:application",
-            "--workers=4",
+            "--workers=6",
         ])
     )

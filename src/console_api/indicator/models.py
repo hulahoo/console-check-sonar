@@ -136,14 +136,15 @@ class Indicator(models.Model):
 
         super().save(*args, **kwargs)
 
-    @property
-    def feeds(self) -> tuple:
+    def get_feeds(self, is_all=False) -> tuple:
         """Return tuple of feeds that linked with the indicator"""
 
         indicators_feeds = IndicatorFeedRelationship.objects.filter(
             indicator_id=self.id,
-            deleted_at=None,
         )
+
+        if not is_all:
+            indicators_feeds.filter(deleted_at=None)
 
         data = []
 
@@ -160,11 +161,15 @@ class Indicator(models.Model):
 
         return tuple(data)
 
+    feeds = property(get_feeds)
+
     @property
     def get_context(self) -> dict:
         context = dict()
-        for key in self.context:
-            context = self.context[key]
+        if self.context:
+            for key in self.context:
+                context = self.context[key]
+            return context
         return context
 
     @property

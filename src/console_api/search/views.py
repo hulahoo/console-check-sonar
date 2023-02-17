@@ -1,6 +1,9 @@
 """Views for search app"""
 from random import randint
 
+
+from urllib import parse
+
 from django.core import serializers
 from django.views.decorators.http import require_http_methods
 from rest_framework.views import APIView
@@ -21,6 +24,7 @@ from console_api.search.models import History
 from console_api.services import (
     CustomTokenAuthentication,
     get_response_with_pagination,
+    get_sort_by_param,
 )
 from console_api.search.serializers import (
     SearchHistorySerializer,
@@ -87,7 +91,11 @@ def search_indicators_view(request: Request) -> Response:
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        values = values.replace("[", "").replace("]", "").replace(" ", "")
+        values = parse.unquote(values)
+
+        values = values.replace("[", "").replace("]", "").replace(
+            " ", ""
+        ).replace('"', '')
         values = values.split(",")
     elif query_type == "text":
         if value := request.GET.get("value"):
@@ -121,10 +129,13 @@ def search_history_view(request: Request) -> Response:
     if not CustomTokenAuthentication().authenticate(request):
         return get_creds_error_response()
 
+    queryset = History.objects.all()
+
+    if sort_by := get_sort_by_param(request):
+        queryset = queryset.order_by(sort_by)
+
     return get_response_with_pagination(
-        request,
-        History.objects.all(),
-        SearchHistoryListSerializer,
+        request, queryset, SearchHistoryListSerializer
     )
 
 

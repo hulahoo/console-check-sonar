@@ -86,12 +86,12 @@ def get_detections_search_results(detections: QuerySet) -> tuple:
 def get_indicators_search_results(indicators: QuerySet) -> tuple:
     """Return search indicators results"""
 
-    return (
+    return tuple(
         {
             "id": indicator.id,
             "feed-name": feed.get("name"),
             "feed-provider": feed.get("provider"),
-            "context": indicator.context,
+            "context": indicator.context or {},
         }
         for indicator in indicators
         for feed in indicator.feeds

@@ -36,11 +36,22 @@ def get_search_history(
 def get_detections_by_query(query: str) -> QuerySet:
     """Return detections found by query"""
 
-    return Detection.objects.filter(
-        Q(source__contains=query)
-        | Q(source_message__contains=query)
-        | Q(detection_message__contains=query)
-    )
+    detections = list(Detection.objects.filter(
+        Q(source__icontains=query)
+        | Q(detection_message__icontains=query)
+        | Q(source_message__icontains=query)
+        | Q(source_event__icontains=query)
+        | Q(detection_event__icontains=query)
+    ))
+
+    detections_2 = [
+        detect for detect in Detection.objects.all()
+        if query in detect.feeds_names
+    ]
+
+    detections.extend(detections_2)
+
+    return detections
 
 
 def get_indicators_by_query(query_type: str, values: list) -> QuerySet:

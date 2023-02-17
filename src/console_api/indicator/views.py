@@ -66,7 +66,9 @@ class IndicatorsView(ModelViewSet, IndicatorQueryMixin):
                     is_archived=is_archived,
                 )
         else:
-            self.queryset = self.queryset.filter(deleted_at=None)
+            self.queryset = self.queryset.filter(
+                deleted_at=None, is_archived=False
+            )
 
         self.add_queryset_filters(request=request)
         self.add_counter_queryset_filters(request=request)

@@ -1,5 +1,8 @@
 """Views for search app"""
 
+
+from urllib import parse
+
 from django.core import serializers
 from django.views.decorators.http import require_http_methods
 from rest_framework.views import APIView
@@ -83,7 +86,11 @@ def search_indicators_view(request: Request) -> Response:
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        values = values.replace("[", "").replace("]", "").replace(" ", "")
+        values = parse.unquote(values)
+
+        values = values.replace("[", "").replace("]", "").replace(
+            " ", ""
+        ).replace('"', '')
         values = values.split(",")
     elif query_type == "text":
         if value := request.GET.get("value"):

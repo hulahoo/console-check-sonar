@@ -89,7 +89,7 @@ def get_indicators_search_results(indicators: QuerySet) -> tuple:
             "context": indicator.context or {},
         }
         for indicator in indicators
-        for feed in indicator.feeds
+        for feed in indicator.get_feeds(is_all=True)
     )
 
 

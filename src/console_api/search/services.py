@@ -74,15 +74,15 @@ def get_detections_search_results(detections: QuerySet) -> tuple:
     return (
         {
             "id": detect.id,
-            "source": detect.source,
-            "source-message": detect.source_message,
-            "source-event": detect.source_event,
-            "details": detect.details,
+            "source": detect.source or "",
+            "source-message": detect.source_message or "",
+            "source-event": detect.source_event or {},
+            "details": detect.details or {},
             "indicator-id": detect.indicator_id,
-            "detection-event": detect.detection_event,
-            "detection-message": detect.detection_message,
-            "tags-weight": detect.tags_weight,
-            "indicator-weight": detect.indicator_weight,
+            "detection-event": detect.detection_event or {},
+            "detection-message": detect.detection_message or {},
+            "tags-weight": detect.tags_weight or 0,
+            "indicator-weight": detect.indicator_weight or 0,
             "created-at": detect.created_at,
         }
         for detect in detections

@@ -33,7 +33,6 @@ from console_api.search.services import (
     get_search_query_error_response,
     get_search_results_response,
 )
-from console_api.config.logger_config import logger
 
 
 @api_view(["GET"])
@@ -100,14 +99,12 @@ def search_indicators_view(request: Request) -> Response:
         )
 
     indicators = get_indicators_by_query(query_type, values)
-    logger.debug(indicators)
 
     search_history = get_search_history(
         f"{query_type}, {values}", indicators, ("id", "value"), user.id
     )
 
     search_results = get_indicators_search_results(indicators)
-    logger.debug(search_results)
 
     return get_search_results_response(search_history, search_results)
 

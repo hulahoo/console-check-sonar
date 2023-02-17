@@ -15,9 +15,8 @@ class History(models.Model):
         max_length=64,
     )
 
-    query_text = models.CharField(
+    query_text = models.TextField(
         "Содержимое текстового запроса",
-        max_length=255,
     )
 
     query_data = models.BinaryField(

@@ -1,5 +1,4 @@
 """Views for search app"""
-from random import randint
 import secrets
 
 

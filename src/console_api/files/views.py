@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_201_CREATED
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_201_CREATED, HTTP_404_NOT_FOUND
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from console_api.files.forms import UploadFileForm
@@ -25,7 +25,8 @@ class FilesView(APIView):
         bucket = kwargs.get("bucket")
 
         instance = Files.objects.get(key=key, bucket=bucket)
-
+        if not instance:
+            return Response(status=HTTP_404_NOT_FOUND, data='File not found')
         file_content = instance.content
 
         response = HttpResponse(file_content, content_type='application/octet-stream')

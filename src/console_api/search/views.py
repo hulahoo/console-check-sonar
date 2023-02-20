@@ -1,5 +1,6 @@
 """Views for search app"""
 from random import randint
+import secrets
 
 
 from urllib import parse
@@ -205,8 +206,8 @@ def file_search_job_result(request: Request, *args, **kwargs) -> Response:
         return get_creds_error_response()
 
     job_id = request.GET.get("job-id")
-    checked_obj = randint(100, 10000)
-    detection = randint(checked_obj / 5, checked_obj / 2)
+    checked_obj = secrets.randbelow(10000)
+    detection = secrets.randbelow(checked_obj / 2)
 
     return Response(status=HTTP_200_OK, data={'job-id': job_id,
                                               'checked-obj': checked_obj,
@@ -226,7 +227,7 @@ def file_search_start_job(request: Request, *args, **kwargs) -> Response:
     if not instance:
         return Response(status=HTTP_404_NOT_FOUND, data='File not found')
 
-    job_id = randint(1, 1000)
+    job_id = secrets.randbelow(1000)
 
     return Response(status=HTTP_202_ACCEPTED, data={'job_id': job_id})
 
